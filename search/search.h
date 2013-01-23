@@ -54,6 +54,7 @@ private:
 	int IsRepetition(sPosition *p);
 	int IsMoveOrdinary(int flagMoveType);
 	int Perft(sPosition *p, int ply, int depth);
+	int SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv);
 	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv);
 	int SetFutilityMargin(int depth);
 	int SetLmrDepth(int move, int movesTried);

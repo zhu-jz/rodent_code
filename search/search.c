@@ -79,7 +79,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 	 //if (rootDepth <= 6 * ONE_PLY) { alpha = -INF; beta = INF; }
     
 	// first use aspiration window around the value from the last completed depth
-	curVal = Search(p, 0, alpha, beta, rootDepth, PV_NODE, NO_NULL, 0, pv);
+	curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, NO_NULL, 0, pv);
 	if (flagAbortSearch) break;
 
 	// if score is outside the window, re-search
@@ -91,12 +91,12 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 		if (curVal >= beta)  beta  = val +3*delta;
 		if (curVal <= alpha) alpha = val -3*delta;
 
-		curVal = Search(p, 0, alpha, beta, rootDepth, PV_NODE, NO_NULL, 0, pv);
+		curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, NO_NULL, 0, pv);
         if (flagAbortSearch) break;
 
 		// the second window
 		if (curVal >= beta || curVal <= alpha) 
-            curVal = Search(p, 0, -INF, INF, rootDepth, PV_NODE, NO_NULL, 0, pv);
+            curVal = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, NO_NULL, 0, pv);
         if (flagAbortSearch) break;
 	}
 
@@ -109,8 +109,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 		Learner.WriteLearnData(p->hashKey, rootDepth, curVal);
 
 	// abort root search if we don't expect to finish the next iteration
-	if (Timer.FinishIteration() ) 
-	{
+	if (Timer.FinishIteration() ) {
 		if (Data.verbose) DisplaySavedIterationTime();
 		break; 
 	}
@@ -130,7 +129,7 @@ int sSearcher::VerifyValue(sPosition *p, int depth, int move)
   if (move != 0) Manipulator.DoMove(p, move, undoData);    
 
   for (rootDepth = ONE_PLY; rootDepth <= depth * ONE_PLY; rootDepth+=ONE_PLY)
-      val = Search(p, 0, -INF, INF, rootDepth, PV_NODE, NO_NULL, 0, pv);
+      val = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, NO_NULL, 0, pv);
 
   Data.isAnalyzing = 0;
 
@@ -140,7 +139,7 @@ int sSearcher::VerifyValue(sPosition *p, int depth, int move)
   return val;
 }
 
-int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv)
+int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv)
 {
   int best,                     // best value found at this node
 	  score,                    // score returned by a search started in this node
@@ -182,6 +181,150 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   if ( IsRepetition(p) && ply )                  return 0;
   if ( DrawBy50Moves(p) )                        return 0;
   if ( !flagInCheck && ply && RecognizeDraw(p) ) return 0;
+  
+  if (ply) *pv = 0;
+  move = 0;
+
+  // MATE DISTANCE PRUNING
+   alpha = Max(-MATE+ply, alpha);
+   beta  = Min( MATE-ply, beta);
+   if (alpha >= beta)
+       return alpha;
+
+  // TRANSPOSITION TABLE READ
+  // get transposition table score or at least get a move for sorting purposes
+
+  if (TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply))
+     return score;
+  
+  // safeguard against hitting max ply limit
+  if (ply >= MAX_PLY - 1) return Eval.Return(p, alpha, beta);
+
+  // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
+  if (nodeType == PV_NODE && !move && depth >= 4*ONE_PLY && !flagInCheck ) {
+	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, newPv);
+	  TransTable.RetrieveMove(p->hashKey, &move);
+  }
+
+  // CREATE MOVE LIST AND START SEARCHING
+  best = -INF;
+  Selector.InitMoves(p, move, ply);
+
+  // LOOP THROUGH THE MOVE LIST
+  while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) 
+  {
+	 // MAKE A MOVE
+	 Manipulator.DoMove(p, move, undoData);    
+	
+	 // UNDO ILLEGAL MOVES
+	 if (IllegalPosition(p)) { 
+	 	 Manipulator.UndoMove(p, move, undoData); 
+		 continue; 
+	 }
+
+     // MAKE RANDOM BLUNDERS IN WEAKENING MODE
+     if (Blunder(p, ply, depth, flagMoveType, move, lastMove, flagInCheck)
+     && (movesTried > 1  || blunderCount < 2 ) ) {
+	     blunderCount++;
+	     Manipulator.UndoMove(p, move, undoData); 
+	     continue; 
+     }
+
+	 movesTried++;                     // increase legal move count
+	 flagIsReduced  = 0;               // this move has not been reduced (yet)
+	 depthChange    = 0;               // no depth modification so far
+	 History.OnMoveTried(move);
+
+	 // EXTENSIONS might be placed here
+
+	 newDepth = depth - ONE_PLY + depthChange; // determine new depth
+
+	 // PRINCIPAL VARIATION SEARCH
+	 if (best == -INF )
+       score =   -Search(p, ply+1, -beta,    -alpha, newDepth, NEW_NODE(nodeType), NO_NULL, move, newPv);
+     else {
+       score =   -Search(p, ply+1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, newPv);
+       if (!flagAbortSearch && score > alpha && score < beta)
+         score = -Search(p, ply+1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, newPv);
+     }
+
+     Manipulator.UndoMove(p, move, undoData);
+
+	 if (!ply && nodeType == PV_NODE) Timer.SetData(FLAG_NO_FIRST_MOVE, 0);
+
+	 if (flagAbortSearch) return 0; // timeout, "stop" command or mispredicted ponder move
+
+     // BETA CUTOFF
+	 if (score >= beta) {
+		 IncStat(FAIL_HIGH);
+		 if (movesTried == 1) IncStat(FAIL_FIRST);
+         History.OnGoodMove(p, move, depth / ONE_PLY, ply);
+         TransTable.Store(p->hashKey, move, score, LOWER, depth, ply);
+         return score;
+     }
+
+	 // SCORE CHANGE
+     if (score > best) {
+         best = score;
+         if (score > alpha) {
+            alpha = score;
+            if (nodeType == PV_NODE) BuildPv(pv, newPv, move);
+		    if (!ply) DisplayPv(score, pv);
+         }
+      }
+   }
+  
+   // RETURN CORRECT CHECKMATE/STALEMATE SCORE
+   if (best == -INF) return flagInCheck ? -MATE + ply : 0;
+
+   // SAVE SEARCH RESULT IN TRANSPOSITION TABLE
+   if (*pv) {
+ 	 History.OnGoodMove(p, *pv, depth / ONE_PLY, ply);
+     TransTable.Store(p->hashKey, *pv, best, EXACT, depth, ply);
+   } else
+     TransTable.Store(p->hashKey, 0, best, UPPER, depth, ply);
+
+   return best;
+}
+
+int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv)
+{
+  int best,                     // best value found at this node
+	  score,                    // score returned by a search started in this node
+	  move,                     // a move we are searching right now
+	  depthChange,              // extension/reduction value
+	  newDepth,                 // depth of a new search started in this node
+	  newPv[MAX_PLY],           // new main line
+      flagMoveType;             // move type flag, supplied by NextMove()
+  sSelector Selector;           // an object responsible for maintaining move list and picking moves 
+    UNDO  undoData[1];          // data required to undo a move
+
+  // NODE INITIALIZATION
+  int nullScore      = 0;       // result of a null move search
+  int nullRefutation = 0;       // a capture that refuted a null move
+  int refutationSq   = NO_SQ;   // target square of that capture
+  int movesTried     = 0;       // count of moves that initiated new searches
+  int blunderCount   = 0;       // forces the engine to try one of the top moves in weakening mode
+  int nodeEval       = INVALID; // we have not called evaluation function at this node yet 
+  int flagIsReduced  = 0;       // are we in a reduced search? (guides re-searches)
+  int flagCanPrune   = 0;       // can we statically prune in this node
+  int flagInCheck    = InCheck(p); // are we in check at the beginning of the search?
+
+  // CHECK EXTENSION
+  if (flagInCheck) depth += ONE_PLY;
+	  // TODO: extend at low no. of replies (requires out of check / legal move generator)
+  
+  // QUIESCENCE SEARCH ENTRY POINT
+  if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, pv);
+
+  nodes++;
+  CheckInput();
+  
+  // EARLY EXIT / DRAW CONDITIONS
+  if ( flagAbortSearch )                  return 0;
+  if ( IsRepetition(p) )                  return 0;
+  if ( DrawBy50Moves(p) )                 return 0;
+  if ( !flagInCheck && RecognizeDraw(p) ) return 0;
 
   // REUSING LEARNED DATA ABOUT SCORE OF SPECIFIC POSITIONS
   if ( Data.useLearning 
@@ -397,7 +540,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 // PRINCIPAL VARIATION SEARCH
 	 if (best == -INF )
        score =   -Search(p, ply+1, -beta,    -alpha, newDepth, NEW_NODE(nodeType), NO_NULL, move, newPv);
-     else {
+     else { 
        score =   -Search(p, ply+1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, newPv);
        if (!flagAbortSearch && score > alpha && score < beta)
          score = -Search(p, ply+1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, newPv);
@@ -412,8 +555,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 }
 
      Manipulator.UndoMove(p, move, undoData);
-
-	 if (!ply && nodeType == PV_NODE) Timer.SetData(FLAG_NO_FIRST_MOVE, 0);
 
 	 if (flagAbortSearch) return 0; // timeout, "stop" command or mispredicted ponder move
 
