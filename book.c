@@ -592,6 +592,7 @@ void sBook::SortMainBook(void) {
 void sBook::FeedMainBook() 
 {
 	 sPosition * p;
+	 SetPosition(p, START_POS); // silencing compiler warning 
 	 printf("Feeding book moves for both sides\n");
 	 ReadMainBookFromOwnFile(p, "feed.txt", NO_CL);
 	 printf("\nFeeding book moves for white only\n");

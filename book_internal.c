@@ -17,17 +17,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// This file contains small, but self-sufficient opening book, somewhat
+// restricted  in  its choices. It is loaded when Rodent  doesn't  find
+// any other book in its folder.
+
 #include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include "timer.h"
 #include "rodent.h"
-#include "data.h"
-#include "parser.h"
-#include "selector.h"
-#include "trans.h"
-#include "search/search.h"
-#include "move/move.h"
 #include "book.h"
 
 void sBook::ReadInternalToGuideBook(sPosition *p)
