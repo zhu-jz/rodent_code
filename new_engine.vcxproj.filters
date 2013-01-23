@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="bitboard\bitboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="book.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="eval\eval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bitboard\gencache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="init.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="learn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="move\move.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rodent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="search\search.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="trans.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="attacks.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitboard\bb_fill.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitboard\bb_init_masks.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitboard\bb_init_mgen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitboard\bb_shift.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitboard\bitboard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="search\blunder.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="book.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="eval\eval.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="eval\eval_degrade.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="eval\eval_material.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="eval\eval_pawns.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="eval\eval_pieces.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="eval\eval_trapped.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitboard\gencache.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="hist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="learn.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="move\legal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="move\movedo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="move\moveundo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="parser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="search\perft.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bitboard\popcnt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pst.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="search\quiescence.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="search\recognize.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="search\report.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="search\search.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="selector.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="setboard.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="swap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="timer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="trans.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="book_internal.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
