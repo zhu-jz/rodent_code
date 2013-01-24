@@ -64,7 +64,10 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   int curVal;
   int alpha, beta, delta;
 
-  int localDepth = AdjustRootDepth(p); // get search depth (reducing it in case of one legal move)
+  rootList.Init(p);
+  int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
+  if (rootList.nOfMoves == 1) localDepth = 4 * ONE_PLY;
+
   Timer.SetIterationTiming();          // define additional rules for starting next iteration
   Data.InitAsymmetric(p->side);        // set asymmetric eval parameters, dependent on the side to move
   Timer.SetData(FLAG_ROOT_FAIL_LOW, 0);
@@ -123,6 +126,8 @@ int sSearcher::VerifyValue(sPosition *p, int depth, int move)
   int val = 0;
   UNDO  undoData[1];  // data required to undo a move
   int pv[MAX_PLY];
+
+  rootList.Init(p);
 
   Data.isAnalyzing = 1;
   isReporting = 0;
@@ -670,44 +675,4 @@ void sSearcher::CheckInput(void)
     && !Timer.IsInfiniteMode()
     && Timer.TimeHasElapsed() )
        flagAbortSearch = 1;
-}
-
-// Returns number of legal moves (in current form
-// it is computationally expensive and used at root only)
-
-int sSearcher::CountLegalMoves(sPosition *p, int cap)
-{
-    // TODO: ply as input variable
-    int move;
-    int moveCount = 0;
-    int unusedFlag;
-    sSelector Selector;
-    UNDO  undoData[1];       // data required to undo a move
-
-    Selector.InitMoves(p, 0, MAX_PLY); // prepare move selector
-
-    while ( move = Selector.NextMove(0, &unusedFlag) ) {
-
-	  Manipulator.DoMove(p, move, undoData);
-      if (IllegalPosition(p)) { 
-		  Manipulator.UndoMove(p, move, undoData); 
-		  continue; 
-	  }
-	  moveCount++;
-	  Manipulator.UndoMove(p, move, undoData);
-	  if (moveCount >= cap) return moveCount;
-    }
-    return moveCount;
-}
-
-int sSearcher::AdjustRootDepth(sPosition *p)
-{
-    // get search depth
-    int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
-
-    // reduce search depth if we have just one legal move
-    // (we want to have some hash draft, so we search to depth of 4 plies)
-    if (CountLegalMoves(p,3) < 2) localDepth = 4 * ONE_PLY;
-
-    return localDepth;
 }

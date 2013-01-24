@@ -261,3 +261,35 @@ int sSelector::MvvLva(sPosition *p, int move)
 
   return 5;
 }
+
+void sFlatMoveList::AddMove(int move)
+{
+	 moves[nOfMoves] = move;
+	 value[nOfMoves] = 256 - nOfMoves;
+	 nOfMoves++;
+}
+
+void sFlatMoveList::Init(sPosition * p)
+{
+	sSelector Selector;      // an object responsible for maintaining move list and picking moves 
+	int move;
+	int unusedFlag;
+    UNDO  undoData[1];       // data required to undo a move
+
+    Selector.InitMoves(p, 0, MAX_PLY); // prepare move selector
+	nOfMoves = 0;
+
+    while ( move = Selector.NextMove(0, &unusedFlag) ) {
+
+      Manipulator.DoMove(p, move, undoData);
+      if (IllegalPosition(p)) { 
+		  Manipulator.UndoMove(p, move, undoData); 
+		  continue; 
+	  }
+
+	  AddMove(move);
+	  Manipulator.UndoMove(p, move, undoData);
+
+	}
+
+}

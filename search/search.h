@@ -60,8 +60,6 @@ private:
 	int SetLmrDepth(int move, int movesTried);
 	int SetNullDepth(int depth);
 	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int *pv);
-	int CountLegalMoves(sPosition *p, int cap);
-	int AdjustRootDepth(sPosition *p);
 	int RecognizeDraw(sPosition *p);
 	int nodes;
 	int rootDepth;

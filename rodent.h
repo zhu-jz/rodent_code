@@ -155,10 +155,11 @@ typedef struct  // set of move lists subdivided into move classes
 
 typedef struct
 {
-  int move[MAX_MOVES];
+  int moves[MAX_MOVES];
   int value[MAX_MOVES];
   int nOfMoves;
   int currMoveIndex;
+  void Init(sPosition *p);
   void AddMove(int move);
   void Sort();
   void ScoreLastMove(int val);
