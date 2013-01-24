@@ -65,6 +65,7 @@ private:
 	int RecognizeDraw(sPosition *p);
 	int nodes;
 	int rootDepth;
+	sFlatMoveList rootList;
 public:
 	void Think(sPosition *, int *);
 	void ShowPerft(sPosition *p, int depth);

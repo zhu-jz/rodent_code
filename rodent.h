@@ -138,7 +138,7 @@ typedef struct
   U64 repetitionList[256];
 } sPosition;
 
-typedef struct  // move classifier
+typedef struct  // set of move lists subdivided into move classes
 {
   sPosition *p;
   int phase;
@@ -152,6 +152,18 @@ typedef struct  // move classifier
   int *badp;
   int bad[MAX_MOVES];
 } MOVES;
+
+typedef struct
+{
+  int move[MAX_MOVES];
+  int value[MAX_MOVES];
+  int nOfMoves;
+  int currMoveIndex;
+  void AddMove(int move);
+  void Sort();
+  void ScoreLastMove(int val);
+  int GetNextMove();
+} sFlatMoveList; // selector.c
 
 typedef struct 
 {
