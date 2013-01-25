@@ -17,10 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define KNIGHT_IN_HOLE    4
-#define BISHOP_IN_HOLE    4
-#define N_BLOCKS_C       15
-
 struct sPawnHashEntry {
   U64 pawnKey;
   int mgPawns;

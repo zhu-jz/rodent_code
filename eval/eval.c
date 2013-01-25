@@ -112,7 +112,7 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
 	  &&    ( bbPc(p, side, P) & SqBb(relativeSq[side][C2]) )
 	  &&    ( bbPc(p, side, P) & SqBb(relativeSq[side][D4]) )
 	  &&   !( bbPc(p, side, P) & SqBb(relativeSq[side][E4]) )
-	  ) score -= N_BLOCKS_C;
+	  ) score -= 15;
 
 	 return score;
  }
@@ -214,9 +214,8 @@ int sEvaluator::Return(sPosition *p, int alpha, int beta)
 
   // lazy evaluation - we avoid costly procedures
   // if score seems already very high/very low
-    if (temp_score > alpha - Data.lazyMargin 
-    &&  temp_score < beta +  Data.lazyMargin) 
-  {
+  if (temp_score > alpha - Data.lazyMargin 
+  &&  temp_score < beta +  Data.lazyMargin) {
 	  SetKingZones(p);
 	  InitDynamic(p);
 
@@ -337,8 +336,7 @@ void sEvaluator::DebugPst(sPosition *p) {
 	 int eg = 0;
 	 U64 bbPieces;
 
-	 for (int pc = 0; pc <= 5; pc++) 
-	 {
+	 for (int pc = 0; pc <= 5; pc++)  {
 	     bbPieces = bbPc(p, WHITE, pc);
 
 	     while (bbPieces) {
@@ -349,8 +347,7 @@ void sEvaluator::DebugPst(sPosition *p) {
 	     }
 	 }
 
-	 for (int pc = 0; pc <= 5; pc++) 
-	 {
+	 for (int pc = 0; pc <= 5; pc++)  {
 	     bbPieces = bbPc(p, BLACK, pc);
 
 	     while (bbPieces) {

@@ -158,8 +158,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	// evaluate rook on an open file
 	U64 bbFrontSpan = GetFrontSpan(SqBb(sq), side );
 
-	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) 
-	{
+	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {
 	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) 
 	   {
 		  AddMiscTwo(side, Data.rookOpenMg, Data.rookOpenEg);
@@ -322,7 +321,7 @@ void sEvaluator::AddMiscTwo(int side, int mg, int eg)
 
 void sEvaluator::ScoreOutpost(sPosition *p, int side, int piece, int sq) 
 {
-	// knight sits in a hole of enemy pawn structure
+	// piece sits in a hole of enemy pawn structure
 	if ( SqBb(sq) & ~bbPawnCanControl[Opp(side)] ) {
 		AddMiscOne(side, outpostBase[piece] );
 
