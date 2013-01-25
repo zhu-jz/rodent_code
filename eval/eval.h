@@ -74,6 +74,7 @@ private:
   void ScoreQ(sPosition *p, int side);
   void ScoreP(sPosition *p, int side);
   void ScoreK(sPosition *p, int side);
+  void ScoreOutpost(sPosition *p, int side, int piece, int sq);
   void ScoreHanging(sPosition *p, int side);
   int  EvalFileShelter(U64 bbOwnPawns, int side);
   int  EvalFileStorm(U64 bbOppPawns, int side);

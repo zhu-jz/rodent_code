@@ -22,7 +22,6 @@
 
 // TODO: Don't evaluate outposts when the opponent has less than 5 pawns
 
-#include <stdio.h>
 #include "../rodent.h"
 #include "../bitboard/bitboard.h"
 #include "../data.h"
@@ -60,6 +59,8 @@ The same is the case for all attacks at enemy king zone
   #define MINOR_ATTACKED_BY_P  -10
   #define MINOR_DEFENDED_BY_P    2
 
+  const int outpostBase[7] = {0, 4, 4, 0, 0, 0, 0};
+
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
   int sq;
@@ -78,14 +79,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	else 
     if ( SqBb(sq) & bbPawnControl[side] )  AddMiscOne(side, MINOR_DEFENDED_BY_P);
 
-	// knight sits in a hole of enemy pawn structure
-	if ( SqBb(sq) & ~bbPawnCanControl[Opp(side)] ) {
-		AddMiscOne(side, KNIGHT_IN_HOLE);
-
-	   // additional bonus if defended by a pawn
-	   if ( SqBb(sq) & bbPawnControl[side] ) 
-		   AddMiscOne(side, Data.outpostKnight[side][sq] );
-	}
+	ScoreOutpost(p, side, N, sq);
 
 	bbAttZone = bbControl & bbKingZone[side];    // king attacks
 	if (bbAttZone && p->pcCount[side][Q] ) 
@@ -115,14 +109,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	else 
     if ( SqBb(sq) & bbPawnControl[side] )  AddMiscOne(side, MINOR_DEFENDED_BY_P);
 
-	// bishop sits in a hole of enemy pawn structure
-	if ( SqBb(sq) & ~bbPawnCanControl[Opp(side)] ) {
-		AddMiscOne(side, BISHOP_IN_HOLE);
-
-	    // additional bonus if defended by a pawn
-		if ( SqBb(sq) & bbPawnControl[side] ) 
-           AddMiscOne(side, Data.outpostBishop[side][sq] );
-	}
+	ScoreOutpost(p, side, B, sq);
 
     // check threats
 	// (we may get false positive due to queen transparency, but it's ok)
@@ -163,11 +150,8 @@ void sEvaluator::ScoreR(sPosition *p, int side)
   while (bbPieces) {
     sq = FirstOne(bbPieces);
 
-	// rook sits in a hole of enemy pawn structure
-	if ( ( SqBb(sq) & ~bbPawnCanControl[Opp(side)] ) 
-	&&   ( SqBb(sq) & bbPawnControl[side] ) )
-		  AddMiscOne(side, Data.outpostRook[side][sq]);
-	
+	ScoreOutpost(p, side, R, sq);
+
 	bbControl = GenCache.GetRookMob(bbOccupied, sq);  // set control bitboard
 	bbAllAttacks[side] |= bbControl;
 
@@ -261,8 +245,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	   // count attacks
 	   bbAttZone = bbAttacks & bbKingZone[side];
 	   if (bbAttZone) 
-		   AddPieceAttack(side, att_Q[PopCntSparse(bbAttZone)] );
-	   
+		   AddPieceAttack(side, att_Q[PopCntSparse(bbAttZone)] );	   
 	}
 	
 	AddMobility(Q, side, PopCnt(bbControl) );
@@ -325,14 +308,26 @@ void sEvaluator::AddMobility( int pc, int side, int cnt)
 	egMobility[side] += Data.mobBonusEg [pc] [cnt];
 }
 
-void sEvaluator::AddMiscOne( int side, int val)
+void sEvaluator::AddMiscOne(int side, int val)
 {
 	mgMisc[side] += val;
 	egMisc[side] += val;
 }
 
-void sEvaluator::AddMiscTwo( int side, int mg, int eg)
+void sEvaluator::AddMiscTwo(int side, int mg, int eg)
 {
 	mgMisc[side] += mg;
 	egMisc[side] += eg;
+}
+
+void sEvaluator::ScoreOutpost(sPosition *p, int side, int piece, int sq) 
+{
+	// knight sits in a hole of enemy pawn structure
+	if ( SqBb(sq) & ~bbPawnCanControl[Opp(side)] ) {
+		AddMiscOne(side, outpostBase[piece] );
+
+	   // additional bonus if defended by a pawn
+	   if ( SqBb(sq) & bbPawnControl[side] ) 
+		   AddMiscOne(side, Data.outpost[side][piece][sq] );
+	}
 }
