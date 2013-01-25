@@ -52,35 +52,32 @@ void sBook::BookDoctor(sPosition * p) {
 	 int flagIsProblem = 0;
 	 printf("Book doctor launched. It looks for a line that might need Your decision and saves it to doctor.txt\n");
 	 
-	 for (int i = 0; i < 10000; i++ ) 
-	 {
+	 for (int i = 0; i < 10000; i++ ) {
 		 SetPosition(p, START_POS);
 		 printf("\n");
 		 fprintf(doctor_file, "\n");
-        for (;;)
-		{
-		 move = GetBookMove(p, 0, &flagIsProblem);
-		 if (move) { 
-			 Manipulator.DoMove(p, move, &u);
-             if (flagIsProblem) break; 
-	         printf("%c",File(Fsq(move)) + 'a');
-			 fprintf(doctor_file, "%c", File(Fsq(move)) + 'a');
-	         printf("%c",Rank(Fsq(move)) + '1');
-			 fprintf(doctor_file, "%c", Rank(Fsq(move)) + '1');
-             printf("%c",File(Tsq(move)) + 'a');
-			 fprintf(doctor_file, "%c", File(Tsq(move)) + 'a');
-	         printf("%c",Rank(Tsq(move)) + '1');
-			 fprintf(doctor_file, "%c", Rank(Tsq(move)) + '1');
-	         printf(" ");
-			 fprintf(doctor_file, " ");
+
+        for (;;) {
+		   move = GetBookMove(p, 0, &flagIsProblem);
+		   if (move) { 
+			  Manipulator.DoMove(p, move, &u);
+              if (flagIsProblem) break; 
+	          printf("%c",File(Fsq(move)) + 'a');
+			  fprintf(doctor_file, "%c", File(Fsq(move)) + 'a');
+	          printf("%c",Rank(Fsq(move)) + '1');
+			  fprintf(doctor_file, "%c", Rank(Fsq(move)) + '1');
+              printf("%c",File(Tsq(move)) + 'a');
+			  fprintf(doctor_file, "%c", File(Tsq(move)) + 'a');
+	          printf("%c",Rank(Tsq(move)) + '1');
+			  fprintf(doctor_file, "%c", Rank(Tsq(move)) + '1');
+	          printf(" ");
+			  fprintf(doctor_file, " ");
 		 }
 		 else break;
 		}
 		if (flagIsProblem) break;
 	 }
-
      fclose(doctor_file);
-
 }
 
 int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
@@ -221,51 +218,49 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 
 int sBook::PrintMissingMoves(sPosition *p)
 {
-      // detection of non-book moves leading to book positions
-      // TODO: separate function
-      sSelector Selector;
-	  UNDO undoData[1];
-	  int move = 0;
-	  int flagMoveType;
-	  int isProblem = 0;
+    // show non-book moves leading to book positions
+    sSelector Selector;
+	UNDO undoData[1];
+	int move = 0;
+	int flagMoveType;
+	int isProblem = 0;
 
-      Selector.InitMoves(p, move, MAX_PLY);
+    Selector.InitMoves(p, move, MAX_PLY);
 
-      // LOOP THROUGH THE MOVE LIST
-      while ( move = Selector.NextMove(0, &flagMoveType) ) {
+    // LOOP THROUGH THE MOVE LIST
+    while ( move = Selector.NextMove(0, &flagMoveType) ) {
 
-	     // MAKE A MOVE
-	     Manipulator.DoMove(p, move, undoData);    
+	   // MAKE A MOVE
+	   Manipulator.DoMove(p, move, undoData);    
 	
-	     // UNDO ILLEGAL MOVES
-	     if (IllegalPosition(p)) { 
-		    Manipulator.UndoMove(p, move, undoData); 
-		    continue; 
-	     }
+	   // UNDO ILLEGAL MOVES
+	   if (IllegalPosition(p)) { 
+		  Manipulator.UndoMove(p, move, undoData); 
+		  continue; 
+	   }
      
-		 for (int i = 0; i < nOfRecords; i++) 
-		 {
+	   for (int i = 0; i < nOfRecords; i++) 
+	   {
 		   if (myBook[i].hash == GetBookHash(p) ) {
 
-           int isUsed = 0;
-		   for (int j = 0; j < nOfChoices; j++) 
-		   {
-			   if (moves[j] == move) isUsed = 1;
-		   }
+              int isUsed = 0;
+		      for (int j = 0; j < nOfChoices; j++) 
+		      {
+			      if (moves[j] == move) isUsed = 1;
+		      }
 
-		   if (!isUsed) 
-		   {
-		      printf("info string missing ");
-			  isProblem = 1;
-		      MoveToStr(move, testString);
-		      printf( testString );
-		      printf("\n");
-		   }
-		   break;
-			 }
-		 }
+		      if (!isUsed) {
+		         printf("info string missing ");
+			     isProblem = 1;
+		         MoveToStr(move, testString);
+		         printf( testString );
+		         printf("\n");
+		      }
+		      break;
+	       }
+	   }
 
-	     Manipulator.UndoMove(p, move, undoData); 
+	   Manipulator.UndoMove(p, move, undoData); 
   }
 
   return isProblem;
@@ -296,8 +291,7 @@ void sBook::AddMoveToMainBook(U64 hashKey, int move, int val) {
 	for (int i = 0; i < nOfRecords; i++ ) 
 	{
          if ( myBook[i].hash == hashKey 
-		 &&   myBook[i].move == move) 
-		 {
+		 &&   myBook[i].move == move) {
 			 if (val == DELETE_MOVE) myBook[i].hash = 0;
 			 if (myBook[i].freq <= 20000 || val != 1) myBook[i].freq += val;
 			 return;
@@ -305,8 +299,7 @@ void sBook::AddMoveToMainBook(U64 hashKey, int move, int val) {
 	 }  
 
 	 // otherwise save it in the last slot
-	 if (val != DELETE_MOVE)
-	 {
+	 if (val != DELETE_MOVE) {
 	    myBook[nOfRecords].hash = hashKey;
 	    myBook[nOfRecords].move = move;
 	    myBook[nOfRecords].freq = val;
@@ -319,8 +312,7 @@ int sBook::IsMoveInBook(U64 hashKey, int move)
 	printf("nofrecords %d", nOfRecords);
 	if (nOfRecords == 0) return 0;
 
-	for (int i = 0; i < nOfRecords; i++ ) 
-	{
+	for (int i = 0; i < nOfRecords; i++ ) {
 		 if ( i % 1000 == 0) printf (" %d ", i); // fixing a heisenbug
          if ( myBook[i].hash == hashKey 
 			 &&   myBook[i].move == move) {
@@ -339,16 +331,14 @@ void sBook::AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor)
     
   SetPosition(p, START_POS);
 
-  for (;;) 
-  {
+  for (;;) {
     ptr = Parser.ParseToken(ptr, token);
 	  
     if (*token == '\0') break;
 
 	move = StrToMove(p, token);
       
-	if (IsLegal(p, move)) 
-	{
+	if (IsLegal(p, move)) {
 		// apply move frequency modifiers
 		freq = 1;
         if (strstr(token, "?")) freq = -100;
@@ -362,7 +352,7 @@ void sBook::AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor)
         
 		Manipulator.DoMove(p, move, u);
 	}
-	  else break;
+	else break;
 
     if (p->reversibleMoves == 0)
         p->head = 0;
@@ -378,16 +368,14 @@ void sBook::AddLineToMainBook(sPosition *p, char *ptr, int excludedColor)
     
   SetPosition(p, START_POS);
 
-  for (;;) 
-  {
+  for (;;) {
     ptr = Parser.ParseToken(ptr, token);
 	  
     if (*token == '\0') break;
 
 	move = StrToMove(p, token);
       
-	if (IsLegal(p, move)) 
-	{
+	if (IsLegal(p, move)) {
 		// apply move frequency modifiers
 		freq = 1;
         if (strstr(token, "?")) freq  = -100;
@@ -504,8 +492,7 @@ void sBook::SaveBookInOwnFormat(char *fileName) {
 	 FILE *book_file; 
 
      book_file = fopen(fileName,"a+"); 
-	 for (int i = 0; i < nOfRecords; i++ ) 
-	 {
+	 for (int i = 0; i < nOfRecords; i++ ) {
 		 if (myBook[i].hash != 0)
 		 fprintf(book_file, "%I64u, %d, %d \n", myBook[i].hash, myBook[i].move, myBook[i].freq);
 	 }
@@ -523,8 +510,7 @@ int sBook::ReadOwnBookFile(char *fileName)
 		 return 0;
 
       // ...else process book file line by line 
-	  while ( fgets(line, 250, book_file) ) 
-	  {
+	  while ( fgets(line, 250, book_file) ) {
 		  ParseBookEntry(line, nOfRecords);
 		  ++nOfRecords;
 	  }
@@ -538,8 +524,7 @@ void sBook::ParseBookEntry(char * ptr, int line_no) {
   char token[256];
   int token_no = 1;
 
-  for (;;) 
-  {
+  for (;;) {
     ptr = Parser.ParseToken(ptr, token);
 	if (token_no == 1) myBook[line_no].hash = atoull(token);
 	if (token_no == 2) myBook[line_no].move = atoi(token); 
@@ -555,30 +540,26 @@ void sBook::SortMainBook(void) {
 	int i, j, change;
 	sBookEntry tmp;
  
-  for (i=0; i<nOfRecords-1; ++i) 
-  {
+  for (i=0; i<nOfRecords-1; ++i) {
        if (i % 100 == 0 ) printf ("%d   \r", i);
 
        change=0;
        for (j=0; j<nOfRecords-1-i; j++)
        { 
 		   if (myBook[j+1].hash < myBook[j].hash // comparing neighbours
-		   || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) 
-		   )   
-          {  
+		   || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) ) {  
               tmp = myBook[j];      
               myBook[j] = myBook[j+1];
               myBook[j+1] = tmp;    // bubble goes up     
               change=1;
-          }
+           }
        }
        if(!change) break;      // no changes - book is sorted
 
        for (j=nOfRecords-2; j>1; j--)
        { 
 		   if (myBook[j+1].hash < myBook[j].hash // comparing neighbours
-		   || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) )   
-          {  
+		   || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) ) {  
               tmp = myBook[j];      
               myBook[j] = myBook[j+1];
               myBook[j+1] = tmp;    // bubble goes down     
