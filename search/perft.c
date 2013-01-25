@@ -69,7 +69,8 @@ NULL
 	}
 
 	int endTime = Timer.GetElapsedTime();
-	printf("%d nodes searched in %d\n", nodes, endTime);
+	U32 nps  = GetNps(nodes, endTime);
+	printf("%d nodes searched in %d, speed %u nps (Score: %.3f)\n", nodes, endTime, nps, (float)nps/430914.0);
 	DisplayStats();
 }
 
