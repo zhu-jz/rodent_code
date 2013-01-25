@@ -64,6 +64,7 @@ NULL
 		printf(test[i]);
 		SetPosition(p, test[i]);
 		printf("\n");
+		if (flagProtocol == PROTO_TXT) PrintTxtHeader();
 		Iterate(p, pv);
 	}
 

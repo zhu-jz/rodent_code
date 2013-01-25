@@ -46,11 +46,7 @@ void sSearcher::Think(sPosition *p, int *pv)
   pv[0] = Book.GetBookMove(p, 1, &flagBookProblem); 
 
   if (!pv[0] || !IsLegal(p, pv[0]) || Data.isAnalyzing) {
-	   if (flagProtocol == PROTO_TXT) {
-		   printf("---------------------------------------------------------------\n");
-		   printf("ply time     nodes  score pv\n");
-		   printf("---------------------------------------------------------------\n");
-	   }
+	   if (flagProtocol == PROTO_TXT) PrintTxtHeader();
       Iterate(p, pv); // TODO: switch search methodologies
       if (Data.panelStyle == PANEL_NORMAL) DisplaySettings();
   }

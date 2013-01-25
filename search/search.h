@@ -47,6 +47,7 @@ private:
 	void DisplaySettings(void);
 	void DisplaySavedIterationTime();
 	void DisplaySpeed(void);
+	void PrintTxtHeader(void);
 	U32  GetNps(int nodes, int time);
 
 	int DrawBy50Moves(sPosition *p);

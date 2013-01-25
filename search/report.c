@@ -138,3 +138,10 @@ U32 sSearcher::GetNps(int nodes, int time)
 
     return (U32)uNodes;
 }
+
+void sSearcher::PrintTxtHeader(void)
+{
+	 printf("---------------------------------------------------------------\n");
+	 printf("ply time      nodes  score pv\n");
+	 printf("---------------------------------------------------------------\n");
+}
