@@ -281,5 +281,5 @@ Classes:
 Structural decisions:
 
 - we use the same square ordering as Crafty and Stockfish (A1 = 0)
-- we DO NOT split Search function into root, pv and non-pv, 
+- we DO NOT split Search function into pv and non-pv, 
   since resulting complexity isn't worth small speed gain.

@@ -227,14 +227,6 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 		 continue; 
 	 }
 
-     // MAKE RANDOM BLUNDERS IN WEAKENING MODE
-     if (Blunder(p, ply, depth, flagMoveType, move, lastMove, flagInCheck)
-     && (movesTried > 1  || blunderCount < 2 ) ) {
-	     blunderCount++;
-	     Manipulator.UndoMove(p, move, undoData); 
-	     continue; 
-     }
-
 	 movesTried++;                     // increase legal move count
 	 flagIsReduced  = 0;               // this move has not been reduced (yet)
 	 depthChange    = 0;               // no depth modification so far
