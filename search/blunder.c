@@ -1,7 +1,6 @@
 #include "../rodent.h"
 #include "../data.h"
 #include "../move/move.h"
-#include "../bitboard/bitboard.h"
 #include "search.h"
 
 /*
@@ -11,16 +10,12 @@
 
 int sSearcher::Blunder(sPosition *p, int ply, int depth, int flag, int move, int lastMove, int flagInCheck) 
 {
-
 	// we're playing the best game we can, so don't bother with weakening
 	// (speed optimization)
 	if (Data.elo == MAX_ELO || !Data.useWeakening ) return 0;
 	
-    // Weaker levels progressively use more heuristics that disallow
-	// forgetting about certain moves. 
-
-	// try all root moves
-	if (!ply) return 0;
+    // Weaker levels progressively use more and more heuristics 
+	// that disallow forgetting about certain moves:
 
 	// try to capture the last piece that moved
 	if (Tsq(move) == Tsq(lastMove) && Data.elo > 999) return 0;
@@ -36,7 +31,7 @@ int sSearcher::Blunder(sPosition *p, int ply, int depth, int flag, int move, int
 	&& flag != FLAG_HASH_MOVE 
 	&& Data.elo > 1299 ) return 0;
 
-    // don't miss a queen promotion
+    // don't miss queen promotions
 	if ( MoveType(move) == Q_PROM && Data.elo > 1399) return 0;
 
 	// don't miss check evasions
@@ -49,20 +44,17 @@ int sSearcher::Blunder(sPosition *p, int ply, int depth, int flag, int move, int
 	||   (Data.elo > 1899 && ply < 4) 
 	||   (Data.elo > 2299 && ply < 5) ) return 0;
 
-    if (Data.elo > 1300 && Data.elo <= 1600 && ply < 3)
-	{
+    if (Data.elo > 1300 && Data.elo <= 1600 && ply < 3)  {
 		int saveRate = p->hashKey % 300;
 		if (saveRate > 1600 - Data.elo) return 0;
 	}
 
-    if (Data.elo > 1600 && Data.elo <= 1900 && ply < 4 )
-	{
+    if (Data.elo > 1600 && Data.elo <= 1900 && ply < 4 ) {
         int saveRate = p->hashKey % 300;
 		if (saveRate > 1900 - Data.elo) return 0;
 	}
 
-    if (Data.elo > 1900 && Data.elo <= 2300 && ply < 5 )
-	{
+    if (Data.elo > 1900 && Data.elo <= 2300 && ply < 5 ) {
         int saveRate = p->hashKey % 300;
 		if (saveRate > 2300 - Data.elo) return 0;
 	}
@@ -70,8 +62,7 @@ int sSearcher::Blunder(sPosition *p, int ply, int depth, int flag, int move, int
 	int blunderRate = p->hashKey % Data.elo;
 
 	if (flag == FLAG_KILLER_MOVE 
-	|| flag == FLAG_HASH_MOVE)
-	{
+	|| flag == FLAG_HASH_MOVE) {
        blunderRate *= 2;
 	   blunderRate *= Data.elo;
 	   blunderRate /= MAX_ELO;
@@ -81,5 +72,4 @@ int sSearcher::Blunder(sPosition *p, int ply, int depth, int flag, int move, int
 	if ( blunderRate + depth < MAX_ELO - Data.elo) return 1;
 
 	return 0;
-	
 }
