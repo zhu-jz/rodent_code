@@ -45,7 +45,9 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
   
   // EARLY EXIT CONDITIONS
   if (flagAbortSearch) return 0;
-  if (IsRepetition(p)) return 0;
+  if (!qDepth) {
+     if (IsRepetition(p)) return 0;
+  }
   // TODO: add draw detection
   
   *pv = 0;
