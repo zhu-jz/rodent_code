@@ -310,18 +310,18 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   // CHECK EXTENSION
   if (flagInCheck) depth += ONE_PLY;
 	  // TODO: extend at low no. of replies (requires out of check / legal move generator)
+
+  // EARLY EXIT / DRAW CONDITIONS
+  if ( flagAbortSearch )                  return 0;
+  if ( IsRepetition(p) )                  return 0;
+  if ( DrawBy50Moves(p) )                 return 0;
+  if ( !flagInCheck && RecognizeDraw(p) ) return 0;
   
   // QUIESCENCE SEARCH ENTRY POINT
   if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, pv);
 
   nodes++;
   CheckInput();
-  
-  // EARLY EXIT / DRAW CONDITIONS
-  if ( flagAbortSearch )                  return 0;
-  if ( IsRepetition(p) )                  return 0;
-  if ( DrawBy50Moves(p) )                 return 0;
-  if ( !flagInCheck && RecognizeDraw(p) ) return 0;
 
   // REUSING LEARNED DATA ABOUT SCORE OF SPECIFIC POSITIONS
   if ( Data.useLearning 
