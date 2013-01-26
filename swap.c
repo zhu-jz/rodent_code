@@ -24,17 +24,15 @@
 
 int Swap(sPosition *p, int from, int to)
 {
-  int side, ply, score[32];
-  U64 bbAttackers, bbOcupied, bbPieceType;
+  int score[32];
+  U64 bbPieceType;
 
-  int type  = TpOnSq(p, from);
-  int vType = TpOnSq(p, to);
-
-  bbAttackers = AttacksTo(p, to);
-
-  bbOcupied   = OccBb(p);
-  score[0]    = Data.matValue[TpOnSq(p, to)];
-  bbOcupied ^= SqBb(from);
+  int side        = side = Opp(p->side); 
+  int type        = TpOnSq(p, from);
+  U64 bbAttackers = AttacksTo(p, to);
+  U64 bbOcupied   = OccBb(p) ^ SqBb(from);         // clear moving piece
+  score[0]        = Data.matValue[TpOnSq(p, to)];  // set initial gain
+  int ply = 1;
 
   // update attacks through removed piece
   if ( type == P || type == B || type == Q)
@@ -43,14 +41,10 @@ int Swap(sPosition *p, int from, int to)
       bbAttackers |= (RAttacks(bbOcupied, to) & (p->bbTp[R] | p->bbTp[Q]));
   bbAttackers &= bbOcupied;
 
-  side = Opp(p->side);
-  ply = 1;
-
   while (bbAttackers & p->bbCl[side]) {
     
-	// safeguard for king captures
-	if (type == K) 
-	{
+	// safeguard against king captures
+	if (type == K) {
       score[ply++] = INF;
       break;
     }
@@ -62,7 +56,7 @@ int Swap(sPosition *p, int from, int to)
       if ((bbPieceType = bbPc(p, side, type) & bbAttackers))
         break;
 
-    bbOcupied ^= bbPieceType & -bbPieceType;
+    bbOcupied ^= bbPieceType & -bbPieceType; // remove attacker we have found
 
 	// update attacks through removed piece
 	if ( type == P || type == B || type == Q)
@@ -75,6 +69,7 @@ int Swap(sPosition *p, int from, int to)
     ply++;
   }
 
+  // now we go down the table and backpropagate the score
   while (--ply)
     score[ply - 1] = -Max(-score[ply - 1], score[ply]);
 
