@@ -17,10 +17,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include "bitboard/bitboard.h"
-#include "data.h"
 #include "rodent.h"
+
+const int swapVal[7] = {80, 325, 335, 500, 975, 0, 0};
 
 int Swap(sPosition *p, int from, int to)
 {
@@ -30,8 +30,8 @@ int Swap(sPosition *p, int from, int to)
   int side        = side = Opp(p->side); 
   int type        = TpOnSq(p, from);
   U64 bbAttackers = AttacksTo(p, to);
-  U64 bbOcupied   = OccBb(p) ^ SqBb(from);         // clear moving piece
-  score[0]        = Data.matValue[TpOnSq(p, to)];  // set initial gain
+  U64 bbOcupied   = OccBb(p) ^ SqBb(from);   // clear moving piece
+  score[0]        = swapVal[TpOnSq(p, to)];  // set initial gain
   int ply = 1;
 
   // update attacks through removed piece
@@ -49,14 +49,16 @@ int Swap(sPosition *p, int from, int to)
       break;
     }
 
-	score[ply] = -score[ply - 1] + Data.matValue[type];
+	// update score by the material gain of the next capture
+	score[ply] = -score[ply - 1] + swapVal[type];
     
 	// find the lowest attacker
 	for (type = P; type <= K; type++)
       if ((bbPieceType = bbPc(p, side, type) & bbAttackers))
         break;
 
-    bbOcupied ^= bbPieceType & -bbPieceType; // remove attacker we have found
+    // remove attacker we have just found
+	bbOcupied ^= bbPieceType & -bbPieceType; 
 
 	// update attacks through removed piece
 	if ( type == P || type == B || type == Q)
@@ -69,7 +71,7 @@ int Swap(sPosition *p, int from, int to)
     ply++;
   }
 
-  // now we go down the table and backpropagate the score
+  // now we go down the score table and backpropagate the score
   while (--ply)
     score[ply - 1] = -Max(-score[ply - 1], score[ply]);
 
