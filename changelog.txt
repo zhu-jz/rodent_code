@@ -1,3 +1,5 @@
+CHANGES AFTER 2013-01-23 recorded on GitHub, https://github.com/nescitus/rodent_code/commits/
+
 BEST GAUNTLET SCORE: 47,3%
 
 2013-01-20
@@ -66,6 +68,10 @@ BEST GAUNTLET SCORE: 47,3%
 
 - FAILED with simultaneous pawn pst change and attackable knight eval (44,2% / 2100 games)
 
+2012-12-xx
+
+- FAILED with razoring a la DiscoCheck (perhaps better qs would be needed)
+
 2012-12-30
 
 - aspiration window correction: 46,5% / 2000 games
@@ -114,6 +120,11 @@ BEST GAUNTLET SCORE: 47,3%
 - returning to work on Rodent
 - overnight gauntlet 15s/game: 45,3% / 2340 games
 - shrinking code initializing bad bishop mask (no functional change)
+
+2012-10-09
+
+- speedup due to different updating scheme of reversible moves counter (thx Kestutis Gasaitis!)
+- failed with Kestitis' suggestion that reduction of null move verification search is too big  
 
 2012-10-07
 
@@ -184,15 +195,25 @@ BEST GAUNTLET SCORE: 47,3%
 
 2012-08-22
 
-- PASSED narrowly with using hash information for sorting qs moves
+- PASSED narrowly with using hash information for sorting qs moves (thx Kestutis Gasaitis!)
 
 2012-08-21
 
 - FAILED with null move verification (but added Kestutis' ply bugfix)
 
+2012-08-18
+
+- FIXED side to move error that switched off black trapped bishop value
+
 2012-08-17
 
+- modified value returned by static null move /9thx Kestutis!)
 - book utility converting e2e4e7e5g1f3b8c6 into e2e4 e7e5 g1f3 b8c6
+
+16-08-2012
+
+- no TT save of a null move result if we already have a hash move (thx Kestutis Gasaitis!)
+- moved IID code after null move (doesn't matter right now, but improves future options, thx Kestutis)
 
 2012-08-14
 
@@ -206,6 +227,7 @@ BEST GAUNTLET SCORE: 47,3%
 - FAILED with no TT in QS: 27,3%
 - NO CHANGE, FAILED no delta pruning in PV QS nodes
 - FAILED adding pawn delta = 100: 27,6% (is it a NPS thing?)
+- FIXED sign error in Eval::Normalize() (thx Kestutis!)
 
 2012-08-06
 
