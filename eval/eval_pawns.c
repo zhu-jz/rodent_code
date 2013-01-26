@@ -29,8 +29,7 @@ void sEvaluator::EvalPawns(sPosition *p)
   int pawnHash = p->pawnKey % PAWN_HASH_SIZE;
 
   // try reading score from pawn hashtable
-  if ( PawnTT[pawnHash].pawnKey == p->pawnKey ) 
-  {
+  if ( PawnTT[pawnHash].pawnKey == p->pawnKey ) {
 	  mgScore += PawnTT[pawnHash].mgPawns;
 	  egScore += PawnTT[pawnHash].egPawns;
   }
@@ -39,8 +38,7 @@ void sEvaluator::EvalPawns(sPosition *p)
       PawnScore(p, WHITE); // pawn eval
       PawnScore(p, BLACK);  
 
-      if (bbPc(p, WHITE, P) & SqBb(D4)) 
-      {
+      if (bbPc(p, WHITE, P) & SqBb(D4)) {
           if (bbPc(p, WHITE, P) & SqBb(E3))  pawnScoreMg[WHITE] += CENT_DEFENSE;
           if (bbPc(p, WHITE, P) & SqBb(C3))  pawnScoreMg[WHITE] += CENT_DEFENSE;
       }
@@ -48,8 +46,7 @@ void sEvaluator::EvalPawns(sPosition *p)
       if (bbPc(p, WHITE, P) & SqBb(E4) && bbPc(p, WHITE, P) & SqBb(D3) ) 
          pawnScoreMg[WHITE] += CENT_DEFENSE;
 
-      if (bbPc(p, BLACK, P) & SqBb(D5)) 
-      {
+      if (bbPc(p, BLACK, P) & SqBb(D5)) {
          if (bbPc(p, BLACK, P) & SqBb(E6))  pawnScoreMg[BLACK] += CENT_DEFENSE;
          if (bbPc(p, BLACK, P) & SqBb(C6))  pawnScoreMg[BLACK] += CENT_DEFENSE;
       }
@@ -85,41 +82,36 @@ void sEvaluator::PawnScore(sPosition *p, int side)
 	flagIsPhalanx  = ShiftEast(SqBb(sq) ) & bbPc(p, side, P);
 	flagIsWeak     = ( ( bbPawnSupport[side][sq] & bbPc(p, side, P) ) == 0);
 
-	if (flagIsPhalanx) 
-	{
+	if (flagIsPhalanx) {
 		pawnScoreMg[side] += Data.phalanxMg[side][sq];
 		//pawnScoreEg[side] += Data.phalanxEg[side][sq];
 	}
 	
 	// doubled pawn
-	if ( bbFrontSpan & bbPc(p, side, P) ) 
-	{
+	if ( bbFrontSpan & bbPc(p, side, P) ) {
 	  pawnScoreMg[side] += Data.doubledPawnMg;
 	  pawnScoreEg[side] += Data.doubledPawnEg;
     }
 
-	if (flagIsOpen) 
-	{
+	if (flagIsOpen) {
 		U64 bbObstacles = bbPassedMask[side][sq] & bbPc(p, Opp(side), P);
 		
-	    if (!bbObstacles)  // passed pawn
-	    {
+	    // passed pawn
+		if (!bbObstacles) {
 	       pawnScoreMg[side] += Data.passersMg[side][sq];	  
            pawnScoreEg[side] += Data.passersEg[side][sq];	
 	    }
 
-	    if (flagIsPhalanx) // can be a candidate passer
-	    {
-		    if (PopCntSparse(bbObstacles) == 1) 
-			{
+	    // can be a candidate passer
+		if (flagIsPhalanx) {
+		    if (PopCntSparse(bbObstacles) == 1) {
            	    pawnScoreMg[side] += Data.candidateMg[side][sq];
                 pawnScoreEg[side] += Data.candidateEg[side][sq];
 		    }
 	    }
 	}
     
-	if (flagIsWeak)        // weak pawn
-	{
+	if (flagIsWeak) {
 		if (!(bbAdjacentMask[File(sq)] & bbPc(p, side, P))) // isolated
 		{ 
 		   pawnScoreMg[side] += Data.isolatedMg[side][sq];
