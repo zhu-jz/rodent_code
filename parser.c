@@ -228,8 +228,7 @@ void sParser::PrintUciOptions()
 	}
 
 	// normal user gets a list of predefined personalities of different playing strengths
-	if (Data.panelStyle == PANEL_NORMAL) 
-	{
+	if (Data.panelStyle == PANEL_NORMAL) {
 	   printf("option name Strength type combo");
 	   printf(Data.levelList);
 	   printf(" default GM\n");	   

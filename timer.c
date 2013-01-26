@@ -29,7 +29,8 @@
 #  include <sys/time.h>
 #endif
 
-void sTimer::Clear(void) {
+void sTimer::Clear(void) 
+{
   iterationTime = 999999000; // TODO: change it to real max_int
   SetData(MAX_DEPTH, MAX_PLY);
   moveTime = -1;
@@ -43,12 +44,13 @@ void sTimer::Clear(void) {
   SetData(MOVES_TO_GO, 40);
 }
 
-void sTimer::SetStartTime(void) {
+void sTimer::SetStartTime(void) 
+{
   startTime = GetMS();
 }
 
-void sTimer::SetMoveTiming(void) { // last change 2012-03-12: bugfix, constraints on maxMoveTime
-
+void sTimer::SetMoveTiming(void) // last change 2012-03-12: bugfix, constraints on maxMoveTime
+{ 
   if ( data[MOVE_TIME] ) {
 	 moveTime    = data[MOVE_TIME];
 	 maxMoveTime = moveTime;
@@ -58,6 +60,7 @@ void sTimer::SetMoveTiming(void) { // last change 2012-03-12: bugfix, constraint
   if (data[TIME] >= 0) {
      if (data[MOVES_TO_GO] == 1) data[TIME] -= Min(1000, data[TIME] / 10);
      moveTime = ( data[TIME] + data[INC] * ( data[MOVES_TO_GO] - 1)) / data[MOVES_TO_GO];
+	 // TODO: divide movetime if it's very low
 	 maxMoveTime = (moveTime * 3) / 2;
 
      if (moveTime    > data[TIME]) moveTime    = data[TIME];
@@ -71,13 +74,14 @@ void sTimer::SetMoveTiming(void) { // last change 2012-03-12: bugfix, constraint
   }
 }
 
-void sTimer::SetIterationTiming(void) {
-
+void sTimer::SetIterationTiming(void) 
+{
 	if (moveTime > 0) iterationTime = ( (moveTime * 3) / 4 );
 	else              iterationTime = 999999000;
 }
 
-int sTimer::FinishIteration(void) {
+int sTimer::FinishIteration(void) 
+{
     return (GetElapsedTime() >= iterationTime && !pondering);
 }
 
@@ -93,15 +97,18 @@ int sTimer::GetMS(void)
 #endif
 }
 
-int sTimer::GetElapsedTime(void) {
+int sTimer::GetElapsedTime(void) 
+{
     return (GetMS() - startTime);
 }
 
-int sTimer::GetSavedIterationTime(void) {
+int sTimer::GetSavedIterationTime(void) 
+{
     return ( moveTime - (GetMS() - startTime) );
 }
 
-int sTimer::IsInfiniteMode(void) {
+int sTimer::IsInfiniteMode(void) 
+{
     return( !(moveTime >= 0) );
 }
 
@@ -116,21 +123,24 @@ int sTimer::TimeHasElapsed(void) // 2013-01-03 node limit added
 	return (GetElapsedTime() >= moveTime);
 }
 
-int sTimer::GetData(int slot) {
+int sTimer::GetData(int slot) 
+{
     return data[slot];
 }
 
-void sTimer::SetData(int slot, int val) {
+void sTimer::SetData(int slot, int val) 
+{
     data[slot] = val;
 }
 
-void sTimer::SetSideData(int side) {
+void sTimer::SetSideData(int side) 
+{
      data[TIME] = side == WHITE ? GetData(W_TIME) : GetData(B_TIME);
      data[INC]  = side == WHITE ? GetData(W_INC)  : GetData(B_INC);
-
 }
 
-void sTimer::WasteTime(int miliseconds) {
+void sTimer::WasteTime(int miliseconds) 
+{
 #if defined(_WIN32) || defined(_WIN64)
     Sleep(miliseconds);
 #endif

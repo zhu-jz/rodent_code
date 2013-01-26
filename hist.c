@@ -33,8 +33,7 @@ void sHistory::OnNewSearch(void)
     for (j = 0; j < 64; j++)
       history[i][j] /= 16;
 
-  for (i = 0; i < MAX_PLY-2; i++) 
-  {
+  for (i = 0; i < MAX_PLY-2; i++) {
     killer[i][0] = killer[i+2][0];
     killer[i][1] = killer[i+2][1];
   }
@@ -52,8 +51,7 @@ void sHistory::OnNewGame(void)
     for (j = 0; j < 64; j++)
       history[i][j] = 0;
 
-  for (i = 0; i < MAX_PLY-2; i++) 
-  {
+  for (i = 0; i < MAX_PLY-2; i++) {
     killer[i][0] = 0;
     killer[i][1] = 0;
   }
@@ -85,8 +83,7 @@ void sHistory::OnGoodMove(sPosition *p, int move, int depth, int ply)
   history[p->pc[Fsq(move)]][Tsq(move)] += hist_change;
 
   // update killer moves
-  if (move != killer[ply][0])
-  {
+  if (move != killer[ply][0]) {
     killer[ply][1] = killer[ply][0];
     killer[ply][0] = move;
   }

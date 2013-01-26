@@ -29,30 +29,27 @@ void sLearner::Init(char *fileName)
 {
 	 FILE *learnFile; 
 	 char line[256];
-	 int lineNo = 0;
+	 learnSize = 0;
 
       // exit if learn file doesn't exist
 	  if ( (learnFile = fopen(fileName, "r")) == NULL ) 
 		 return;
-
      
 	 // TODO: read learn file line by line, increasing age of each entry
 	  	  while ( fgets(line, 256, learnFile) ) {
-		    ++lineNo;
-		    ParseLearnEntry(line, lineNo);
+		    ++learnSize;
+		    ParseLearnEntry(line, learnSize);
 	  }
 
-      learnSize = lineNo;
       fclose(learnFile);
 }
 
-void sLearner::ParseLearnEntry(char * ptr, int line_no) {
-
+void sLearner::ParseLearnEntry(char * ptr, int line_no) 
+{
   char token[256];
   int token_no = 1;
 
-  for (;;) 
-  {
+  for (;;) {
     ptr = Parser.ParseToken(ptr, token);
 	if (token_no == 1) learnData[line_no].hash = atoull(token);
 	if (token_no == 2) learnData[line_no].depth = atoi(token); 
@@ -71,12 +68,10 @@ void sLearner::WriteLearnData(U64 hash, int depth, int val)
 	if ( hash < 0 ) hash *= -1;
 
     // update existing entry 
-	for (int i = 0; i < learnSize; i++ ) 
-	 {
+	for (int i = 0; i < learnSize; i++ ) {
 		 if ( learnData[i].hash == hash )
 		 {
-		    if ( learnData[i].depth <= depth )
-			{
+		    if ( learnData[i].depth <= depth ) {
 				learnData[i].depth = depth;
 				learnData[i].val   = val;
 			}
@@ -84,8 +79,7 @@ void sLearner::WriteLearnData(U64 hash, int depth, int val)
 		 }
 	 } 
 
-	 if (learnSize < MAX_LEARN_SIZE)
-	 {
+	 if (learnSize < MAX_LEARN_SIZE) {
 	   learnData[learnSize].hash  = hash;
 	   learnData[learnSize].depth = depth;
 	   learnData[learnSize].val   = val;
@@ -101,8 +95,7 @@ int sLearner::ReadLearnData(U64 hash, int depth)
 	if ( hash < 0 ) hash *= -1;
 
    // TODO: reset age on a visit
-     for (int i = 0; i < learnSize; i++ ) 
-	 {
+     for (int i = 0; i < learnSize; i++ ) {
 		 if ( learnData[i].hash == hash && learnData[i].depth >= depth )
 			 return learnData[i].val;
      }
@@ -110,14 +103,14 @@ int sLearner::ReadLearnData(U64 hash, int depth)
    return INVALID;
 }
 
-void sLearner::Save(char *fileName) {
+void sLearner::Save(char *fileName) 
+{
 	 FILE *learnFile; 
 
      if (!Data.useLearning) return;
-
      learnFile = fopen(fileName,"w"); 
-	 for (int i = 0; i < learnSize; i++ ) 
-	 {
+
+	 for (int i = 0; i < learnSize; i++ ) {
 		 if (learnData[i].hash != 0)
 		 fprintf(learnFile, "%I64u, %d, %d \n", learnData[i].hash, learnData[i].depth, learnData[i].val);
 	 }
