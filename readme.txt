@@ -1,6 +1,8 @@
 Rodent, a UCI chess playing engine derived from Sungorus 1.4
 Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
 Copyright (C) 2011-2012 Pawel Koziol
+http://www.pkoziol.cal24.pl/rodent/rodent.htm
+https://github.com/nescitus/rodent_code
 
 I. GPL License
 
@@ -38,7 +40,7 @@ Rodent would be clearly weaker without the following contributions:
 
 *Kestutis Gasaitis* has made a thorough inspection of Rodent's code,
 pointing out many bugs and suggesting several improvements. See
-FIXED.txt for details.
+changelog and github tickets for details.
 
 *Dann Corbit* supplied fast population count functions 
 making use of advanced 64-bit instructions and first bit intrinsics
@@ -144,7 +146,7 @@ VI. EVALUATION
 
 - Fruit-like piece/square tables and mobility values
 - Fruit-like weak pawns eval
-- very basic passed pawns eval
+- passed pawns eval
 - strong squares (B, N, even R)
 - logaritmic, and therefore dynamic King safety evaluation
 
@@ -195,8 +197,7 @@ a file called newbook.wtf. At this stage user MUST RENAME newbook.wtf
 to bigbook.wtf. This is a precaution allowing to save old book in case that
 user considers feed files corrupt.
 
-Rodent contains small utility allowing to reformat book files from something
-like:
+Rodent contains small utility reformatting book files from something like:
 
 e2e4e7e6d2d4d7d5b1c3f8b4
 
