@@ -47,8 +47,8 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
   if (flagAbortSearch) return 0;
   if (!qDepth) {
      if (IsRepetition(p)) return 0;
+     // TODO: add draw detection
   }
-  // TODO: add draw detection
   
   *pv = 0;
 
@@ -56,8 +56,7 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
   if (ply >= MAX_PLY - 1) return Eval.Return(p, alpha, beta);
 
   best = Eval.Return(p, alpha, beta);
-  if (best >= beta) 
-  { 
+  if (best >= beta) { 
   // CAUSES DIFFERENT NODE COUNTS BETWEEN DEBUG AND RELEASE COMPILE 
   // - probably there's an uninitialized variable in sEvaluator or setboard
   //  TransTable.Store(p->hashKey, 0, score, LOWER, 1, ply);
@@ -108,10 +107,8 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
   }
 
   // SAVE SEARCH RESULT IN TRANSPOSITION TABLE
-  if (*pv) {
-    TransTable.Store(p->hashKey, *pv, best, EXACT, 1, ply);
-  } else
-    TransTable.Store(p->hashKey, 0, best, UPPER, 1, ply);
+  if (*pv) TransTable.Store(p->hashKey, *pv, best, EXACT, 1, ply);
+  else     TransTable.Store(p->hashKey,   0, best, UPPER, 1, ply);
 
   return best;
 }
