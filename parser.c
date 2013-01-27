@@ -159,6 +159,8 @@ void sParser::SetOption(char *ptr)
 	Data.matValue[B] = atoi(value);
   } else if (strcmp(name, "Knight") == 0) {
 	Data.matValue[N] = atoi(value);
+  } else if (strcmp(name, "BishPair") == 0) {
+	Data.bishopPair = atoi(value);
   } else if (strcmp(name, "OwnMobility") == 0) {
 	Data.ownMobility = atoi(value);
   } else if (strcmp(name, "OppMobility") == 0) {
@@ -214,6 +216,7 @@ void sParser::PrintUciOptions()
 	printf("option name Rook type spin default %d min 0 max 1200\n", Data.matValue[R] );
 	printf("option name Bishop type spin default %d min 0 max 1200\n", Data.matValue[B] );
 	printf("option name Knight type spin default %d min 0 max 1200\n", Data.matValue[N] );
+	printf("option name BishPair type spin default %d min 0 max 100\n", Data.bishopPair );
 	printf("option name OwnMobility type spin default %d min 0 max 300\n", Data.ownMobility);
 	printf("option name OppMobility type spin default %d min 0 max 300\n", Data.oppMobility);
 	printf("option name OwnAttack type spin default %d min 0 max 300\n", Data.ownAttack);
