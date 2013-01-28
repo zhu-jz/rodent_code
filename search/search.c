@@ -64,9 +64,12 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
   if (rootList.nOfMoves == 1) localDepth = 4 * ONE_PLY;
 
-  Timer.SetIterationTiming();          // define additional rules for starting next iteration
-  Data.InitAsymmetric(p->side);        // set asymmetric eval parameters, dependent on the side to move
-  Timer.SetData(FLAG_ROOT_FAIL_LOW, 0);
+  Timer.SetIterationTiming();            // define additional rules for starting next iteration
+  Data.InitAsymmetric(p->side);          // set asymmetric eval parameters, dependent on the side to move
+  Timer.SetData(FLAG_ROOT_FAIL_LOW, 0);  // we haven't failed low yet
+  Timer.SetData(FLAG_EASY_MOVE,     0);  // we haven't found an easy move yet, preliminary test will follow
+
+  // TODO: quiescence search with open window on all moves to determine if one of them stands out
 
   for (rootDepth = ONE_PLY; rootDepth <= localDepth; rootDepth+=ONE_PLY) {
 
@@ -85,7 +88,10 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 	if (curVal >= beta || curVal <= alpha) 
 	{
         // fail-low, it might be prudent to assign some more time
-        if (curVal < val) Timer.SetData(FLAG_ROOT_FAIL_LOW, 1);
+        if (curVal < val) { 
+			Timer.SetData(FLAG_ROOT_FAIL_LOW, 1);
+			Timer.SetData(FLAG_EASY_MOVE,     0);
+		}
 
 		if (curVal >= beta)  beta  = val +3*delta;
 		if (curVal <= alpha) alpha = val -3*delta;
@@ -249,6 +255,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 
      // BETA CUTOFF
 	 if (score >= beta) {
+		 if (movesTried > 1 && depth > 1*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
 		 IncStat(FAIL_HIGH);
 		 if (movesTried == 1) IncStat(FAIL_FIRST);
          History.OnGoodMove(p, move, depth / ONE_PLY, ply);
@@ -259,6 +266,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 	 // SCORE CHANGE
      if (score > best) {
          best = score;
+		 if (movesTried > 1 && depth > 1*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
          if (score > alpha) {
             alpha = score;
             if (nodeType == PV_NODE) BuildPv(pv, newPv, move);
@@ -309,7 +317,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // EARLY EXIT / DRAW CONDITIONS
   if ( flagAbortSearch )                  return 0;
-  if ( IsRepetition(p) )                  return 0;
+  if (!wasNull) {if ( IsRepetition(p) )                  return 0; }
   if ( DrawBy50Moves(p) )                 return 0;
   if ( !flagInCheck && RecognizeDraw(p) ) return 0;
   
@@ -479,7 +487,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 // FUTILITY PRUNING 
 	 if ( flagCanPrune                 // flag is set
 	 && !depthChange                   // we have not extended this move
-	 && IsMoveOrdinary(flagMoveType)   // we are considering ordinary move
+	 && IsMoveOrdinary(flagMoveType)   // not a tt move, not a capture, not a killer move
 	 && movesTried > 1                 // we have found at least one legal move
 	 ) {
         Manipulator.UndoMove(p, move, undoData);

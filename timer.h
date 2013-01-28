@@ -28,6 +28,7 @@ enum eTimeData {
 	 MOVE_TIME,
 	 MAX_NODES,
 	 MAX_DEPTH,
+	 FLAG_EASY_MOVE,
 	 FLAG_ROOT_FAIL_LOW,
 	 FLAG_NO_FIRST_MOVE,
      SIZE_OF_DATA
@@ -40,6 +41,7 @@ private:
 	int iterationTime;      // when we are allowed to start new iteration
 	int moveTime;           // basic time allocated for a move
 	int maxMoveTime;        // time allocated for a move in more difficult circumstances
+	int minMoveTime;        // time allocated for an easy move
 public:
 	void Clear(void);
 	void SetStartTime();

@@ -29,6 +29,11 @@
 #  include <sys/time.h>
 #endif
 
+// we need macros here, because they can be used 
+// to modify both move time and iteration time
+#define EASY_TIME(time) ((time*2)/3)
+#define HARD_TIME(time) ((time*3)/2)
+
 void sTimer::Clear(void) 
 {
   iterationTime = 999999000; // TODO: change it to real max_int
@@ -49,8 +54,9 @@ void sTimer::SetStartTime(void)
   startTime = GetMS();
 }
 
-void sTimer::SetMoveTiming(void) // last change 2012-03-12: bugfix, constraints on maxMoveTime
+void sTimer::SetMoveTiming(void)
 { 
+  // user-defined time per move, no tricks available
   if ( data[MOVE_TIME] ) {
 	 moveTime    = data[MOVE_TIME];
 	 maxMoveTime = moveTime;
@@ -60,14 +66,23 @@ void sTimer::SetMoveTiming(void) // last change 2012-03-12: bugfix, constraints 
   if (data[TIME] >= 0) {
      if (data[MOVES_TO_GO] == 1) data[TIME] -= Min(1000, data[TIME] / 10);
      moveTime = ( data[TIME] + data[INC] * ( data[MOVES_TO_GO] - 1)) / data[MOVES_TO_GO];
-	 // TODO: divide movetime if it's very low
-	 maxMoveTime = (moveTime * 3) / 2;
+	 
+	 // assign less time per move on extremely short time controls
+	 if		 (moveTime <  200) moveTime = (moveTime * 23) / 32;
+	 else if (moveTime <  400) moveTime = (moveTime * 26) / 32;
+	 else if (moveTime < 1200) moveTime = (moveTime * 29) / 32;	 
+	 
+	 maxMoveTime = HARD_TIME(moveTime);
+	 minMoveTime = EASY_TIME(moveTime);
 
      if (moveTime    > data[TIME]) moveTime    = data[TIME];
 	 if (maxMoveTime > data[TIME]) maxMoveTime = data[TIME];
+	 if (minMoveTime > data[TIME]) minMoveTime = data[TIME];
 
-     moveTime    -= 10; // safeguard against a lag
+     // safeguard against a lag
+	 moveTime    -= 10;
 	 maxMoveTime -= 15;
+	 minMoveTime -=  5;
 
      if (moveTime < 0) moveTime = 0;
 	 if (maxMoveTime < moveTime) maxMoveTime = moveTime;
@@ -82,7 +97,9 @@ void sTimer::SetIterationTiming(void)
 
 int sTimer::FinishIteration(void) 
 {
-    return (GetElapsedTime() >= iterationTime && !pondering);
+    if ( data[FLAG_EASY_MOVE] ) 
+		return (GetElapsedTime() >= EASY_TIME(iterationTime) && !pondering);
+	return (GetElapsedTime() >= iterationTime && !pondering);
 }
 
 int sTimer::GetMS(void)
@@ -112,7 +129,7 @@ int sTimer::IsInfiniteMode(void)
     return( !(moveTime >= 0) );
 }
 
-int sTimer::TimeHasElapsed(void) // 2013-01-03 node limit added
+int sTimer::TimeHasElapsed(void)
 {
     if (Data.isAnalyzing) return 0;
 
