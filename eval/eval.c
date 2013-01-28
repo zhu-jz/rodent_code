@@ -330,26 +330,24 @@ void sEvaluator::ScaleValue(int * value, int factor)
 	 *value /= 100;
 }
 
-void sEvaluator::DebugPst(sPosition *p) {
+void sEvaluator::DebugPst(sPosition *p) 
+{
 	 int sq;
 	 int mg = 0;
 	 int eg = 0;
 	 U64 bbPieces;
 
 	 for (int pc = 0; pc <= 5; pc++)  {
-	     bbPieces = bbPc(p, WHITE, pc);
 
+	     bbPieces = bbPc(p, WHITE, pc);
 	     while (bbPieces) {
            sq = FirstOne(bbPieces);
 	       mg += Data.pstMg[WHITE][pc][sq];
 		   eg += Data.pstEg[WHITE][pc][sq];
 	       bbPieces &= bbPieces - 1;
 	     }
-	 }
 
-	 for (int pc = 0; pc <= 5; pc++)  {
 	     bbPieces = bbPc(p, BLACK, pc);
-
 	     while (bbPieces) {
            sq = FirstOne(bbPieces);
 	       mg -= Data.pstMg[BLACK][pc][sq];
