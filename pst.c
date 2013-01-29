@@ -386,9 +386,9 @@ void sData::InitPstValues(void) {
 	  backwardMg[side][relativeSq[side][i]] = pstBackwardMg[i];
 	  backwardEg[side][relativeSq[side][i]] = pstBackwardEg[i];
 
-	  outpostKnight[side][relativeSq[side][i]] = pstKnightOutpost[i];
-	  outpostBishop[side][relativeSq[side][i]] = pstBishopOutpost[i];
-	  outpostRook[side][relativeSq[side][i]]   = pstRookOutpost[i];
+	  outpost[side][N][relativeSq[side][i]] = pstKnightOutpost[i];
+	  outpost[side][B][relativeSq[side][i]] = pstBishopOutpost[i];
+	  outpost[side][R][relativeSq[side][i]]   = pstRookOutpost[i];
 	  badBishopPenalty[side] [relativeSq[side][i]] = pstBadBishop[i];
     }
   }

@@ -240,3 +240,7 @@ BEST GAUNTLET SCORE: 47,3%
   (no strength change but no error source - thx Kestutis)
 - adding parser features from discarded version
 - TESTING to estimate base score vs Fruit: 28,6%
+
+2012-03-12 
+
+- BUGFIX in SetMoveTiming(), constraints on maxMoveTime

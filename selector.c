@@ -23,11 +23,11 @@ Its core function is NextMove(), implementing staged move generation
 and sorting of moves.
 */
 
-#include <stdio.h>
+#include "rodent.h"
 #include "data.h"
 #include "bitboard/bitboard.h"
 #include "move/move.h"
-#include "rodent.h"
+#include "search/search.h"
 #include "hist.h"
 #include "selector.h"
 
@@ -230,7 +230,7 @@ int sSelector::BadCapture(sPosition *p, int move) // last change 2012-03-06
   int tsq = Tsq(move);
 
   // Marginal speedup: function saves on some value comparisons and Swap() calls
-  // and automatically accepts BxN (added 2012-03-06)
+  // automatically accepts P x X and minor x minor, including BxN (added 2012-03-06)
   if ( TpOnSq(p, fsq) == P ) return 0;
   if ( TpOnSq(p, fsq) == N && TpOnSq(p, tsq) != P) return 0;
   if ( TpOnSq(p, fsq) == B && TpOnSq(p, tsq) != P) return 0;
@@ -265,7 +265,6 @@ int sSelector::MvvLva(sPosition *p, int move)
 void sFlatMoveList::AddMove(int move)
 {
 	 moves[nOfMoves] = move;
-	 value[nOfMoves] = 256 - nOfMoves;
 	 nOfMoves++;
 }
 
@@ -274,22 +273,30 @@ void sFlatMoveList::Init(sPosition * p)
 	sSelector Selector;      // an object responsible for maintaining move list and picking moves 
 	int move;
 	int unusedFlag;
-    UNDO  undoData[1];       // data required to undo a move
+	UNDO  undoData[1];       // data required to undo a move
+	  int pv[MAX_PLY];
 
-    Selector.InitMoves(p, 0, MAX_PLY); // prepare move selector
+	Selector.InitMoves(p, 0, 0); // prepare move selector
 	nOfMoves = 0;
+	bestMove = 0;
+	bestVal = -INF;
 
-    while ( move = Selector.NextMove(0, &unusedFlag) ) {
+	while ( move = Selector.NextMove(0, &unusedFlag) ) {
 
       Manipulator.DoMove(p, move, undoData);
       if (IllegalPosition(p)) { 
 		  Manipulator.UndoMove(p, move, undoData); 
 		  continue; 
 	  }
+ 
+	  value[nOfMoves] = -Searcher.Quiesce(p, 0, 0, -INF, INF, pv);
+	  if (value[nOfMoves] > bestVal) {
+		  bestVal = value[nOfMoves];
+		  bestMove = move;
+	  }
 
 	  AddMove(move);
 	  Manipulator.UndoMove(p, move, undoData);
-
 	}
 
 }

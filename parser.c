@@ -370,7 +370,6 @@ void sParser::ReadPersonality(char *fileName)
 			}
 	  }
       
-	  // close personality file
 	  fclose(personalityFile);	  
 }
 

@@ -157,6 +157,8 @@ typedef struct
 {
   int moves[MAX_MOVES];
   int value[MAX_MOVES];
+  int bestMove;
+  int bestVal;
   int nOfMoves;
   int currMoveIndex;
   void Init(sPosition *p);

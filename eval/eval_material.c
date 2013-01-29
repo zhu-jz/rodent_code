@@ -122,10 +122,10 @@ int sEvaluator::CheckmateHelper(sPosition *p)
 	  {
       // drive enemy king towards the edge
 	  result += (40 - Data.pstEg[BLACK][K][p->kingSquare[BLACK]] + Data.distance[p->kingSquare[WHITE]] [p->kingSquare[BLACK]]);
-	  if (MaterialBN(p, WHITE) ) // mate with bishop and knight
-	    {
-			if ( bbPc(p, WHITE, B) & bbWhiteSq) result -= 2*BN_bb[p->kingSquare[BLACK]];
-			if ( bbPc(p, WHITE, B) & bbBlackSq) result -= 2*BN_wb[p->kingSquare[BLACK]];
+
+	  if (MaterialBN(p, WHITE) ) { // mate with bishop and knight
+		  if ( bbPc(p, WHITE, B) & bbWhiteSq) result -= 2*BN_bb[p->kingSquare[BLACK]];
+		  if ( bbPc(p, WHITE, B) & bbBlackSq) result -= 2*BN_wb[p->kingSquare[BLACK]];
 	    }
 	  }
 
@@ -134,8 +134,8 @@ int sEvaluator::CheckmateHelper(sPosition *p)
 	  {
       // drive enemy king towards the edge
 	  result -= (40 - Data.pstEg[WHITE][K][p->kingSquare[WHITE]] + Data.distance[p->kingSquare[WHITE]] [p->kingSquare[BLACK]]);
-      if (MaterialBN(p, BLACK) ) // mate with bishop and knight
-	    {
+
+      if (MaterialBN(p, BLACK) ) { // mate with bishop and knight
 			if ( bbPc(p, BLACK, B) & bbWhiteSq) result += 2*BN_bb[p->kingSquare[WHITE]];
 			if ( bbPc(p, BLACK, B) & bbBlackSq) result += 2*BN_wb[p->kingSquare[WHITE]];
 	    }

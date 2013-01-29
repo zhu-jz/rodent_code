@@ -34,6 +34,7 @@ public:
  int distance[64][64];
  int pstMg[2][6][64];
  int pstEg[2][6][64];
+ int outpost[2][6][64];
  int phalanxMg[2][64];
  int phalanxEg[2][64];
  int passersMg[2][64];
@@ -44,9 +45,6 @@ public:
  int backwardEg[2][64];
  int candidateMg[2][64];
  int candidateEg[2][64];
- int outpostKnight[2][64];
- int outpostBishop[2][64];
- int outpostRook[2][64];
  int mobBonusMg[6][28];
  int mobBonusEg[6][28];
  int mobSidePercentage[2];

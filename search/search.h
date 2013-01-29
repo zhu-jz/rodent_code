@@ -60,12 +60,13 @@ private:
 	int SetFutilityMargin(int depth);
 	int SetLmrDepth(int move, int movesTried);
 	int SetNullDepth(int depth);
-	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int *pv);
+	
 	int RecognizeDraw(sPosition *p);
 	int nodes;
 	int rootDepth;
 	sFlatMoveList rootList;
 public:
+	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int *pv);
 	void Think(sPosition *, int *);
 	void ShowPerft(sPosition *p, int depth);
 	void Divide(sPosition *p, int ply, int depth);

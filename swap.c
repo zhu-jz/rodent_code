@@ -30,7 +30,7 @@ int Swap(sPosition *p, int from, int to)
   int side        = side = Opp(p->side); 
   int type        = TpOnSq(p, from);
   U64 bbAttackers = AttacksTo(p, to);
-  U64 bbOcupied   = OccBb(p) ^ SqBb(from);   // clear moving piece
+  U64 bbOcupied   = OccBb(p) ^ SqBb(from);   // clear the moving piece
   score[0]        = swapVal[TpOnSq(p, to)];  // set initial gain
   int ply = 1;
 

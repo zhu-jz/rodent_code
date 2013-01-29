@@ -21,7 +21,8 @@
 #include "../bitboard/bitboard.h"
 #include "eval.h"
 
-int sEvaluator::EvalTrappedRook(sPosition *p) {
+int sEvaluator::EvalTrappedRook(sPosition *p) 
+{
 	int score = 0;
 	const U64 bbWKTrapKs  = SqBb(F1) | SqBb(G1);
 	const U64 bbWRTrapKs  = SqBb(G1) | SqBb(H1) | SqBb(H2);
@@ -42,7 +43,8 @@ int sEvaluator::EvalTrappedRook(sPosition *p) {
   return score;
 }
 
-int sEvaluator::EvalTrappedBishop(sPosition *p) {
+int sEvaluator::EvalTrappedBishop(sPosition *p) 
+{
 	int score = 0;
 	const U64 bbWBTrap    = SqBb(A7) | SqBb(B8) | SqBb(H7) | SqBb(G8) | SqBb(A6) | SqBb(H6);
 	const U64 bbBBTrap    = SqBb(A2) | SqBb(B1) | SqBb(H2) | SqBb(G1) | SqBb(A3) | SqBb(H3);
@@ -68,7 +70,8 @@ int sEvaluator::EvalTrappedBishop(sPosition *p) {
   return score;
 }
 
-int sEvaluator::EvalTrappedKnight(sPosition *p) {
+int sEvaluator::EvalTrappedKnight(sPosition *p) 
+{
   int score = 0;
   const U64 bbWNTrap    = SqBb(A7) | SqBb(A6) | SqBb(H7) | SqBb(H6);
   const U64 bbBNTrap    = SqBb(A2) | SqBb(A3) | SqBb(H2) | SqBb(H3);

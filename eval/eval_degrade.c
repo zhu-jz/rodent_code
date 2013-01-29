@@ -15,8 +15,6 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-  Last modified: 2012-03-19 (bugfix in KRPKR code and one drawn position added)
 */
 
 #include "../rodent.h"
@@ -39,8 +37,7 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 
 
 	// no pawns for stronger side
-	if (p->pcCount[stronger][P] == 0) 
-	{
+	if (p->pcCount[stronger][P] == 0) {
        // no win if stronger side has just one minor piece
        if ( p->pieceMat[stronger] < 400 ) return 0;
 	}
@@ -131,7 +128,8 @@ int BishopsAreDifferent(sPosition * p) {
     return 0;
 }
 
-int NotOnBishColor(sPosition * p, int bishSide, int sq) {
+int NotOnBishColor(sPosition * p, int bishSide, int sq) 
+{
     if ( ( ( bbWhiteSq & bbPc(p, bishSide, B) ) == 0 )
     && ( SqBb(sq) & bbWhiteSq) ) return 1;
 

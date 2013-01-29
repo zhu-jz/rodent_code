@@ -67,9 +67,17 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   Timer.SetIterationTiming();            // define additional rules for starting next iteration
   Data.InitAsymmetric(p->side);          // set asymmetric eval parameters, dependent on the side to move
   Timer.SetData(FLAG_ROOT_FAIL_LOW, 0);  // we haven't failed low yet
-  Timer.SetData(FLAG_EASY_MOVE,     0);  // we haven't found an easy move yet, preliminary test will follow
 
-  // TODO: quiescence search with open window on all moves to determine if one of them stands out
+  // check whether one move has a potential to be easy
+  Timer.SetData(FLAG_EASY_MOVE,     1);  
+  for(int i = 0; i < rootList.nOfMoves; i ++)
+  {
+	  if (rootList.moves[i] != rootList.bestMove
+	  && rootList.value[i] > rootList.bestVal - 220) {
+	  Timer.SetData(FLAG_EASY_MOVE,     0);
+	  break;
+	  }
+  }
 
   for (rootDepth = ONE_PLY; rootDepth <= localDepth; rootDepth+=ONE_PLY) {
 
@@ -90,7 +98,6 @@ void sSearcher::Iterate(sPosition *p, int *pv)
         // fail-low, it might be prudent to assign some more time
         if (curVal < val) { 
 			Timer.SetData(FLAG_ROOT_FAIL_LOW, 1);
-			Timer.SetData(FLAG_EASY_MOVE,     0);
 		}
 
 		if (curVal >= beta)  beta  = val +3*delta;
@@ -115,7 +122,10 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 
 	// abort root search if we don't expect to finish the next iteration
 	if (Timer.FinishIteration() ) {
-		if (Data.verbose) DisplaySavedIterationTime();
+		if (Data.verbose) {
+			DisplaySavedIterationTime();
+		    if (Timer.GetData(FLAG_EASY_MOVE) ) printf("info string This iteration was easy!\n");
+		}
 		break; 
 	}
 
@@ -255,7 +265,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 
      // BETA CUTOFF
 	 if (score >= beta) {
-		 if (movesTried > 1 && depth > 1*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
+		 if (movesTried > 1 && depth > 2*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
 		 IncStat(FAIL_HIGH);
 		 if (movesTried == 1) IncStat(FAIL_FIRST);
          History.OnGoodMove(p, move, depth / ONE_PLY, ply);
@@ -266,11 +276,11 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 	 // SCORE CHANGE
      if (score > best) {
          best = score;
-		 if (movesTried > 1 && depth > 1*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
+		 if (movesTried > 1 && depth > 2*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
          if (score > alpha) {
             alpha = score;
             if (nodeType == PV_NODE) BuildPv(pv, newPv, move);
-		    if (!ply) DisplayPv(score, pv);
+		    DisplayPv(score, pv);
          }
       }
    }
@@ -574,7 +584,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
          if (score > alpha) {
             alpha = score;
             if (nodeType == PV_NODE) BuildPv(pv, newPv, move);
-		    if (!ply) DisplayPv(score, pv);
          }
       }
    }
