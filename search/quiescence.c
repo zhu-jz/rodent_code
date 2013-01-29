@@ -38,6 +38,7 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
   nodes++;
   IncStat(Q_NODES);
   CheckInput();
+  //int flagInCheck    = InCheck(p); // are we in check at the beginning of the search?
 
   // TRANSPOSITION TABLE READ
   if (TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, 1, ply))
@@ -47,6 +48,7 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
   if (flagAbortSearch) return 0;
   if (!qDepth) {
      if (IsRepetition(p)) return 0;
+	// if ( !flagInCheck && RecognizeDraw(p) ) return 0;
      // TODO: add draw detection
   }
   
