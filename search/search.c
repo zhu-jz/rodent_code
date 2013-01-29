@@ -320,6 +320,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   int flagIsReduced  = 0;       // are we in a reduced search? (guides re-searches)
   int flagCanPrune   = 0;       // can we statically prune in this node
   int flagInCheck    = InCheck(p); // are we in check at the beginning of the search?
+  int normalMoveCnt  = 0;       // counter used to delay futility pruning initialization
 
   // CHECK EXTENSION
   if (flagInCheck) depth += ONE_PLY;
@@ -449,20 +450,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   }
   /**/
 
-  // SET FUTILITY PRUNING FLAG
-  if ( depth < Data.futilityDepth * ONE_PLY  // we are sufficiently close to the leaf
-  && beta < MAX_EVAL                         // we're not checkmating
-  && alpha > -MAX_EVAL                       // we're not being checkmated
-  && nodeType != PV_NODE                     // we're not in a pv node
-  && !flagInCheck )                          // we're not in check
-  {
-     if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
-     nodeEval = TransTable.RefineScore( p->hashKey, nodeEval );
-
-     // this node looks bad enough, so we may apply futility pruning
-     if ( (nodeEval + SetFutilityMargin(depth) ) < beta ) flagCanPrune = 1;
-  }
-
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
   Selector.InitMoves(p, move, ply);
@@ -470,6 +457,27 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   // LOOP THROUGH THE MOVE LIST
   while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) 
   {
+
+     // SET FUTILITY PRUNING FLAG BEFORE SEARCHING FIRST APPLICABLE MOVE
+	 if (IsMoveOrdinary(flagMoveType) ) {
+		 
+	     normalMoveCnt++;
+	     if (normalMoveCnt == 1) {
+            
+            if ( depth < Data.futilityDepth * ONE_PLY  // we are sufficiently close to the leaf
+            && beta < MAX_EVAL                         // we're not checkmating
+            && alpha > -MAX_EVAL                       // we're not being checkmated
+            && nodeType != PV_NODE                     // we're not in a pv node
+            && !flagInCheck ) {                        // we're not in check
+               if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
+               nodeEval = TransTable.RefineScore( p->hashKey, nodeEval );
+
+               // this node looks bad enough, so we may apply futility pruning
+               if ( (nodeEval + SetFutilityMargin(depth) ) < beta ) flagCanPrune = 1;
+            }
+	     }
+	 }
+
 	 // MAKE A MOVE
 	 Manipulator.DoMove(p, move, undoData);    
 	
