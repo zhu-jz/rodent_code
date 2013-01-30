@@ -22,16 +22,15 @@
 
 struct sSelector {
 private:
-   MOVES m[1];  // move list
-   
-   int MvvLva(sPosition *p, int move);
-   void ScoreCaptures(int hashMove);
-   void ScoreQuiet(int refutationSq);
-   int SelectBest(void);
+	MOVES m[1];  // move list
+	int MvvLva(sPosition *p, int move);
+	void ScoreCaptures(int hashMove);
+	void ScoreQuiet(int refutationSq);
+	int SelectBest(void);
 public:
 	int BadCapture(sPosition *p, int move);
-   void InitCaptures(sPosition *p, int hashMove);
-   void InitMoves(sPosition *p, int transMove, int ply);
-   int NextMove(int refutationSq, int *flag);
-   int NextCapture(void);
+	void InitCaptures(sPosition *p, int hashMove);
+	void InitMoves(sPosition *p, int transMove, int ply);
+	int NextMove(int refutationSq, int *flag);
+	int NextCapture(void);
 };

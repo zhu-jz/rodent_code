@@ -74,8 +74,8 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   {
 	  if (rootList.moves[i] != rootList.bestMove
 	  && rootList.value[i] > rootList.bestVal - 220) {
-	  Timer.SetData(FLAG_EASY_MOVE,     0);
-	  break;
+	     Timer.SetData(FLAG_EASY_MOVE,     0);
+	     break;
 	  }
   }
 
@@ -328,7 +328,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // EARLY EXIT / DRAW CONDITIONS
   if ( flagAbortSearch )                  return 0;
-  if (!wasNull) {if ( IsRepetition(p) )                  return 0; }
+  if (!wasNull) {if ( IsRepetition(p) )   return 0; } // TODO: is it correct?
   if ( DrawBy50Moves(p) )                 return 0;
   if ( !flagInCheck && RecognizeDraw(p) ) return 0;
   

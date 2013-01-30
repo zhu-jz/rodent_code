@@ -25,7 +25,7 @@
 #define WAS_NULL  1
 #define NO_NULL   0
 
-enum statEntries { FAIL_HIGH, FAIL_FIRST, Q_NODES, END_OF_STATS};
+enum eStatEntries { FAIL_HIGH, FAIL_FIRST, Q_NODES, END_OF_STATS};
 
 struct sSearcher {
 private:
@@ -50,6 +50,7 @@ private:
 	void PrintTxtHeader(void);
 	U32  GetNps(int nodes, int time);
 
+	// search.c
 	int DrawBy50Moves(sPosition *p);
 	void Iterate(sPosition *p, int *);
 	int IsRepetition(sPosition *p);
@@ -66,7 +67,7 @@ private:
 	int rootDepth;
 	sFlatMoveList rootList;
 public:
-	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int *pv);
+	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int *pv); // for sFlatMoveList
 	void Think(sPosition *, int *);
 	void ShowPerft(sPosition *p, int depth);
 	void Divide(sPosition *p, int ply, int depth);
