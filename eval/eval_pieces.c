@@ -52,14 +52,13 @@ The same is the case for all attacks at enemy king zone
   const int att_R[12] = { 0, 7, 11, 15, 19, 22,  24,  26,  28,  30,  31,  32};   
   const int att_Q[12] = { 0, 9, 15, 21, 27, 33,  39,  46,  50,  52,  54,  56};   
 
-  #define QUEEN_CAN_CHECK       10
-  #define ROOK_CAN_CHECK         4
-  #define BISH_CAN_CHECK         1 
   #define QUEEN_CONTACT_CHECK   30
   #define MINOR_ATTACKED_BY_P  -10
   #define MINOR_DEFENDED_BY_P    2
 
-  const int outpostBase[7] = {0, 4, 4, 0, 0, 0, 0};
+  //                           P   N   B   R   Q   K   -
+  const int outpostBase [7] = {0,  4,  4,  0,  0,  0,  0};
+  const int canCheckWith[7] = {0,  0,  1,  4, 10,  0,  0};
 
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
@@ -114,7 +113,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
     // check threats
 	// (we may get false positive due to queen transparency, but it's ok)
 	if (bbControl & ( kingDiagChecks[Opp(side)] ) )
-		attCount[side] += BISH_CAN_CHECK; 
+		attCount[side] += canCheckWith[B]; 
 
     // If we can attack zone around enemy king from the current square, 
 	// test this possibility on the actual board.
@@ -181,7 +180,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
     // check threats
 	// (we may get a false positive due to R/Q transparency, but that's ok)
 	if (bbControl & kingStraightChecks[Opp(side)] )
-		attCount[side] += ROOK_CAN_CHECK;
+		attCount[side] += canCheckWith[R];
 
 	// if we can attack enemy king from current square, test this possibility
 	if ( bbRCanAttack[sq] [KingSq(p, side ^ 1) ]  
@@ -230,7 +229,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 
     // check threats
 	if (bbControl & ( kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)] ) )
-		attCount[side] += PopCntSparse( bbControl & ( kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)] ) ) * QUEEN_CAN_CHECK;
+		attCount[side] += PopCntSparse( bbControl & ( kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)] ) ) * canCheckWith[Q];
 
     if (bbQCanAttack[sq] [KingSq(p, side ^ 1) ]
 	&& (attCount[side] > 0 || p->pcCount[side][Q] > 1) ) // otherwise queen attack won't change score
