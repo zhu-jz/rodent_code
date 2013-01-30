@@ -328,7 +328,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // EARLY EXIT / DRAW CONDITIONS
   if ( flagAbortSearch )                  return 0;
-  if (!wasNull) {if ( IsRepetition(p) )   return 0; } // TODO: is it correct?
+  if ( IsRepetition(p) )                  return 0; 
   if ( DrawBy50Moves(p) )                 return 0;
   if ( !flagInCheck && RecognizeDraw(p) ) return 0;
   
