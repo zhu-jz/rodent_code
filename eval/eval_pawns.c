@@ -35,24 +35,10 @@ void sEvaluator::EvalPawns(sPosition *p)
   }
   else
   {
-      PawnScore(p, WHITE); // pawn eval
-      PawnScore(p, BLACK);  
-
-      if (bbPc(p, WHITE, P) & SqBb(D4)) {
-          if (bbPc(p, WHITE, P) & SqBb(E3))  pawnScoreMg[WHITE] += CENT_DEFENSE;
-          if (bbPc(p, WHITE, P) & SqBb(C3))  pawnScoreMg[WHITE] += CENT_DEFENSE;
-      }
-
-      if (bbPc(p, WHITE, P) & SqBb(E4) && bbPc(p, WHITE, P) & SqBb(D3) ) 
-         pawnScoreMg[WHITE] += CENT_DEFENSE;
-
-      if (bbPc(p, BLACK, P) & SqBb(D5)) {
-         if (bbPc(p, BLACK, P) & SqBb(E6))  pawnScoreMg[BLACK] += CENT_DEFENSE;
-         if (bbPc(p, BLACK, P) & SqBb(C6))  pawnScoreMg[BLACK] += CENT_DEFENSE;
-      }
-
-      if (bbPc(p, BLACK, P) & SqBb(E5) && bbPc(p, BLACK, P) & SqBb(D6) ) 
-         pawnScoreMg[BLACK] += CENT_DEFENSE;
+      SinglePawnScore(p, WHITE);
+      SinglePawnScore(p, BLACK);
+	  EvalPawnCenter(p, WHITE);
+	  EvalPawnCenter(p, BLACK);
  
       mgScore += (pawnScoreMg[WHITE] - pawnScoreMg[BLACK]);
       egScore += (pawnScoreEg[WHITE] - pawnScoreEg[BLACK]);
@@ -64,7 +50,18 @@ void sEvaluator::EvalPawns(sPosition *p)
   }
 }
 
-void sEvaluator::PawnScore(sPosition *p, int side)
+void sEvaluator::EvalPawnCenter(sPosition *p, int side)
+{
+      if (bbPc(p, side, P) & SqBb(relativeSq[side][D4])) {
+          if (bbPc(p, side, P) & SqBb(relativeSq[side][E3]))  pawnScoreMg[side] += CENT_DEFENSE;
+          if (bbPc(p, side, P) & SqBb(relativeSq[side][C3]))  pawnScoreMg[side] += CENT_DEFENSE;
+      }
+
+      if (bbPc(p, side, P) & SqBb(relativeSq[side][E4]) && bbPc(p, side, P) & SqBb(relativeSq[side][D3]) ) 
+         pawnScoreMg[side] += CENT_DEFENSE;	
+}
+
+void sEvaluator::SinglePawnScore(sPosition *p, int side)
 {
   int sq; 
   int flagIsOpen, flagIsWeak;
