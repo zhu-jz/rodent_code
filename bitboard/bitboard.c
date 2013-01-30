@@ -75,3 +75,15 @@ int PopFirstBit(U64 * bb)
     *bb &= (*bb - 1);
     return FirstOne(bbLocal);
 }
+
+int FirstOneAsm(U64 bb)
+{ _asm { mov  eax, dword ptr bb[0]
+         test eax, eax
+         jz   f_hi
+         bsf  eax, eax
+         jmp  f_ret
+f_hi:    bsf  eax, dword ptr bb[4]
+         add  eax, 20h
+f_ret:
+  }
+}

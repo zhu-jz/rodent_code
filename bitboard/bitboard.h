@@ -18,35 +18,38 @@
 */
 
 /* Compiler switches activating faster instructions for newer 64-bit architectures
-   - patch supplied by Dann Corbit, 17.02.2012
+   - patch  supplied  by Dann Corbit, 17.02.2012. Asm  version  added  30.01.2013.
+   If both USE_FIRST_ONE_ASM  and USE_FIRST_ONE_INTRINSICS are defined, the latter 
+   takes precedence.
 */
 
-// #define USE_FIRST_ONE_INTRINSICS
 // #define USE_MM_POPCNT
+// #define USE_FIRST_ONE_INTRINSICS
+#define USE_FIRST_ONE_ASM
 
 typedef unsigned long long U64;
 
-#define bbEmpty         (U64)0ULL
-#define bbWhiteSq       (U64)0x55AA55AA55AA55AA
-#define bbBlackSq       (U64)0xAA55AA55AA55AA55
+#define bbEmpty			(U64)0ULL
+#define bbWhiteSq		(U64)0x55AA55AA55AA55AA
+#define bbBlackSq		(U64)0xAA55AA55AA55AA55
 
-#define bbRANK_1        (U64)0x00000000000000FF
-#define bbRANK_2        (U64)0x000000000000FF00
-#define bbRANK_3        (U64)0x0000000000FF0000
-#define bbRANK_4        (U64)0x00000000FF000000
-#define bbRANK_5        (U64)0x000000FF00000000
-#define bbRANK_6        (U64)0x0000FF0000000000
-#define bbRANK_7        (U64)0x00FF000000000000
-#define bbRANK_8        (U64)0xFF00000000000000
+#define bbRANK_1		(U64)0x00000000000000FF
+#define bbRANK_2		(U64)0x000000000000FF00
+#define bbRANK_3		(U64)0x0000000000FF0000
+#define bbRANK_4		(U64)0x00000000FF000000
+#define bbRANK_5		(U64)0x000000FF00000000
+#define bbRANK_6		(U64)0x0000FF0000000000
+#define bbRANK_7		(U64)0x00FF000000000000
+#define bbRANK_8		(U64)0xFF00000000000000
 
-#define bbFILE_A        (U64)0x0101010101010101
-#define bbFILE_B        (U64)0x0202020202020202
-#define bbFILE_C        (U64)0x0404040404040404
-#define bbFILE_D        (U64)0x0808080808080808
-#define bbFILE_E        (U64)0x1010101010101010
-#define bbFILE_F        (U64)0x2020202020202020
-#define bbFILE_G        (U64)0x4040404040404040
-#define bbFILE_H        (U64)0x8080808080808080
+#define bbFILE_A		(U64)0x0101010101010101
+#define bbFILE_B		(U64)0x0202020202020202
+#define bbFILE_C		(U64)0x0404040404040404
+#define bbFILE_D		(U64)0x0808080808080808
+#define bbFILE_E		(U64)0x1010101010101010
+#define bbFILE_F		(U64)0x2020202020202020
+#define bbFILE_G		(U64)0x4040404040404040
+#define bbFILE_H		(U64)0x8080808080808080
 
 #define bbNotA          (U64)0xfefefefefefefefe // ~bbFILE_A
 #define bbNotH          (U64)0x7f7f7f7f7f7f7f7f // ~bbFILE_H
@@ -55,6 +58,8 @@ typedef unsigned long long U64;
 
 #define SqBb(x)         ((U64)1 << (x)) // returns bitboard with a bit of square "x" set
 
+// Compiler and architecture dependent versions of FirstOne() function, 
+// triggered by defines at the top of this file.
 #ifdef USE_FIRST_ONE_INTRINSICS
 #include <intrin.h>
 #pragma intrinsic(_BitScanForward64)
@@ -65,7 +70,11 @@ static int __forceinline FirstOne(U64 x) {
     return index;
 }
 #else
-#define FirstOne(x)     bitTable[(((x) & (~(x) + 1)) * (U64)0x0218A392CD3D5DBF) >> 58] // first "1" in a bitboard
+	#ifdef USE_FIRST_ONE_ASM
+		#define FirstOne(x) FirstOneAsm(x)
+	#else
+		#define FirstOne(x)     bitTable[(((x) & (~(x) + 1)) * (U64)0x0218A392CD3D5DBF) >> 58] // first "1" in a bitboard
+	#endif
 #endif
 
 void PrintBb(U64 bbTest);
@@ -111,3 +120,4 @@ U64 GetBPControl(U64 bb);
 U64 GetPawnAttacks(int side, U64 bb);
 
 int PopFirstBit(U64 *bb);
+int FirstOneAsm(U64 bb);
