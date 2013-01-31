@@ -128,8 +128,7 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 		   if (values[i] > 0) curVal = 1 + rand() % values[i]; 
 		   else curVal = -1;
 
-		   if (curVal > bestVal) 
-		   {
+		   if (curVal > bestVal) {
 			   bestVal = curVal;
 			   choice  = i;
 		   }
@@ -153,8 +152,7 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 	}
 
 	// find possible book moves
-	for (i = iStart; i < nOfRecords; i++ ) 
-	{
+	for (i = iStart; i < nOfRecords; i++ ) {
         if (myBook[i].hash > localHash) break;
 
 		if (myBook[i].hash == localHash
@@ -170,8 +168,7 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 
        // get maximum frequency of a move - it will be used
        // to filter out moves that were played not often enough
-	   for (i = 0; i < nOfChoices; i++ )
-	   {
+	   for (i = 0; i < nOfChoices; i++ ) {
           if (values[i] > maxFreq ) maxFreq = values[i];
 	   }
 
@@ -186,22 +183,20 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 
 		   if (values[i] > 0 ) 
 		   { 
-			   if ( IsInfrequent(values[i], maxFreq) )
-				   {
-					   values[i] = 0;
-					   printf(" infrequent ");
-					   *flagIsProblem = 1;
-				   }
-				   if (canPrint) printf(" %d ", values[i] );
+			   if ( IsInfrequent(values[i], maxFreq) ) {
+					values[i] = 0;
+					printf(" infrequent ");
+					*flagIsProblem = 1;
+			   }
+			   if (canPrint) printf(" %d ", values[i] );
 		   }
-		   else                if (canPrint) printf("? ");
+		   else if (canPrint) printf("? ");
 		   
            // pick move randomly, based on its value
 		   // (we add 5 to ensure choice between equally rare moves)
 		   if (values[i] > 0) curVal = 1 + rand() % (values[i] + 5); 
 		   else curVal = -1;
-		   if (curVal > bestVal) 
-		   {
+		   if (curVal > bestVal) {
 			   bestVal = curVal;
 			   choice  = i;
 		   }
@@ -230,10 +225,8 @@ int sBook::PrintMissingMoves(sPosition *p)
     // LOOP THROUGH THE MOVE LIST
     while ( move = Selector.NextMove(0, &flagMoveType) ) {
 
-	   // MAKE A MOVE
 	   Manipulator.DoMove(p, move, undoData);    
 	
-	   // UNDO ILLEGAL MOVES
 	   if (IllegalPosition(p)) { 
 		  Manipulator.UndoMove(p, move, undoData); 
 		  continue; 
@@ -244,8 +237,7 @@ int sBook::PrintMissingMoves(sPosition *p)
 		   if (myBook[i].hash == GetBookHash(p) ) {
 
               int isUsed = 0;
-		      for (int j = 0; j < nOfChoices; j++) 
-		      {
+		      for (int j = 0; j < nOfChoices; j++) {
 			      if (moves[j] == move) isUsed = 1;
 		      }
 
@@ -481,14 +473,16 @@ void sBook::ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedCo
  }
 
 
-U64 sBook::GetBookHash(sPosition *p) {
+U64 sBook::GetBookHash(sPosition *p) 
+{
 	// TODO: return Polyglot-compatibile hash key
 	U64 bookKey = p->hashKey / 4;
 	if (bookKey < 0) bookKey *= -1;
     return (signed long long) (bookKey);
 }
 
-void sBook::SaveBookInOwnFormat(char *fileName) {
+void sBook::SaveBookInOwnFormat(char *fileName) 
+{
 	 FILE *book_file; 
 
      book_file = fopen(fileName,"a+"); 
@@ -519,8 +513,8 @@ int sBook::ReadOwnBookFile(char *fileName)
 	  return 1;
  }
 
-void sBook::ParseBookEntry(char * ptr, int line_no) {
-
+void sBook::ParseBookEntry(char * ptr, int line_no)
+{
   char token[256];
   int token_no = 1;
 
@@ -533,7 +527,6 @@ void sBook::ParseBookEntry(char * ptr, int line_no) {
 	  
     if (*token == '\0') break;
   }
-
 }
 
 void sBook::SortMainBook(void) {
@@ -567,7 +560,6 @@ void sBook::SortMainBook(void) {
           }
        }
   }
-
 };
 
 void sBook::FeedMainBook() 
@@ -586,8 +578,7 @@ void sBook::FeedMainBook()
 }
 
 // Arbitrary definition of an infrequent move: less than 100 entries
-// in the book and less than 15% of frequency of the most popular move
-// in a given position.
+// and less than 15% of frequency of the most popular move.
 int sBook::IsInfrequent(int val, int maxFreq)
 {
 return ( val < 100 && val < maxFreq / 15); 

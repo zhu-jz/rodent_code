@@ -45,27 +45,8 @@ const int relativeSq[2][64] = {
   A1, B1, C1, D1, E1, F1, G1, H1}
 };
 
-#define PA   -15 // -15 best so far, -12 is worse
-#define PB    -5
-#define PC     5
-#define PD    10 // 15 is worse
 #define PE    10 // endgame material gain of a pawn
 
-/**
-const int pstPawnMg[64] = 
-{
-     0,   0,   0,   0,   0,   0,   0,   0,
-    PA,  PB,   0,  -5,  -5,   0,  PB,  PA,
-    PA,  PB,  PC,  PD,  PD,  PC,  PB,  PA,
-    PA,  PB,  PC,  PD,  PD,  PC,  PB,  PA,
-    PA,  PB,  PC,  PD,  PD,  PC,  PB,  PA,
-    PA,  PB,  PC,  PD,  PD,  PC,  PB,  PA,
-    PA,  PB,  PC,  PD,  PD,  PC,  PB,  PA,
-     0,   0,   0,   0,   0,   0,   0,   0
-};
-/**/
-
-/**/
 int pstPawnMg[64] = {
 	0,   0,   0,   0,   0,   0,   0,   0,
   -15,  -5,   0,   5,   5,   0,  -5, -15,
@@ -76,7 +57,6 @@ int pstPawnMg[64] = {
   -15,  -5,   5,   5,   5,   5,  -5, -15,
     0,   0,   0,   0,   0,   0,   0,   0
 };
-/**/
 
 // material endgame bonus only
 const int pstPawnEg[64] = 
@@ -102,7 +82,6 @@ const int pstKnightMg[64] =
    -20, -10,   0,   5,   5,   0, -10, -20,
   -135, -25, -15, -10, -10, -15, -25, -135
 };
-
 
 const int pstKnightEg[64] = 
 {
@@ -307,7 +286,6 @@ const int pstBackwardEg[64] =
     -8,  -9, -10, -12, -12, -10,  -9,  -8,
      0,   0,   0,   0,   0,   0,   0,   0
 };
-
 
 const int pstKnightOutpost[64] = 
 {   

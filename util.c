@@ -155,10 +155,9 @@ U64 atoull(const char *s)
   U64 x = 0;
   char c;
   while (c = *s++) {
-	if (c != ' ' && c != ',')
-	{
-    x *= 10;
-    x += c - '0';
+	if (c != ' ' && c != ',') {
+       x *= 10;
+       x += c - '0';
 	}
   }
   return x;
