@@ -213,23 +213,23 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	bbControl = GenCache.GetQueenMob(bbOccupied, sq);
 	bbAllAttacks[side] |= bbControl;
 
-	// contact checks
-	bbContact = bbControl & bbKingAttacks[ p->kingSquare[Opp(side)] ];
+	if (bbControl & ( kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)] ) ) {
 
-	while (bbContact) {
-       contactSq = FirstOne(bbContact);
-
-	   if ( Swap(p, sq, contactSq) >= 0 ) {
-          attCount[side] += QUEEN_CONTACT_CHECK; 
-		  break;
-	   }
-	  
-	   bbContact &= bbContact - 1;
-	}
-
-    // check threats
-	if (bbControl & ( kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)] ) )
+		// queen check threats (unlike with other pieces, we *count the number* of possible checks here)
 		attCount[side] += PopCntSparse( bbControl & ( kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)] ) ) * canCheckWith[Q];
+
+        // contact checks
+	    bbContact = bbControl & bbKingAttacks[ p->kingSquare[Opp(side)] ];
+	    while (bbContact) {
+           contactSq = FirstOne(bbContact);
+
+	       if ( Swap(p, sq, contactSq) >= 0 ) {
+              attCount[side] += QUEEN_CONTACT_CHECK; 
+		      break;
+	       }
+	       bbContact &= bbContact - 1;
+	    }
+	}
 
     if (bbQCanAttack[sq] [KingSq(p, side ^ 1) ]
 	&& (attCount[side] > 0 || p->pcCount[side][Q] > 1) ) // otherwise queen attack won't change score
