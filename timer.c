@@ -71,8 +71,13 @@ void sTimer::SetMoveTiming(void)
 	 if		 (moveTime <  200) moveTime = (moveTime * 23) / 32;
 	 else if (moveTime <  400) moveTime = (moveTime * 26) / 32;
 	 else if (moveTime < 1200) moveTime = (moveTime * 29) / 32;	 
+
+	 // while in time trouble, try to save a bit on increment
+	 if (moveTime < data[INC] ) moveTime -= ( (data[INC] * 4) / 5);
 	 
-	 maxMoveTime = HARD_TIME(moveTime);
+	 if (moveTime > 2000 ) maxMoveTime = HARD_TIME(moveTime);
+	 else                  maxMoveTime = moveTime;
+
 	 minMoveTime = EASY_TIME(moveTime);
 
      if (moveTime    > data[TIME]) moveTime    = data[TIME];
@@ -81,7 +86,7 @@ void sTimer::SetMoveTiming(void)
 
      // safeguard against a lag
 	 moveTime    -= 10;
-	 maxMoveTime -= 15;
+	 maxMoveTime -= 10;
 	 minMoveTime -=  5;
 
      if (moveTime < 0) moveTime = 0;
@@ -93,6 +98,14 @@ void sTimer::SetIterationTiming(void)
 {
 	if (moveTime > 0) iterationTime = ( (moveTime * 3) / 4 );
 	else              iterationTime = 999999000;
+
+	 // assign less time per itwration on extremely short time controls
+	 if		 (iterationTime <  200) iterationTime = (iterationTime * 23) / 32;
+	 else if (iterationTime <  400) iterationTime = (iterationTime * 26) / 32;
+	 else if (iterationTime < 1200) iterationTime = (iterationTime * 29) / 32;	 
+
+	 // while in time trouble, try to save a bit on increment
+	 if (iterationTime < data[INC] ) iterationTime -= ( (data[INC] * 4) / 5);
 }
 
 int sTimer::FinishIteration(void) 
@@ -133,8 +146,8 @@ int sTimer::TimeHasElapsed(void)
 {
     if (Data.isAnalyzing) return 0;
 
-	if (data[FLAG_ROOT_FAIL_LOW] 
-	|| data[FLAG_NO_FIRST_MOVE]) 
+	if ( (data[FLAG_ROOT_FAIL_LOW] || data[FLAG_NO_FIRST_MOVE]) 
+    &&   moveTime > 2000 )
 		return (GetElapsedTime() >= maxMoveTime );
 
 	if (data[FLAG_EASY_MOVE]) 

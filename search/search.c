@@ -455,8 +455,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   Selector.InitMoves(p, move, ply);
 
   // LOOP THROUGH THE MOVE LIST
-  while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) 
-  {
+  while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
 
      // SET FUTILITY PRUNING FLAG BEFORE SEARCHING FIRST APPLICABLE MOVE
 	 if (IsMoveOrdinary(flagMoveType) ) {

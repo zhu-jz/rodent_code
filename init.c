@@ -51,8 +51,8 @@ void Init(void)
   Data.InitDistanceBonus();
 }
 
-
-void InitZobrist() {
+void InitZobrist() 
+{
   for (int i = 0; i < 12; i++)
     for (int j = 0; j < 64; j++)
       zobPiece[i][j] = Random64();
