@@ -137,10 +137,8 @@ int sTimer::TimeHasElapsed(void)
 	|| data[FLAG_NO_FIRST_MOVE]) 
 		return (GetElapsedTime() >= maxMoveTime );
 
-	if (data[FLAG_EASY_MOVE]) {
-		printf("info string We're having easy time! \n");
+	if (data[FLAG_EASY_MOVE]) 
 		return (EASY_TIME(GetElapsedTime() ) >= minMoveTime);
-	}
 
 	return (GetElapsedTime() >= moveTime);
 }
