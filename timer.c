@@ -99,13 +99,10 @@ void sTimer::SetIterationTiming(void)
 	if (moveTime > 0) iterationTime = ( (moveTime * 3) / 4 );
 	else              iterationTime = 999999000;
 
-	 // assign less time per itwration on extremely short time controls
-	 if		 (iterationTime <  200) iterationTime = (iterationTime * 23) / 32;
-	 else if (iterationTime <  400) iterationTime = (iterationTime * 26) / 32;
-	 else if (iterationTime < 1200) iterationTime = (iterationTime * 29) / 32;	 
-
-	 // while in time trouble, try to save a bit on increment
-	 if (iterationTime < data[INC] ) iterationTime -= ( (data[INC] * 4) / 5);
+	// assign less time per iteration on extremely short time controls
+	if		(iterationTime <  200) iterationTime = (iterationTime * 23) / 32;
+	else if (iterationTime <  400) iterationTime = (iterationTime * 26) / 32;
+	else if (iterationTime < 1200) iterationTime = (iterationTime * 29) / 32;	 
 }
 
 int sTimer::FinishIteration(void) 
