@@ -69,6 +69,11 @@ U64 GetPawnAttacks(int side, U64 bb)
 	                   return GetBPControl(bb);    
 }
 
+U64 ShiftFwd(U64 bb, int side) {
+	if (side == WHITE) return ShiftNorth(bb);
+	                   return ShiftSouth(bb);
+}
+
 int PopFirstBit(U64 * bb) 
 {
 	U64 bbLocal = *bb;

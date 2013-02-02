@@ -57,6 +57,14 @@ typedef unsigned long long U64;
 #define bbCentralFile   (U64)(bbFILE_C | bbFILE_D | bbFILE_E | bbFILE_F)
 
 #define SqBb(x)         ((U64)1 << (x)) // returns bitboard with a bit of square "x" set
+#define ShiftNorth(x)   (x<<8)
+#define ShiftSouth(x)   (x>>8)
+#define ShiftWest(x)    ((x & bbNotA)>>1)
+#define ShiftEast(x)    ((x & bbNotH)<<1)
+#define ShiftNW(x)      ((x & bbNotA)<<7)
+#define ShiftNE(x)      ((x & bbNotH)<<9)
+#define ShiftSW(x)      ((x & bbNotA)>>9)
+#define ShiftSE(x)      ((x & bbNotH)>>7)
 
 // Compiler and architecture dependent versions of FirstOne() function, 
 // triggered by defines at the top of this file.
@@ -82,14 +90,14 @@ extern int PopCnt(U64);
 extern int PopCnt15(U64 bb);
 extern int PopCntSparse(U64);
 
-extern U64 ShiftNorth(U64 bb);
-extern U64 ShiftSouth(U64 bb);
-extern U64 ShiftWest(U64 bb);
-extern U64 ShiftEast(U64 bb);
-extern U64 ShiftNE(U64 bb);
-extern U64 ShiftNW(U64 bb);
-extern U64 ShiftSE(U64 bb);
-extern U64 ShiftSW(U64 bb);
+//extern U64 ShiftNorth(U64 bb);
+//extern U64 ShiftSouth(U64 bb);
+//extern U64 ShiftWest(U64 bb);
+//extern U64 ShiftEast(U64 bb);
+//extern U64 ShiftNE(U64 bb);
+//extern U64 ShiftNW(U64 bb);
+//extern U64 ShiftSE(U64 bb);
+//extern U64 ShiftSW(U64 bb);
 extern U64 ShiftFwd(U64 bb, int side);
 
 U64 FillKing(U64 bb);
