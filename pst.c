@@ -21,30 +21,6 @@
 #include "data.h"
 #include "bitboard/bitboard.h"
 
-// Array of "equivalent squares", used to  initialize
-// pst tables and to make certain parts of evaluation 
-// color-independent.
-
-const int relativeSq[2][64] = {
- {A1, B1, C1, D1, E1, F1, G1, H1,
-  A2, B2, C2, D2, E2, F2, G2, H2,
-  A3, B3, C3, D3, E3, F3, G3, H3,
-  A4, B4, C4, D4, E4, F4, G4, H4,
-  A5, B5, C5, D5, E5, F5, G5, H5,
-  A6, B6, C6, D6, E6, F6, G6, H6,
-  A7, B7, C7, D7, E7, F7, G7, H7,
-  A8, B8, C8, D8, E8, F8, G8, H8},
-
-{ A8, B8, C8, D8, E8, F8, G8, H8,
-  A7, B7, C7, D7, E7, F7, G7, H7,
-  A6, B6, C6, D6, E6, F6, G6, H6,
-  A5, B5, C5, D5, E5, F5, G5, H5,
-  A4, B4, C4, D4, E4, F4, G4, H4,
-  A3, B3, C3, D3, E3, F3, G3, H3,
-  A2, B2, C2, D2, E2, F2, G2, H2,
-  A1, B1, C1, D1, E1, F1, G1, H1}
-};
-
 #define PE    10 // endgame material gain of a pawn
 
 int pstPawnMg[64] = {
@@ -340,34 +316,34 @@ void sData::InitPstValues(void) {
   for (int i = 0; i < 64; i++) {  
 	for (int side = 0; side < 2; side++) {
 
-      pstMg[side][P][relativeSq[side][i]] = pstPawnMg[i];
-      pstMg[side][N][relativeSq[side][i]] = pstKnightMg[i];
-      pstMg[side][B][relativeSq[side][i]] = pstBishopMg[i];
-	  pstMg[side][R][relativeSq[side][i]] = pstRookMg[i];
-      pstMg[side][Q][relativeSq[side][i]] = pstQueenMg[i];
-      pstMg[side][K][relativeSq[side][i]] = pstKingMg[i];
+      pstMg[side][P][REL_SQ(i,side)] = pstPawnMg[i];
+      pstMg[side][N][REL_SQ(i,side)] = pstKnightMg[i];
+      pstMg[side][B][REL_SQ(i,side)] = pstBishopMg[i];
+	  pstMg[side][R][REL_SQ(i,side)] = pstRookMg[i];
+      pstMg[side][Q][REL_SQ(i,side)] = pstQueenMg[i];
+      pstMg[side][K][REL_SQ(i,side)] = pstKingMg[i];
 
-      pstEg[side][P][relativeSq[side][i]] = pstPawnEg[i];
-      pstEg[side][N][relativeSq[side][i]] = pstKnightEg[i];
-      pstEg[side][B][relativeSq[side][i]] = pstBishopEg[i];
-      pstEg[side][R][relativeSq[side][i]] = pstRookEg[i];
-      pstEg[side][Q][relativeSq[side][i]] = pstQueenEg[i];
-      pstEg[side][K][relativeSq[side][i]] = pstKingEg[i];
+      pstEg[side][P][REL_SQ(i,side)] = pstPawnEg[i];
+      pstEg[side][N][REL_SQ(i,side)] = pstKnightEg[i];
+      pstEg[side][B][REL_SQ(i,side)] = pstBishopEg[i];
+      pstEg[side][R][REL_SQ(i,side)] = pstRookEg[i];
+      pstEg[side][Q][REL_SQ(i,side)] = pstQueenEg[i];
+      pstEg[side][K][REL_SQ(i,side)] = pstKingEg[i];
 
-	  phalanxMg[side][relativeSq[side][i]]  = pstPhalanxMg[i];
-	  passersMg[side][relativeSq[side][i]]  = pstPasserMg[i];
-	  passersEg[side][relativeSq[side][i]]  = pstPasserEg[i];
-	  candidateMg[side][relativeSq[side][i]]  = pstPasserMg[i] / 3;
-	  candidateEg[side][relativeSq[side][i]]  = pstPasserEg[i] / 3;
-      isolatedMg[side][relativeSq[side][i]] = pstIsolatedMg[i];
-	  isolatedEg[side][relativeSq[side][i]] = pstIsolatedEg[i];
-	  backwardMg[side][relativeSq[side][i]] = pstBackwardMg[i];
-	  backwardEg[side][relativeSq[side][i]] = pstBackwardEg[i];
+	  phalanxMg[side][REL_SQ(i,side)]  = pstPhalanxMg[i];
+	  passersMg[side][REL_SQ(i,side)]  = pstPasserMg[i];
+	  passersEg[side][REL_SQ(i,side)]  = pstPasserEg[i];
+	  candidateMg[side][REL_SQ(i,side)]  = pstPasserMg[i] / 3;
+	  candidateEg[side][REL_SQ(i,side)]  = pstPasserEg[i] / 3;
+      isolatedMg[side][REL_SQ(i,side)] = pstIsolatedMg[i];
+	  isolatedEg[side][REL_SQ(i,side)] = pstIsolatedEg[i];
+	  backwardMg[side][REL_SQ(i,side)] = pstBackwardMg[i];
+	  backwardEg[side][REL_SQ(i,side)] = pstBackwardEg[i];
 
-	  outpost[side][N][relativeSq[side][i]] = pstKnightOutpost[i];
-	  outpost[side][B][relativeSq[side][i]] = pstBishopOutpost[i];
-	  outpost[side][R][relativeSq[side][i]]   = pstRookOutpost[i];
-	  badBishopPenalty[side] [relativeSq[side][i]] = pstBadBishop[i];
+	  outpost[side][N][REL_SQ(i,side)] = pstKnightOutpost[i];
+	  outpost[side][B][REL_SQ(i,side)] = pstBishopOutpost[i];
+	  outpost[side][R][REL_SQ(i,side)]   = pstRookOutpost[i];
+	  badBishopPenalty[side] [REL_SQ(i,side)] = pstBadBishop[i];
     }
   }
 }

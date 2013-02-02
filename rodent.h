@@ -227,7 +227,6 @@ extern U64 bbPassedMask[2][64];
 extern U64 bbAdjacentMask[8];
 
 extern int castleMask[64];
-extern const int relativeSq[2][64];
 extern const int bitTable[64];
 extern U64 zobPiece[12][64];
 extern U64 zobCastle[16];

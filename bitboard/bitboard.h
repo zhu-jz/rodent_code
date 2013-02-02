@@ -66,6 +66,8 @@ typedef unsigned long long U64;
 #define ShiftSW(x)      ((x & bbNotA)>>9)
 #define ShiftSE(x)      ((x & bbNotH)>>7)
 
+#define REL_SQ(sq,cl) ( sq ^ (cl * 56) )
+
 // Compiler and architecture dependent versions of FirstOne() function, 
 // triggered by defines at the top of this file.
 #ifdef USE_FIRST_ONE_INTRINSICS

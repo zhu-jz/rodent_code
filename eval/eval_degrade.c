@@ -53,7 +53,6 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	  if ( MaterialQueen(p, stronger) && MaterialQueen(p, weaker) ) return 8;
 	  if ( MaterialBN(p, stronger) && ( MaterialMinor (p, weaker) || MaterialRook(p, weaker) ) ) return 8;
 	  if ( MaterialBB(p, stronger) && ( MaterialBishop(p, weaker) || MaterialRook(p, weaker) ) ) return 8;
-
 	}
 
     // it's hard to win with a bare rook against a minor/minor + pawn
@@ -92,26 +91,24 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
     &&  p->pcCount[stronger][P] == 1
     &&  p->pcCount[weaker][P] == 0
   ) {
-
-       // good defensive position with a king on pawn's path
-	   if ( ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) ) ) 
+      // good defensive position with a king on pawn's path
+	  if ( ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) ) ) 
 	      return 32; // 1/2
 
-	   // draw code for rook endgame with edge pawn
-	  if ( ( SqBb(relativeSq[stronger] [A7]) & bbPc(p, stronger, P) )
-	  &&   ( SqBb(relativeSq[stronger][A8] ) & bbPc(p, stronger, R) )
+	  // draw code for rook endgame with edge pawn
+	  if ( ( SqBb(REL_SQ(A7,stronger) ) & bbPc(p, stronger, P) )
+	  &&   ( SqBb(REL_SQ(A8,stronger) ) & bbPc(p, stronger, R) )
 	  &&   ( bbFILE_A & bbPc(p, weaker, R) )
-	  &&   ( ( SqBb(relativeSq[stronger][H7]) & bbPc(p, weaker, K) ) || ( SqBb(relativeSq[stronger][G7]) & bbPc(p, weaker, K) ) )
+	  &&   ( ( SqBb(REL_SQ(H7,stronger)) & bbPc(p, weaker, K) ) || ( SqBb(REL_SQ(G7,stronger) ) & bbPc(p, weaker, K) ) )
 		  ) return 0; // dead draw
 
-	  if ( ( SqBb(relativeSq[stronger][H7]) & bbPc(p, stronger, P) )
-	  &&   ( SqBb(relativeSq[stronger][H8]) & bbPc(p, stronger, R) )
+	  if ( ( SqBb(REL_SQ(H7,stronger)) & bbPc(p, stronger, P) )
+	  &&   ( SqBb(REL_SQ(H8,stronger)) & bbPc(p, stronger, R) )
 	  &&   ( bbFILE_H & bbPc(p, weaker, R) )
-	  &&   ( ( SqBb(relativeSq[stronger][A7]) & bbPc(p, weaker, K) ) || ( SqBb(relativeSq[stronger][B7]) & bbPc(p, weaker, K) ) )
+	  &&   ( ( SqBb(REL_SQ(A7,stronger)) & bbPc(p, weaker, K) ) || ( SqBb(REL_SQ(B7,stronger)) & bbPc(p, weaker, K) ) )
 		  ) return 0; // dead draw
 
 	  // TODO: back rank defense
-
 	}
 
     // TODO: KRPPKRP, no passers
