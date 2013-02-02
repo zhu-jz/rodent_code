@@ -90,14 +90,6 @@ extern int PopCnt(U64);
 extern int PopCnt15(U64 bb);
 extern int PopCntSparse(U64);
 
-//extern U64 ShiftNorth(U64 bb);
-//extern U64 ShiftSouth(U64 bb);
-//extern U64 ShiftWest(U64 bb);
-//extern U64 ShiftEast(U64 bb);
-//extern U64 ShiftNE(U64 bb);
-//extern U64 ShiftNW(U64 bb);
-//extern U64 ShiftSE(U64 bb);
-//extern U64 ShiftSW(U64 bb);
 extern U64 ShiftFwd(U64 bb, int side);
 
 U64 FillKing(U64 bb);
