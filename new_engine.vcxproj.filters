@@ -74,9 +74,6 @@
     <ClCompile Include="bitboard\bb_init_mgen.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bitboard\bb_shift.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="bitboard\bitboard.c">
       <Filter>Source Files</Filter>
     </ClCompile>

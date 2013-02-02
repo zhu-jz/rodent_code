@@ -111,7 +111,6 @@
     <ClCompile Include="bitboard\bb_fill.c" />
     <ClCompile Include="bitboard\bb_init_masks.c" />
     <ClCompile Include="bitboard\bb_init_mgen.c" />
-    <ClCompile Include="bitboard\bb_shift.c" />
     <ClCompile Include="bitboard\bitboard.c" />
     <ClCompile Include="book_internal.c" />
     <ClCompile Include="search\blunder.c" />
