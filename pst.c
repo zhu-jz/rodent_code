@@ -311,31 +311,31 @@ const int pstBadBishop[64] =
      0,   0,   0,   0,   0,   0,   0,   0
 };
 
-void sData::InitPstValues(void) {
-
+void sData::InitPstValues(void)
+{
   for (int i = 0; i < 64; i++) {  
 	for (int side = 0; side < 2; side++) {
 
-      pstMg[side][P][REL_SQ(i,side)] = pstPawnMg[i];
-      pstMg[side][N][REL_SQ(i,side)] = pstKnightMg[i];
-      pstMg[side][B][REL_SQ(i,side)] = pstBishopMg[i];
+	  pstMg[side][P][REL_SQ(i,side)] = pstPawnMg[i];
+	  pstMg[side][N][REL_SQ(i,side)] = pstKnightMg[i];
+	  pstMg[side][B][REL_SQ(i,side)] = pstBishopMg[i];
 	  pstMg[side][R][REL_SQ(i,side)] = pstRookMg[i];
-      pstMg[side][Q][REL_SQ(i,side)] = pstQueenMg[i];
-      pstMg[side][K][REL_SQ(i,side)] = pstKingMg[i];
+	  pstMg[side][Q][REL_SQ(i,side)] = pstQueenMg[i];
+	  pstMg[side][K][REL_SQ(i,side)] = pstKingMg[i];
 
-      pstEg[side][P][REL_SQ(i,side)] = pstPawnEg[i];
-      pstEg[side][N][REL_SQ(i,side)] = pstKnightEg[i];
-      pstEg[side][B][REL_SQ(i,side)] = pstBishopEg[i];
-      pstEg[side][R][REL_SQ(i,side)] = pstRookEg[i];
-      pstEg[side][Q][REL_SQ(i,side)] = pstQueenEg[i];
-      pstEg[side][K][REL_SQ(i,side)] = pstKingEg[i];
+	  pstEg[side][P][REL_SQ(i,side)] = pstPawnEg[i];
+	  pstEg[side][N][REL_SQ(i,side)] = pstKnightEg[i];
+	  pstEg[side][B][REL_SQ(i,side)] = pstBishopEg[i];
+	  pstEg[side][R][REL_SQ(i,side)] = pstRookEg[i];
+	  pstEg[side][Q][REL_SQ(i,side)] = pstQueenEg[i];
+	  pstEg[side][K][REL_SQ(i,side)] = pstKingEg[i];
 
 	  phalanxMg[side][REL_SQ(i,side)]  = pstPhalanxMg[i];
 	  passersMg[side][REL_SQ(i,side)]  = pstPasserMg[i];
 	  passersEg[side][REL_SQ(i,side)]  = pstPasserEg[i];
 	  candidateMg[side][REL_SQ(i,side)]  = pstPasserMg[i] / 3;
 	  candidateEg[side][REL_SQ(i,side)]  = pstPasserEg[i] / 3;
-      isolatedMg[side][REL_SQ(i,side)] = pstIsolatedMg[i];
+	  isolatedMg[side][REL_SQ(i,side)] = pstIsolatedMg[i];
 	  isolatedEg[side][REL_SQ(i,side)] = pstIsolatedEg[i];
 	  backwardMg[side][REL_SQ(i,side)] = pstBackwardMg[i];
 	  backwardEg[side][REL_SQ(i,side)] = pstBackwardEg[i];
