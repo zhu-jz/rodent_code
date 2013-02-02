@@ -27,7 +27,7 @@
 #include "hist.h"
 #include "book.h"
 #include "eval/eval.h"
-#include "bitboard/bitboard.h"
+#include "bitboard/bitboard.h"  // for SqBb and REL_SQ macros
 #include "search/search.h"
 #include "parser.h"
 
@@ -365,9 +365,8 @@ void sParser::ReadPersonality(char *fileName)
 	  // read options line by line
 	  while ( fgets(line, 256, personalityFile) ) {
 		    ptr = ParseToken(line, token);
-			if (strcmp(token, "setoption") == 0) {
-                SetOption(ptr);
-			}
+			if (strcmp(token, "setoption") == 0) 
+				SetOption(ptr);
 	  }
       
 	  fclose(personalityFile);	  
@@ -430,10 +429,9 @@ void sParser::PrintBoard(sPosition *p)
   printf("\na b c d e f g h\n");
   printf("Incremental  hash: %llu pawn: %llu \n", p->hashKey, p->pawnKey);
   printf("Recalculated hash: %llu pawn: %llu \n", TransTable.InitHashKey(p), TransTable.InitPawnKey(p));
-  printf("Incremental  pst  mg %d eg %d\n", p->pstMg[WHITE]-p->pstMg[BLACK], p->pstEg[WHITE]-p->pstEg[BLACK]);
+  printf("Incremental  pst : mg %d eg %d\n", p->pstMg[WHITE]-p->pstMg[BLACK], p->pstEg[WHITE]-p->pstEg[BLACK]);
   Eval.DebugPst(p);
   printf("\n");
 
   printf("--------------------------------------------\n");
-
 }

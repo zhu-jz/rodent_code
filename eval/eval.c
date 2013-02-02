@@ -332,9 +332,7 @@ void sEvaluator::ScaleValue(int * value, int factor)
 
 void sEvaluator::DebugPst(sPosition *p) 
 {
-	 int sq;
-	 int mg = 0;
-	 int eg = 0;
+	 int sq, mg = 0, eg = 0;
 	 U64 bbPieces;
 
 	 for (int pc = 0; pc <= 5; pc++)  {
@@ -355,6 +353,5 @@ void sEvaluator::DebugPst(sPosition *p)
 	       bbPieces &= bbPieces - 1;
 	     }
 	 }
-
-	 printf("Recalculated pst  mg %d eg %d\n", mg, eg);
+	 printf("Recalculated pst : mg %d eg %d\n", mg, eg);
 }
