@@ -33,9 +33,6 @@
     <ClInclude Include="hist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="init.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="learn.h">
       <Filter>Header Files</Filter>
     </ClInclude>

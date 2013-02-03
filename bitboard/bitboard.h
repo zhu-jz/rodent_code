@@ -131,3 +131,13 @@ U64 GetPawnAttacks(int side, U64 bb);
 
 int PopFirstBit(U64 *bb);
 int FirstOneAsm(U64 bb);
+
+void InitKindergartenBitboards(void);
+void InitPawnAttacks(void);
+void InitKnightAttacks(void);
+void InitKingAttacks(void);
+void InitPassedMask(void);
+void InitAdjacentMask(void);
+void InitZobrist(void);
+void InitPossibleAttacks(void);
+void InitPawnSupport(void);

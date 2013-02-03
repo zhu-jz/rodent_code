@@ -25,9 +25,8 @@
 
 void sSearcher::ClearStats(void)
 {
-	for (int i=0; i < END_OF_STATS; i++) {
+	for (int i=0; i < END_OF_STATS; i++) 
 		stat[i] = 0;
-	}
 }
 
 void sSearcher::IncStat(int slot) 

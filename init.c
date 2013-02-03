@@ -20,7 +20,6 @@
 #include "bitboard/bitboard.h"
 #include "data.h"
 #include "rodent.h"
-#include "init.h"
 
 U64 bbRAttacksOnEmpty[64];
 U64 bbBAttacksOnEmpty[64];

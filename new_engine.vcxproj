@@ -96,7 +96,6 @@
     <ClInclude Include="eval\eval.h" />
     <ClInclude Include="bitboard\gencache.h" />
     <ClInclude Include="hist.h" />
-    <ClInclude Include="init.h" />
     <ClInclude Include="learn.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="rodent.h" />
