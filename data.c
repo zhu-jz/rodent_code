@@ -30,6 +30,7 @@ U64 bbKnightAttacks[64];
 U64 bbKingAttacks[64];
 U64 bbPassedMask[2][64];
 U64 bbAdjacentMask[8];
+U64 bbBadBishopMasks[2][64];
 int castleMask[64];
 
 // used for a mathematical trick in FirstOne
@@ -66,7 +67,7 @@ void sData::InitBadBishop(void)
 	 // first clear bad bishop masks
 	 for (int side = 0; side < 2; side++) {
 	    for (int i = 0; i < 64; i++) {  
-			 Data.bbBadBishopMasks [side][i] = 0ULL;
+			 bbBadBishopMasks [side][i] = 0ULL;
 		 }
 	 }
 

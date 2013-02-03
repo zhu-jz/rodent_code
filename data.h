@@ -19,14 +19,6 @@
 
 #pragma once
 
-// portable definition of an unsigned 64-bit integer
-#if defined(_WIN32) || defined(_WIN64)
-    typedef unsigned long long U64;
-#else
-    #include <stdint.h>
-    typedef uint64_t U64;
-#endif
-
 enum ePanelStyle { PANEL_NORMAL, PANEL_POWER };
 
 struct sData {
@@ -67,7 +59,6 @@ public:
  int doubledPawnMg;
  int doubledPawnEg;
  int badBishopPenalty[2][64];
- U64 bbBadBishopMasks[2][64];
  int rookOpenMg;
  int rookOpenEg;
  int rookSemiOpenMg;

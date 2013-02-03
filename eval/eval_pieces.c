@@ -130,7 +130,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	AddMobility(B, side, PopCnt15(bbControl) );  // evaluate mobility
 
 	// penalize bishop blocked by own pawns
-	if ( Data.bbBadBishopMasks[side][sq] & bbPc(p, side, P) )
+	if ( bbBadBishopMasks[side][sq] & bbPc(p, side, P) )
        AddMiscOne(side, Data.badBishopPenalty[side][sq]);
     
 	bbPieces &= bbPieces - 1;

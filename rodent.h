@@ -245,6 +245,7 @@ extern U64 bbKingAttacks[64];
 
 extern U64 bbPassedMask[2][64];
 extern U64 bbAdjacentMask[8];
+extern U64 bbBadBishopMasks[2][64];
 
 extern int castleMask[64];
 extern const int bitTable[64];
