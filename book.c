@@ -43,10 +43,11 @@ void sBook::Init(sPosition * p)
 
 void sBook::BookDoctor(sPosition * p) {
 	 int move;
+	 char moveStr[6];
 	 UNDO u;
 
-	 FILE *doctor_file; 
-     doctor_file = fopen("doctor.txt","a+"); 
+	 FILE *doctorFile; 
+     doctorFile = fopen("doctor.txt","a+"); 
 
 	 int flagIsProblem = 0;
 	 printf("Book doctor launched. It looks for a line that might need Your decision and saves it to doctor.txt\n");
@@ -54,29 +55,24 @@ void sBook::BookDoctor(sPosition * p) {
 	 for (int i = 0; i < 10000; i++ ) {
 		 SetPosition(p, START_POS);
 		 printf("\n");
-		 fprintf(doctor_file, "\n");
+		 fprintf(doctorFile, "\n");
 
         for (;;) {
 		   move = GetBookMove(p, 0, &flagIsProblem);
 		   if (move) { 
 			  Manipulator.DoMove(p, move, &u);
               if (flagIsProblem) break; 
-	          printf("%c",File(Fsq(move)) + 'a');
-			  fprintf(doctor_file, "%c", File(Fsq(move)) + 'a');
-	          printf("%c",Rank(Fsq(move)) + '1');
-			  fprintf(doctor_file, "%c", Rank(Fsq(move)) + '1');
-              printf("%c",File(Tsq(move)) + 'a');
-			  fprintf(doctor_file, "%c", File(Tsq(move)) + 'a');
-	          printf("%c",Rank(Tsq(move)) + '1');
-			  fprintf(doctor_file, "%c", Rank(Tsq(move)) + '1');
+			  PrintMove(move);
+			  MoveToStr(move, moveStr);
+			  fprintf(doctorFile, "%s", moveStr);
 	          printf(" ");
-			  fprintf(doctor_file, " ");
+			  fprintf(doctorFile, " ");
 		 }
 		 else break;
 		}
 		if (flagIsProblem) break;
 	 }
-     fclose(doctor_file);
+     fclose(doctorFile);
 }
 
 int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
