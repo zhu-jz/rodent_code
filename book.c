@@ -27,7 +27,6 @@
 #include "selector.h"
 #include "trans.h"
 #include "search/search.h"
-#include "move/move.h"
 #include "book.h"
 
 #define DELETE_MOVE 888

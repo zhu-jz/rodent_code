@@ -26,7 +26,6 @@ and sorting of moves.
 #include "rodent.h"
 #include "data.h"
 #include "bitboard/bitboard.h"
-#include "move/move.h"
 #include "search/search.h"
 #include "hist.h"
 #include "selector.h"

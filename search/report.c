@@ -21,7 +21,6 @@
 #include "../rodent.h"
 #include "../data.h"
 #include "../timer.h"
-#include "../move/move.h"
 #include "search.h"
 
 void sSearcher::ClearStats(void)

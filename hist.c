@@ -18,7 +18,6 @@
 */
 
 #include "rodent.h"
-#include "move/move.h"
 #include "hist.h"
 
 void sHistory::OnNewSearch(void)

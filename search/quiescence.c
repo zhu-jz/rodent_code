@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include "../rodent.h"
 #include "../data.h"
-#include "../move/move.h"
 #include "../selector.h"
 #include "../timer.h"
 #include "../trans.h"

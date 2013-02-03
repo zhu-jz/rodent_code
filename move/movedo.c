@@ -20,7 +20,6 @@
 #include "../bitboard/bitboard.h"
 #include "../data.h"
 #include "../rodent.h"
-#include "move.h"
 
 void sManipulator::DoMove(sPosition *p, int move, UNDO *u)
 {

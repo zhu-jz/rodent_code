@@ -22,7 +22,6 @@
 #include "../rodent.h"
 #include "../data.h"
 #include "../bitboard/bitboard.h"
-#include "../move/move.h"
 #include "../selector.h"
 #include "../timer.h"
 #include "../trans.h"

@@ -19,7 +19,6 @@
 
 #include "../bitboard/bitboard.h"
 #include "../data.h"
-#include "move.h"
 #include "../rodent.h"
 
 int IsLegal(sPosition *p, int move)

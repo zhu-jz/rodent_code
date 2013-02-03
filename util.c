@@ -26,7 +26,6 @@
 #  include <sys/time.h>
 #endif
 #include "data.h"
-#include "move/move.h"
 #include "rodent.h"
 
 int InputAvailable(void)
