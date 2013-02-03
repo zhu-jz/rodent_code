@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 // class responsible for maintaining move list 
 // and returning moves in a predefined order
 

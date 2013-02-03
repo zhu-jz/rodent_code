@@ -25,7 +25,7 @@ void PrintBb( U64 bbTest)
 {
   for (int i = 0; i < 64; i++) {
       if (bbTest & SqBb( REL_SQ(i,BLACK)) ) printf("+ ");
-	  else                   printf(". ");
+	  else									printf(". ");
 	  if ( (i+1) % 8 == 0) printf(" %d\n", 9 - ((i+1) / 8) );
   }
   printf("\na b c d e f g h\n");

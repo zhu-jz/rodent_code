@@ -23,11 +23,19 @@
    takes precedence.
 */
 
+#pragma once
+
 // #define USE_MM_POPCNT
 // #define USE_FIRST_ONE_INTRINSICS
 #define USE_FIRST_ONE_ASM
 
-typedef unsigned long long U64;
+// portable definition of an unsigned 64-bit integer
+#if defined(_WIN32) || defined(_WIN64)
+    typedef unsigned long long U64;
+#else
+    #include <stdint.h>
+    typedef uint64_t U64;
+#endif
 
 #define bbEmpty			(U64)0ULL
 #define bbWhiteSq		(U64)0x55AA55AA55AA55AA

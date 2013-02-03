@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 #define Fsq(x)          ((x) & 63)          // "from" square of a move "x"
 #define Tsq(x)          (((x) >> 6) & 63)   // "to" square of a move "x"
 #define MoveType(x)     ((x) >> 12)         // type of a move "x" (see eMoveType)

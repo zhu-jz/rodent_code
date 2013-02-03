@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 struct sHistory {
      int history[12][64];
 	 int cutoff[64][64];  

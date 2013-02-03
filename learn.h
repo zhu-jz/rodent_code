@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 #define MAX_LEARN_SIZE 48000
 
 struct sLearnEntry {

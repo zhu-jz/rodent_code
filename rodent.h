@@ -17,11 +17,25 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 // sets max nodes, used to create Rodent's version for ultra-fast tests
 //#define FAST_TUNING 100000
 
-typedef unsigned long long U64;
-typedef unsigned long      U32;
+#undef CDECL
+
+#if defined(_WIN32) || defined(_WIN64)
+   #define llu_format  "%I64u"
+   typedef unsigned long long U64;
+   typedef unsigned long      U32;
+   #define CDECL __cdecl
+#else
+   #include <stdint.h>
+   #define llu_format  "%llu"
+   typedef uint64_t U64;
+   typedef uint32_t U32;
+   #define CDECL
+#endif
 
 #define MAX_ELO 2600
 

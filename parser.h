@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 struct sParser {
 private:
 	void ParseGo(sPosition *, char *);
