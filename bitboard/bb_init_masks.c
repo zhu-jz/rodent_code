@@ -22,14 +22,12 @@
 
 void InitPassedMask() 
 {
-	 int i,j,k;
+  int i,j,k;
 
-  for (i = 0; i < 64; i++) 
-  {
+  for (i = 0; i < 64; i++) {
     bbPassedMask[WHITE][i] = 0;
 
-    for (j = File(i) - 1; j <= File(i) + 1; j++) 
-	{
+    for (j = File(i) - 1; j <= File(i) + 1; j++) {
       if ((File(i) == FILE_A && j == -1) 
       || (File(i) == FILE_H && j == 8))
         continue;
@@ -55,13 +53,10 @@ void InitPassedMask()
 
 void InitAdjacentMask() 
 {
-     for (int i = 0; i < 8; i++) 
-     {
+     for (int i = 0; i < 8; i++) {
          bbAdjacentMask[i] = 0;
-         if (i > 0)
-            bbAdjacentMask[i] |= bbFILE_A << (i - 1);
-         if (i < 7)
-            bbAdjacentMask[i] |= bbFILE_A << (i + 1);
+         if (i > 0) bbAdjacentMask[i] |= bbFILE_A << (i - 1);
+         if (i < 7) bbAdjacentMask[i] |= bbFILE_A << (i + 1);
      }
 }
 
@@ -85,12 +80,11 @@ void InitPossibleAttacks()
 
 void InitPawnSupport() 
 {
-  for (int i = 0; i < 64; i++) 
-  {
+  for (int i = 0; i < 64; i++) {
       bbPawnSupport[WHITE][i] = ( (SqBb(i) & bbNotA) >> 1 ) | ((SqBb(i) & bbNotH) << 1 );
-      bbPawnSupport[WHITE][i] |= FillNorth(bbPawnSupport [WHITE][i] );
+	  bbPawnSupport[WHITE][i] |= FillNorth(bbPawnSupport [WHITE][i] );
 
 	  bbPawnSupport[BLACK][i] = ( (SqBb(i) & bbNotA) >> 1 ) | ((SqBb(i) & bbNotH) << 1 );
-      bbPawnSupport[BLACK][i] |= FillSouth(bbPawnSupport [BLACK][i] );
+	  bbPawnSupport[BLACK][i] |= FillSouth(bbPawnSupport [BLACK][i] );
   }
 }
