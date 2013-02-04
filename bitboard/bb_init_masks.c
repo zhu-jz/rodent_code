@@ -22,32 +22,13 @@
 
 void InitPassedMask() 
 {
-  int i,j,k;
-
-  for (i = 0; i < 64; i++) {
-    bbPassedMask[WHITE][i] = 0;
-
-    for (j = File(i) - 1; j <= File(i) + 1; j++) {
-      if ((File(i) == FILE_A && j == -1) 
-      || (File(i) == FILE_H && j == 8))
-        continue;
-
-      for (k = Rank(i) + 1; k <= RANK_8; k++)
-        bbPassedMask[WHITE][i] |= SqBb(Sq(j, k));
-    }
-  }
-
-  for (i = 0; i < 64; i++) {
-    bbPassedMask[BLACK][i] = 0;
-    for (j = File(i) - 1; j <= File(i) + 1; j++) {
-
-      if ((File(i) == FILE_A && j == -1)
-      || (File(i) == FILE_H && j == 8))
-        continue;
-
-      for (k = Rank(i) - 1; k >= RANK_1; k--)
-        bbPassedMask[BLACK][i] |= SqBb(Sq(j, k));
-    }
+  for (int i = 0; i < 64; i++) {
+	bbPassedMask[WHITE][i] = FillNorthExcl(SqBb(i));
+	bbPassedMask[WHITE][i] |= ShiftWest(bbPassedMask[WHITE][i]);
+	bbPassedMask[WHITE][i] |= ShiftEast(bbPassedMask[WHITE][i]);
+	bbPassedMask[BLACK][i] = FillSouthExcl(SqBb(i));
+	bbPassedMask[BLACK][i] |= ShiftWest(bbPassedMask[BLACK][i]);
+	bbPassedMask[BLACK][i] |= ShiftEast(bbPassedMask[BLACK][i]);
   }
 }
 
