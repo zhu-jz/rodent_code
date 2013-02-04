@@ -56,13 +56,10 @@ void sHistory::OnNewGame(void)
   }
 }
 
-
 void sHistory::Reduce(void)
 {
-  int i, j;
-
-  for (i = 0; i < 12; i++)
-    for (j = 0; j < 64; j++)
+  for (int i = 0; i < 12; i++)
+    for (int j = 0; j < 64; j++)
       history[i][j] /= 2;
 }
 
@@ -88,7 +85,6 @@ void sHistory::OnGoodMove(sPosition *p, int move, int depth, int ply)
   }
 }
 
-
 int sHistory::GetMoveHistoryValue(int pc, int sq_to) 
 {
     int val = history[pc][sq_to];
@@ -113,14 +109,10 @@ void sHistory::OnMoveReduced(int move)
 
 void sHistory::OnMoveTried(int move) 
 {
-   // TODO: do nothing if move changes material balance
-   // (would require move flag as input variable)
-
     cutoff [Fsq(move)] [Tsq(move)] -= 1;
 }
 
 int sHistory::MoveIsBad(int move) 
 {
     return (cutoff [Fsq(move)] [Tsq(move)] < 50);
-	// TODO: test 60 and 40
 }

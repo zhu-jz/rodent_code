@@ -48,7 +48,6 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
   if (!qDepth) {
      if (IsRepetition(p)) return 0;
 	// if ( !flagInCheck && RecognizeDraw(p) ) return 0;
-     // TODO: add draw detection
   }
   
   *pv = 0;

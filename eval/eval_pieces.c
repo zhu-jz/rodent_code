@@ -20,8 +20,6 @@
   that trapped pieces evaluation is coded in eval_trapped.c
 */
 
-// TODO: Don't evaluate outposts when the opponent has less than 5 pawns
-
 #include "../rodent.h"
 #include "../bitboard/bitboard.h"
 #include "../data.h"

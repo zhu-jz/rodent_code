@@ -46,7 +46,7 @@ void sSearcher::Think(sPosition *p, int *pv)
 
   if (!pv[0] || !IsLegal(p, pv[0]) || Data.isAnalyzing) {
 	   if (flagProtocol == PROTO_TXT) PrintTxtHeader();
-      Iterate(p, pv); // TODO: switch search methodologies
+      Iterate(p, pv);
       if (Data.panelStyle == PANEL_NORMAL) DisplaySettings();
   }
 
@@ -81,7 +81,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   for (rootDepth = ONE_PLY; rootDepth <= localDepth; rootDepth+=ONE_PLY) {
 
 	 DisplayRootInfo();
-	 delta = Data.aspiration; // TODO: progressive widening loop 
+	 delta = Data.aspiration;
 	 alpha = val-delta;
 	 beta  = val+delta;
 
@@ -184,7 +184,6 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 
   // CHECK EXTENSION
   if (flagInCheck) depth += ONE_PLY;
-	  // TODO: extend at low no. of replies (requires out of check / legal move generator)
   
   // QUIESCENCE SEARCH ENTRY POINT
   if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, pv);
@@ -323,7 +322,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // CHECK EXTENSION
   if (flagInCheck) depth += ONE_PLY;
-	  // TODO: extend at low no. of replies (requires out of check / legal move generator)
 
   // EARLY EXIT / DRAW CONDITIONS
   if ( flagAbortSearch )                  return 0;
