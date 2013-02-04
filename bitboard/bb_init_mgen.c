@@ -22,7 +22,8 @@
 
 static const int dirs[4][2]    = {{1, -1}, {16, -16}, {17, -17}, {15, -15}};
 
-void InitKindergartenBitboards() {
+void InitKindergartenBitboards() 
+{
   int i, j, k, l, x, y;
 
   // constants shifted to create bitmasks
@@ -66,14 +67,16 @@ void InitKindergartenBitboards() {
       }
 }
 
-void InitPawnAttacks() {
+void InitPawnAttacks()
+{
   for (int i = 0; i < 64; i++) {
       bbPawnAttacks[WHITE][i] = GetWPControl(SqBb(i) );
 	  bbPawnAttacks[BLACK][i] = GetBPControl(SqBb(i) );
   }
 }
 
-void InitKnightAttacks() {
+void InitKnightAttacks() 
+{
   for (int i = 0; i < 64; i++) 
     bbKnightAttacks[i] = ShiftNE( ShiftNorth(SqBb(i) ) )
 		               | ShiftNW( ShiftNorth(SqBb(i) ) )
@@ -85,7 +88,13 @@ void InitKnightAttacks() {
 					   | ShiftSW( ShiftWest (SqBb(i) ) );
 }
 
-void InitKingAttacks() {
-  for (int i = 0; i < 64; i++) 
+void InitKingAttacks() 
+{
+  for (int i = 0; i < 64; i++) {
     bbKingAttacks[i] = FillKing( SqBb(i) ) ^ SqBb(i);
+  
+    // set bitboard of squares constituting king zone (used in king safety eval)
+    bbKingZone[WHITE][i]    = bbKingAttacks[i] | bbKingAttacks[i] << 8; 
+    bbKingZone[BLACK][i]    = bbKingAttacks[i] | bbKingAttacks[i] >> 8; 
+  }
 }

@@ -982,7 +982,7 @@ char *book[] =
 	"g1f3 g8f6 c2c4 b7b6? g2g3 c8b7 f1g2 e7e6 d2d4 f8b4? c1d2 d8e7 e1g1 b4d2 d1d2 e8g8 b1c3 d7d5 c4d5",
 	"g1f3 g8f6 c2c4 c7c5 b1c3 b8c6 g2g3 d7d5 c4d5 f6d5 f1g2 e7e6",
 	"g1f3 g8f6 c2c4 c7c5 b1c3 e7e6 g2g3 b7b6 f1g2 c8b7 e1g1 f8e7",
-	"g1f3 g8f6 c2c4 c7c5 g2g3 b8c6 f1g2 e7e6 b1c3 e7e6 b1c3 d7d5 c4d5 e6d5 d2d4 c5d4 f3d4 f8c5",
+	"g1f3 g8f6 c2c4 c7c5 g2g3 b8c6 f1g2 e7e6 b1c3 d7d5 c4d5 f6d5", // TODO: add
 	"g1f3 g8f6 c2c4 e7e6 b1c3 d7d5 d2d4",
 	"g1f3 g8f6 c2c4 e7e6 b1c3 f8b4 d1c2 e8g8 a2a3 b4c3 c2c3 c7c5 b2b4 b7b6 g2g3 b8c6 f1g2 c8b7 e1g1 d7d6 c1b2",
 	"g1f3 g8f6 c2c4 e7e6 b1c3 f8b4 d1c2 e8g8 a2a3 b4c3 c2c3 c7c5 b2b4 d7d6 c1b2",

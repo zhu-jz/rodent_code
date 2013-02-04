@@ -36,7 +36,6 @@ private:
   int egMisc[2];           // miscelanneous endgame scores
   int pawnScoreMg[2];      // midgame pawn structure scores
   int pawnScoreEg[2];      // endgame pawn structure scores
-  U64 bbKingZone[2];       // bitboard of squares near enemy king
   U64 bbPawnControl[2];    // squares controlled by pawns, used in mobility eval (pawn eval uses only occupancy masks)
   U64 bbPawnCanControl[2]; // squares that can be controlled by pawns as they advance, used in outpost eval
   U64 kingDiagChecks[2];
@@ -59,7 +58,6 @@ private:
   int CheckmateHelper(sPosition *p);
   void InitStatic(void);            
   void InitDynamic(sPosition *p);            
-  void SetKingZones(sPosition *p);
   void SetScaleFactor(sPosition *p);
   int SetDegradationFactor(sPosition *p, int stronger);
   int Interpolate(void);

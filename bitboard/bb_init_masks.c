@@ -45,7 +45,7 @@ void InitPossibleAttacks()
 {
   for (int i = 0; i < 64; i++) {
 	for (int j = 0; j < 64; j++) {
-	  // which squares can be attacked from a given square
+	  // which squares can be attacked from a given square?
 	  bbBAttacksOnEmpty[i] = BAttacks(0ULL, i); 
 	  bbRAttacksOnEmpty[i] = RAttacks(0ULL, i); 
 
@@ -62,10 +62,10 @@ void InitPossibleAttacks()
 void InitPawnSupport() 
 {
   for (int i = 0; i < 64; i++) {
-      bbPawnSupport[WHITE][i] = ( (SqBb(i) & bbNotA) >> 1 ) | ((SqBb(i) & bbNotH) << 1 );
+      bbPawnSupport[WHITE][i] = ShiftWest(SqBb(i)) | ShiftEast(SqBb(i));
 	  bbPawnSupport[WHITE][i] |= FillNorth(bbPawnSupport [WHITE][i] );
 
-	  bbPawnSupport[BLACK][i] = ( (SqBb(i) & bbNotA) >> 1 ) | ((SqBb(i) & bbNotH) << 1 );
+	  bbPawnSupport[BLACK][i] = ShiftWest(SqBb(i)) | ShiftEast(SqBb(i));
 	  bbPawnSupport[BLACK][i] |= FillSouth(bbPawnSupport [BLACK][i] );
   }
 }

@@ -28,6 +28,7 @@ U64 attacks[4][64][64];
 U64 bbPawnAttacks[2][64];
 U64 bbKnightAttacks[64];
 U64 bbKingAttacks[64];
+U64 bbKingZone[2][64];
 U64 bbPassedMask[2][64];
 U64 bbAdjacentMask[8];
 U64 bbBadBishopMasks[2][64];

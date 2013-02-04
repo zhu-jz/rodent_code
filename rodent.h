@@ -242,6 +242,7 @@ extern U64 attacks[4][64][64];
 extern U64 bbPawnAttacks[2][64];
 extern U64 bbKnightAttacks[64];
 extern U64 bbKingAttacks[64];
+extern U64 bbKingZone[2][64];
 
 extern U64 bbPassedMask[2][64];
 extern U64 bbAdjacentMask[8];

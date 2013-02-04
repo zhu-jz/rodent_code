@@ -78,7 +78,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 
 	ScoreOutpost(p, side, N, sq);
 
-	bbAttZone = bbControl & bbKingZone[side];    // king attacks
+	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];    // king attacks
 	if (bbAttZone && p->pcCount[side][Q] ) 
        AddPieceAttack(side, att_N[PopCntSparse(bbAttZone)] ); 
 
@@ -116,9 +116,9 @@ void sEvaluator::ScoreB(sPosition *p, int side)
     // If we can attack zone around enemy king from the current square, 
 	// test this possibility on the actual board.
 	if (bbBCanAttack[sq] [KingSq(p, side ^ 1) ] 
-	&& (bbControl & bbKingZone[side])  ) {
+	&& (bbControl & bbKingZone[side][p->kingSquare[Opp(side)]] ) ) {
 
-       bbAttZone = bbControl & bbKingZone[side];  
+       bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone 
 	   && p->pcCount[side][Q] ) // no attack eval without queens on board
 		  AddPieceAttack( side, att_B[PopCntSparse(bbAttZone)] ); 
@@ -159,12 +159,12 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) 
 	   {
 		  AddMiscTwo(side, Data.rookOpenMg, Data.rookOpenEg);
-		  if (bbFrontSpan & bbKingZone[side] ) attCount[side] += Data.rookOpenAttack;
+		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += Data.rookOpenAttack;
 	   }
 	  else
 	  {
 		  AddMiscTwo(side, Data.rookSemiOpenMg, Data.rookSemiOpenEg);
-		  if (bbFrontSpan & bbKingZone[side] ) attCount[side] += Data.rookSemiOpenAttack;
+		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += Data.rookSemiOpenAttack;
 	  }
 	}
 
@@ -182,9 +182,9 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
 	// if we can attack enemy king from current square, test this possibility
 	if ( bbRCanAttack[sq] [KingSq(p, side ^ 1) ]  
-	&& ( bbControl & bbKingZone[side] ) ) {
+	&& ( bbControl & bbKingZone[side][p->kingSquare[Opp(side)]] ) ) {
 
-       bbAttZone = bbControl & bbKingZone[side];
+       bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone && p->pcCount[side][Q]) 
 		  AddPieceAttack(side, att_R[ PopCntSparse(bbAttZone) ] );
 	}
@@ -239,7 +239,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	      bbAttacks = bbControl;
 
 	   // count attacks
-	   bbAttZone = bbAttacks & bbKingZone[side];
+	   bbAttZone = bbAttacks & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone) 
 		   AddPieceAttack(side, att_Q[PopCntSparse(bbAttZone)] );	   
 	}

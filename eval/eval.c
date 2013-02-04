@@ -43,17 +43,24 @@ void sEvaluator::InitStatic(void)
 void sEvaluator::InitDynamic(sPosition *p) 
 {
      attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
-     attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear attack scores
-     mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
-     egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
-     mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
-     egMobility[WHITE]       = 0;   egMobility[BLACK]  = 0;  // clear endgame mobility	 
-     bbPawnControl[WHITE]    = GetWPControl( bbPc(p, WHITE, P) );
+	 attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear attack scores
+	 mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
+	 egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
+	 mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
+	 egMobility[WHITE]       = 0;   egMobility[BLACK]  = 0;  // clear endgame mobility	 
+	 bbPawnControl[WHITE]    = GetWPControl( bbPc(p, WHITE, P) );
 	 bbPawnControl[BLACK]    = GetBPControl( bbPc(p, BLACK, P) );
 	 bbPawnCanControl[WHITE] = FillNorth( bbPawnControl[WHITE] );
 	 bbPawnCanControl[BLACK] = FillSouth( bbPawnControl[BLACK] );
 	 bbAllAttacks[WHITE]     = bbPawnControl[WHITE];
 	 bbAllAttacks[BLACK]     = bbPawnControl[BLACK];
+	 
+	 // set squares from which king can be checked 
+	 U64 bbOccupied = OccBb(p);
+	 kingStraightChecks[WHITE] = RAttacks(bbOccupied, KingSq(p, WHITE) );  
+	 kingStraightChecks[BLACK] = RAttacks(bbOccupied, KingSq(p, BLACK) );  
+	 kingDiagChecks[WHITE]     = BAttacks(bbOccupied, KingSq(p, WHITE) );  
+	 kingDiagChecks[BLACK]     = BAttacks(bbOccupied, KingSq(p, BLACK) );  
 }
 
 void sEvaluator::SetScaleFactor(sPosition *p) 
@@ -66,24 +73,6 @@ void sEvaluator::SetScaleFactor(sPosition *p)
 int sEvaluator::Interpolate(void) 
 {
     return ( (mgFact * mgScore ) / 24 ) + ( (egFact * egScore ) / 24 );
-}
-
-void sEvaluator::SetKingZones(sPosition *p) 
-{
-  // set bitboard of squares around enemy king
-  bbKingZone[WHITE]    = bbKingAttacks[KingSq(p, WHITE ^ 1) ]; 
-  bbKingZone[BLACK]    = bbKingAttacks[KingSq(p, BLACK ^ 1) ]; 
-
-  // enlarge king attack zone by squares in front of the ring, facing enemy position
-  bbKingZone[WHITE]   |= ( bbKingZone[WHITE] << 8 );
-  bbKingZone[BLACK]   |= ( bbKingZone[BLACK] >> 8 );
-
-  // set squares from which a king can be checked 
-  U64 bbOccupied = OccBb(p);
-  kingStraightChecks[WHITE] = RAttacks(bbOccupied, KingSq(p, WHITE) );  
-  kingStraightChecks[BLACK] = RAttacks(bbOccupied, KingSq(p, BLACK) );  
-  kingDiagChecks[WHITE]     = BAttacks(bbOccupied, KingSq(p, WHITE) );  
-  kingDiagChecks[BLACK]     = BAttacks(bbOccupied, KingSq(p, BLACK) );  
 }
 
 void sEvaluator::ScoreHanging(sPosition *p, int side)
@@ -216,7 +205,6 @@ int sEvaluator::Return(sPosition *p, int alpha, int beta)
   // if score seems already very high/very low
   if (temp_score > alpha - Data.lazyMargin 
   &&  temp_score < beta +  Data.lazyMargin) {
-	  SetKingZones(p);
 	  InitDynamic(p);
 
       ScoreN(p, WHITE);

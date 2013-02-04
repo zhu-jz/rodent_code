@@ -58,7 +58,8 @@ int PopCnt(U64 bb)
 // used in knight/bishop/rook mobility calculation, posted on CCC forum
 // by Marco Costalba of the Stockfish team
 
-int PopCnt15(U64 bb) {
+int PopCnt15(U64 bb) 
+{
     unsigned w = unsigned(bb >> 32), v = unsigned(bb);
     v -= (v >> 1) & 0x55555555; // 0-2 in 2 bits
     w -= (w >> 1) & 0x55555555;
