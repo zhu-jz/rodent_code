@@ -292,7 +292,6 @@ void sBook::AddMoveToMainBook(U64 hashKey, int move, int val) {
 
 int sBook::IsMoveInBook(U64 hashKey, int move)
 {
-	printf("nofrecords %d", nOfRecords);
 	if (nOfRecords == 0) return 0;
 
 	for (int i = 0; i < nOfRecords; i++ ) {
@@ -342,7 +341,7 @@ void sBook::AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor)
     }
 }
 
-void sBook::AddLineToMainBook(sPosition *p, char *ptr, int excludedColor)
+void sBook::AddLineToMainBook(sPosition *p, char *ptr, int excludedColor, int verifyDepth)
 {
   char token[2048];
   UNDO u[1];
@@ -367,13 +366,11 @@ void sBook::AddLineToMainBook(sPosition *p, char *ptr, int excludedColor)
 		if (strstr(token, "!!")) freq = +900;
 		if (strstr(token, "xx")) freq = DELETE_MOVE;
 
-		// disabled code for book feeder
-		/**
-        if (freq == 1 && !IsMoveInBook( GetBookHash(p), move ) && p->side != excludedColor )
+		// if asked for, verify new move with a search
+        if (freq == 1 && !IsMoveInBook( GetBookHash(p), move ) && p->side != excludedColor && verifyDepth)
 		{
-			if ( Searcher.VerifyValue(p, 16, move) < -75 ) freq = -100;
+			if ( Searcher.VerifyValue(p, verifyDepth, move) < -75 ) freq = -100;
 		}
-		/**/
 
 		// add move to book if we accept moves of a given color
 		if (p->side != excludedColor)
@@ -441,7 +438,7 @@ void sBook::SplitContinousBookFormat(char *fileName)
 	  fclose(outFile);
  }
 
-void sBook::ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedColor)
+void sBook::ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedColor, int verifyDepth)
 {
 	  FILE *bookFile; 
 	  char line[2048];
@@ -456,7 +453,7 @@ void sBook::ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedCo
 		    ++line_no;
 			if ( line_no % 100 == 0 ) printf("Adding line no. %d\r",line_no);
 		    if(line[0] == ';') continue; // don't process comment lines
-		    AddLineToMainBook(p, line, excludedColor);
+		    AddLineToMainBook(p, line, excludedColor, verifyDepth);
 	  }
 
 	  printf("Adding line no. %d\r",line_no);
@@ -551,14 +548,14 @@ void sBook::SortMainBook(void) {
   }
 };
 
-void sBook::FeedMainBook(sPosition *p) 
+void sBook::FeedMainBook(sPosition *p, int verifyDepth) 
 {
 	 printf("Feeding book moves for both sides\n");
-	 ReadMainBookFromOwnFile(p, "feed.txt", NO_CL);
+	 ReadMainBookFromOwnFile(p, "feed.txt", NO_CL, verifyDepth);
 	 printf("\nFeeding book moves for white only\n");
-	 ReadMainBookFromOwnFile(p, "feed_white.txt", BLACK);
+	 ReadMainBookFromOwnFile(p, "feed_white.txt", BLACK, verifyDepth);
 	 printf("\nFeeding book moves for black only\n");
-	 ReadMainBookFromOwnFile(p, "feed_black.txt", WHITE);
+	 ReadMainBookFromOwnFile(p, "feed_black.txt", WHITE, verifyDepth);
 	 printf("\nSorting book moves\n");
 	 SortMainBook();
 	 SaveBookInOwnFormat("newbook.wtf");
