@@ -55,7 +55,7 @@ void AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor);
 void AddLineToMainBook(sPosition *p, char *ptr, int excludedColor);
 U64 GetBookHash(sPosition *p);
 int GetBookMove(sPosition *p, int canPrint, int *flagIsProblem);
-void FeedMainBook(void);
+void FeedMainBook(sPosition *p);
 int IsInfrequent(int val, int maxFreq);
 int IsMoveInBook(U64 hashKey, int move);
 };

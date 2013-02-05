@@ -97,7 +97,7 @@ void sParser::UciLoop(void)
     } else if (strcmp(token, "split") == 0) {
 	  Book.SplitContinousBookFormat("dense.txt");
     } else if (strcmp(token, "feedbook") == 0) {
-      Book.FeedMainBook();
+      Book.FeedMainBook(p);
     } else if (strcmp(token, "bookdoctor") == 0) {
       Book.BookDoctor(p);
     } else if (strcmp(token, "print") == 0) {

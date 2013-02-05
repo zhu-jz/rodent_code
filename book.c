@@ -114,10 +114,10 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 		   if (canPrint) printf(" ");
 		   MoveToStr(moves[i], testString);
 		   printf( testString );
-		   if (values[i] > 0 ) { 
-			   if (canPrint) printf(" %d ", values[i] );
+		   if (canPrint) { 
+			   if (values[i] > 0 ) printf(" %d ", values[i] );
+		       else                printf("? ");
 		   }
-		   else              if (canPrint)  printf("? ");
 
            // pick move with the best random value based on frequency
 		   if (values[i] > 0) curVal = 1 + rand() % values[i]; 
@@ -158,7 +158,6 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 	}
 
 	if (nOfChoices) {
-
        // get maximum frequency of a move - it will be used
        // to filter out moves that were played not often enough
 	   for (i = 0; i < nOfChoices; i++ ) {
@@ -552,10 +551,8 @@ void sBook::SortMainBook(void) {
   }
 };
 
-void sBook::FeedMainBook() 
+void sBook::FeedMainBook(sPosition *p) 
 {
-	 sPosition * p;
-	 SetPosition(p, START_POS); // silencing compiler warning 
 	 printf("Feeding book moves for both sides\n");
 	 ReadMainBookFromOwnFile(p, "feed.txt", NO_CL);
 	 printf("\nFeeding book moves for white only\n");
