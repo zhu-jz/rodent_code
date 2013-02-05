@@ -255,14 +255,12 @@ void sEvaluator::ScoreP(sPosition *p, int side)
   int sq;
   U64 bbPieces = bbPc(p, side, P);
   U64 bbOccupied    = OccBb(p);
-  U64 bbStop, bbNextStop, bbObstacles;
+  U64 bbStop, bbObstacles;
   int passUnitMg, passUnitEg; 
 
   while (bbPieces) {
     sq = FirstOne(bbPieces);
-
 	bbStop = ShiftFwd(SqBb(sq), side);
-	//bbNextStop = ShiftFwd(bbStop, side);
 
 	if (bbStop &~bbOccupied) {           // this pawn is mobile
 	   if (Data.pstMg[side][P][sq] > 0)  // and placed on a good square
