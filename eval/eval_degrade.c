@@ -35,7 +35,6 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	if ( p->pieceMat[weaker] > 1400
 	||   p->pcCount[weaker][P] > 2 ) return 64;
 
-
 	// no pawns for stronger side
 	if (p->pcCount[stronger][P] == 0) {
        // no win if stronger side has just one minor piece
@@ -46,7 +45,7 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
     if (p->pcCount[stronger][P] == 0 
     &&  p->pcCount[weaker  ][P] == 0) 
 	{
-       if (MaterialNN(p,stronger) ) return 0;
+      if (MaterialNN(p,stronger) ) return 0;
 
 	  // low and almost equal material, except KBB vs KN:     1/8
 	  if ( MaterialRook(p, stronger)  && MaterialRook(p, weaker) ) return 8;
@@ -58,12 +57,12 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
     // it's hard to win with a bare rook against a minor/minor + pawn
     if (p->pcCount[stronger][P] == 0 
     && p->pieceMat[stronger] == Data.matValue[R] 
-    && p->pieceMat[weaker] > 0 ) return 32; // 1/2
+    && p->pieceMat[weaker] > 0 ) return 16; // 1/4
 
     // it's hard to win with a rook and a minor against a rook/rook + pawns
     if (p->pcCount[stronger][P] == 0 
     && MaterialRookMinor(p, stronger) 
-    && MaterialRook(p, weaker) ) return 32; // 1/2
+    && MaterialRook(p, weaker) ) return 16; // 1/4
 
     // it's hard to win with a queen and a minor against a queen/queen + pawns
     if (p->pcCount[stronger][P] == 0 
