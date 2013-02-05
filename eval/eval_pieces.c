@@ -108,8 +108,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 
 	ScoreOutpost(p, side, B, sq);
 
-    // check threats
-	// (we may get false positive due to queen transparency, but it's ok)
+    // check threats (with false positive due to queen transparency)
 	if (bbControl & ( kingDiagChecks[Opp(side)] ) )
 		attCount[side] += canCheckWith[B]; 
 
@@ -175,8 +174,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	   )  AddMiscTwo(side, Data.rookSeventhMg, Data.rookSeventhEg);
 	}
 
-    // check threats
-	// (we may get a false positive due to R/Q transparency, but that's ok)
+    // check threats (with false positive due to queen/rook transparency)
 	if (bbControl & kingStraightChecks[Opp(side)] )
 		attCount[side] += canCheckWith[R];
 

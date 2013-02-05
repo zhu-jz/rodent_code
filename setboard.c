@@ -38,9 +38,8 @@ void SetPosition(sPosition *p, char *epd)
     p->pstMg[i]     = 0;
 	p->pstEg[i]     = 0;
 
-	for (j = 0; j < 6; j++) {
+	for (j = 0; j < 6; j++) 
 		p->pcCount[i][j] = 0; // clear piece counts
-	}
   }
 
   for (i = 0; i < 6; i++)

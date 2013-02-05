@@ -94,7 +94,7 @@ void InitKingAttacks()
     bbKingAttacks[i] = FillKing( SqBb(i) ) ^ SqBb(i);
   
     // set bitboard of squares constituting king zone (used in king safety eval)
-    bbKingZone[WHITE][i]    = bbKingAttacks[i] | bbKingAttacks[i] << 8; 
-    bbKingZone[BLACK][i]    = bbKingAttacks[i] | bbKingAttacks[i] >> 8; 
+    bbKingZone[WHITE][i] = bbKingAttacks[i] | bbKingAttacks[i] << 8; 
+    bbKingZone[BLACK][i] = bbKingAttacks[i] | bbKingAttacks[i] >> 8; 
   }
 }

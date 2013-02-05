@@ -327,18 +327,16 @@ void sEvaluator::DebugPst(sPosition *p)
 
 	     bbPieces = bbPc(p, WHITE, pc);
 	     while (bbPieces) {
-           sq = FirstOne(bbPieces);
+           sq = PopFirstBit(&bbPieces);
 	       mg += Data.pstMg[WHITE][pc][sq];
 		   eg += Data.pstEg[WHITE][pc][sq];
-	       bbPieces &= bbPieces - 1;
 	     }
 
 	     bbPieces = bbPc(p, BLACK, pc);
 	     while (bbPieces) {
-           sq = FirstOne(bbPieces);
+           sq = PopFirstBit(&bbPieces);
 	       mg -= Data.pstMg[BLACK][pc][sq];
 		   eg -= Data.pstEg[BLACK][pc][sq];
-	       bbPieces &= bbPieces - 1;
 	     }
 	 }
 	 printf("Recalculated pst : mg %d eg %d\n", mg, eg);
