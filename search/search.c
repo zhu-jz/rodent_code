@@ -498,8 +498,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // EXTENSIONS might be placed here
 
+	 int flagCanReduce = (nodeType != PV_NODE) && !flagInCheck && !depthChange && (MoveType(move) != CASTLE);
+
 	 // FUTILITY PRUNING 
-	 if ( flagCanPrune                 // flag is set
+	 if ( flagCanReduce 
+	 && flagCanPrune                   // futility pruning flag is set
 	 && !depthChange                   // we have not extended this move
 	 && IsMoveOrdinary(flagMoveType)   // not a tt move, not a capture, not a killer move
 	 && movesTried > 1                 // we have found at least one legal move
@@ -509,10 +512,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 }
 
 	 // LATE MOVE PRUNING near the leaves (2012-04-02: two-tier approach)
-	 if (nodeType != PV_NODE            // we're not in a pv node
+	 if ( flagCanReduce
      &&  depth <= Data.minimalLmrDepth  // we are near the leaf
-	 &&  depthChange == 0               // we have not extended
-	 &&  !flagInCheck                   // we're not escaping from check
      &&  !InCheck(p)                    // we're not giving check	
 	 &&  movesTried > 12                // move is sufficiently down the list
 	 // adding !flagMoveType (= not pruning bad captures) or history restiction is worse
@@ -523,12 +524,10 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 		    { Manipulator.UndoMove(p, move, undoData); continue; }
 	 }
 
-	 // LATE MOVE REDUCTION (lmr) - we reduce a move if:
-	 if  ( nodeType != PV_NODE          // we're not in a pv node
+	 // LATE MOVE REDUCTION (lmr)
+	 if  ( flagCanReduce
      &&  depth > Data.minimalLmrDepth   // we have some depth left
-	 &&  depthChange == 0               // it has not been extended
 	 &&  movesTried > Data.moveIsLate   // it is sufficiently down the move list
-	 &&  !flagInCheck                   // we're not escaping a check
      &&  !InCheck(p)                    // we're not giving check
 	 &&  History.MoveIsBad(move)        // current move has bad history score
 	 ) {
