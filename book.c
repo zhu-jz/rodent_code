@@ -295,7 +295,6 @@ int sBook::IsMoveInBook(U64 hashKey, int move)
 	if (nOfRecords == 0) return 0;
 
 	for (int i = 0; i < nOfRecords; i++ ) {
-		 if ( i % 1000 == 0) printf (" %d ", i); // fixing a heisenbug
          if ( myBook[i].hash == hashKey 
 			 &&   myBook[i].move == move) {
 		 return 1;

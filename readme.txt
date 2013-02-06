@@ -197,6 +197,10 @@ a file called newbook.wtf. At this stage user MUST RENAME newbook.wtf
 to bigbook.wtf. This is a precaution allowing to save old book in case that
 user considers feed files corrupt.
 
+Calling "feedbook" with a numeric parameter causes Rodent to verify new
+book moves with a search to the depth supplied by the parameter. It takes
+insanely long, though.
+
 Rodent contains small utility reformatting book files from something like:
 
 e2e4e7e6d2d4d7d5b1c3f8b4
@@ -210,11 +214,6 @@ investigate its main book file and stop at first point where it finds
 either an infrequent move or missing transposition into book line. In both
 cases it would be prudent to decide whether a move should be upgraded
 or marked as unplayable.
-
-Rodent may use big book in two modes: it may pick moves according to their 
-frequency or conduct short verification search. The latter causes it to play
-moves that it likes and to reject errors that are likely to be found in the 
-big book. The second mode can be turned on using UCI option "VerifyBook"
 
 VIII. WEAKENING
 
@@ -232,10 +231,9 @@ basic infrastructure is already in place. It consists of three parts:
 
 As You can probably guess, tuning the third element of the algorithm presents
 the hardest challenge. Engine forgetting about certain moves (like captures
-by a pawn or (re)captures of recently moved piece) would look unnatural, except
-of the lowest levels. Engine forgetting about escapes from check would happily
-sack material for false checkmates. Engine not missing tactical moves would not
-be weak enough.
+by a pawn or (re)captures of recently moved piece) would look unnatural. 
+Engine forgetting about escapes from check would happily sack material for 
+false checkmates. Engine not missing tactical moves would not be weak enough.
 
 IX. INI FILE
 
