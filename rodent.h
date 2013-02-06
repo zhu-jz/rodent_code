@@ -19,8 +19,9 @@
 
 #pragma once
 
+#define BUILD 2
 // sets max nodes, used to create Rodent's version for ultra-fast tests
-//#define FAST_TUNING 100000
+// #define FAST_TUNING 100000
 
 #undef CDECL
 

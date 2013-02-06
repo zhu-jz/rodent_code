@@ -23,8 +23,6 @@ enum ePanelStyle { PANEL_NORMAL, PANEL_POWER };
 
 struct sData {
 public:
- 
- int buildNo;
 
  // eval data
  int matValue[7];

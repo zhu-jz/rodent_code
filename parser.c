@@ -409,8 +409,8 @@ void sParser::ReadIniFile(char *fileName)
 
 void sParser::PrintEngineHeader() 
 {
-    printf("id name Rodent 0.18.");
-	printf("%d\n", Data.buildNo);
+    printf("id name Rodent 0.19.");
+	printf("%d\n", BUILD);
     printf("id author Pawel Koziol (based on Sungorus by Pablo Vazquez)\n");
 }
 

@@ -196,7 +196,6 @@ void sData::InitMaterialValues(void)
 
 void sData::InitEvalVars(void) 
 {
-	 buildNo = 0; 
 	 ownMobility    = 110;
 	 oppMobility    = 100;
 	 ownAttack      = 100; 

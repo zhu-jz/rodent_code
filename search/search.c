@@ -498,12 +498,12 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // EXTENSIONS might be placed here
 
-	 int flagCanReduce = (nodeType != PV_NODE) && !flagInCheck && !depthChange && (MoveType(move) != CASTLE);
+	 int flagCanReduce = (nodeType != PV_NODE) && !flagInCheck && !depthChange 
+		 && (MoveType(move) != CASTLE) && (flagMoveType != FLAG_HASH_MOVE) && (flagMoveType != FLAG_KILLER_MOVE);
 
 	 // FUTILITY PRUNING 
 	 if ( flagCanReduce 
 	 && flagCanPrune                   // futility pruning flag is set
-	 && !depthChange                   // we have not extended this move
 	 && IsMoveOrdinary(flagMoveType)   // not a tt move, not a capture, not a killer move
 	 && movesTried > 1                 // we have found at least one legal move
 	 ) {
