@@ -80,12 +80,11 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 
   for (rootDepth = ONE_PLY; rootDepth <= localDepth; rootDepth+=ONE_PLY) {
 
-	 DisplayRootInfo();
-	 delta = Data.aspiration;
-	 alpha = val-delta;
-	 beta  = val+delta;
+	DisplayRootInfo();
+	delta = Data.aspiration;
 
-	 //if (rootDepth <= 6 * ONE_PLY) { alpha = -INF; beta = INF; }
+	if (rootDepth <= 6 * ONE_PLY) { alpha = -INF;      beta = INF;       }
+	else                          { alpha = val-delta; beta = val+delta; }
     
 	// first use aspiration window around the value from the last completed depth
 	curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, NO_NULL, 0, pv);
