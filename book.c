@@ -87,8 +87,7 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 
 	nOfChoices = 0;
 
-	// no book move returned in analyse mode
-	if (Data.isAnalyzing) return 0;
+	if (Data.isAnalyzing) return 0; // book movea aren't returned in analyse mode
 
 	for (i = 0; i < nOfGuideRecords; i++ ) {
 		if (guideBook[i].hash == localHash
@@ -250,8 +249,8 @@ int sBook::PrintMissingMoves(sPosition *p)
   return isProblem;
 }
 
-void sBook::AddMoveToGuideBook(U64 hashKey, int move, int val) {
-
+void sBook::AddMoveToGuideBook(U64 hashKey, int move, int val) 
+{
     // if move is already in the book, just change its frequency 
 	for (int i = 0; i < nOfGuideRecords; i++ ) {
          if ( guideBook[i].hash == hashKey 

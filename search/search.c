@@ -316,7 +316,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   int blunderCount   = 0;       // forces the engine to try one of the top moves in weakening mode
   int nodeEval       = INVALID; // we have not called evaluation function at this node yet 
   int flagIsReduced  = 0;       // are we in a reduced search? (guides re-searches)
-  int flagCanPrune   = 0;       // can we statically prune in this node
+  int flagFutility   = 0;       // can we apply futility pruning in this node
   int flagInCheck    = InCheck(p); // are we in check at the beginning of the search?
   int normalMoveCnt  = 0;       // counter used to delay futility pruning initialization
 
@@ -362,12 +362,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   // safeguard against hitting max ply limit
   if (ply >= MAX_PLY - 1) return Eval.Return(p, alpha, beta);
 
+  int flagCanPrune = (nodeType != PV_NODE) && (beta < MAX_EVAL) && !flagInCheck;
+
   // EVAL PRUNING (inspired by DiscoCheck by Lucas Braesch)
   if (depth <= 3*ONE_PLY
-  && nodeType != PV_NODE
-  &&  beta < MAX_EVAL
-  && !flagInCheck) 
-  {
+  && flagCanPrune) {
      if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
 	 int evalMargin = 40 * depth;
 	 if ( nodeEval - evalMargin >= beta )
@@ -376,29 +375,24 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // QUIESCENCE NULL MOVE (idea from CCC post of Vincent Diepeveen)
   if (Data.useNull
-  && nodeType != PV_NODE
+  && flagCanPrune
   && depth <= Data.minimalNullDepth
   && !wasNull
-  && beta < MAX_EVAL
-  && !flagInCheck
-  && p->pieceMat[p->side] > Data.matValue[N])
-  {
-    Manipulator.DoNull(p, undoData);
-    score = -Quiesce(p, ply, 0, -beta, -beta+1, pv);
-	Manipulator.UndoNull(p, undoData);
+  && p->pieceMat[p->side] > Data.matValue[N]) {
+     Manipulator.DoNull(p, undoData);
+     score = -Quiesce(p, ply, 0, -beta, -beta+1, pv);
+	 Manipulator.UndoNull(p, undoData);
 
-	if (score >= beta) return score;
+	 if (score >= beta) return score;
   }
 
   // NULL MOVE - we allow opponent to move twice in a row; if he cannot beat
   // beta this way, then we assume that there is no need to search any further.
 
   if (Data.useNull
-  && nodeType != PV_NODE
+  && flagCanPrune
   && depth > Data.minimalNullDepth
   && !wasNull
-  && beta < MAX_EVAL
-  && !flagInCheck
   && p->pieceMat[p->side] > Data.matValue[N]) 
   {
     if ( beta <= Eval.Return(p, alpha, beta) )
@@ -461,15 +455,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	     if (normalMoveCnt == 1) {
             
             if ( depth < Data.futilityDepth * ONE_PLY  // we are sufficiently close to the leaf
-            && beta < MAX_EVAL                         // we're not checkmating
-            && alpha > -MAX_EVAL                       // we're not being checkmated
-            && nodeType != PV_NODE                     // we're not in a pv node
-            && !flagInCheck ) {                        // we're not in check
+            && flagCanPrune
+            && alpha > -MAX_EVAL ) {
                if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
                nodeEval = TransTable.RefineScore( p->hashKey, nodeEval );
 
                // this node looks bad enough, so we may apply futility pruning
-               if ( (nodeEval + SetFutilityMargin(depth) ) < beta ) flagCanPrune = 1;
+               if ( (nodeEval + SetFutilityMargin(depth) ) < beta ) flagFutility = 1;
             }
 	     }
 	 }
@@ -498,12 +490,12 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // EXTENSIONS might be placed here
 
-	 int flagCanReduce = (nodeType != PV_NODE) && !flagInCheck && !depthChange 
-		 && (MoveType(move) != CASTLE) && (flagMoveType != FLAG_HASH_MOVE) && (flagMoveType != FLAG_KILLER_MOVE);
+	 int flagCanReduce = (nodeType != PV_NODE) && !flagInCheck && !depthChange && (MoveType(move) != CASTLE) 
+		               && (flagMoveType != FLAG_HASH_MOVE) && (flagMoveType != FLAG_KILLER_MOVE);
 
 	 // FUTILITY PRUNING 
-	 if ( flagCanReduce 
-	 && flagCanPrune                   // futility pruning flag is set
+	 if ( flagCanReduce
+	 && flagFutility
 	 && IsMoveOrdinary(flagMoveType)   // not a tt move, not a capture, not a killer move
 	 && movesTried > 1                 // we have found at least one legal move
 	 ) {
@@ -538,13 +530,12 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
  	        flagIsReduced = 1;
 		 }
 		
-		 // marginal reduction of bad captures
+		 // marginal reduction of bad captures (somehow history restriction from main loop helps here)
 		 if (flagMoveType == FLAG_BAD_CAPTURE) {
             depthChange -= HALF_PLY;
  	        flagIsReduced = 1;
 	     }
 		
-	   // strangely, history restriction from main lmr loop is beneficial for bad captures)
 	 } // end of late move reduction code
 
 	 newDepth = depth - ONE_PLY + depthChange; // determine new depth
@@ -603,8 +594,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
    return best;
 }
-
-// determine the amount a null move is reduced
 
 int sSearcher::SetNullDepth(int depth) 
 {
