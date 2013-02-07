@@ -26,38 +26,35 @@ struct sBookEntry {
 };
 
 struct sBook {
-sBookEntry myBook[1024000];
-sBookEntry guideBook[48000];
-int nOfRecords;
-int nOfGuideRecords;
-void Init(sPosition *p);
-
-// variables used for move selection
-int moves[100];
-int nOfChoices;
-
-char testString [12];
-
-int ReadOwnBookFile(char *filename);
-void SaveBookInOwnFormat(char *filename);
-void ParseBookEntry(char * ptr, int line_no);
-
-void BookDoctor(sPosition * p);
-void ReadInternalToGuideBook(sPosition *p);
-int  ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedColor);
-void ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedColor, int verifyDepth);
-int PrintMissingMoves(sPosition *p);
-void SplitContinousBookFormat(char *fileName);
-void SortMainBook(void);
-void AddMoveToGuideBook(U64 hash, int move, int val);
-void AddMoveToMainBook(U64 hash, int move, int val);
-void AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor);
-void AddLineToMainBook(sPosition *p, char *ptr, int excludedColor, int verifyDepth);
-U64 GetBookHash(sPosition *p);
-int GetBookMove(sPosition *p, int canPrint, int *flagIsProblem);
-void FeedMainBook(sPosition *p, int verifyDepth);
-int IsInfrequent(int val, int maxFreq);
-int IsMoveInBook(U64 hashKey, int move);
+private:
+   sBookEntry myBook[1024000];
+   sBookEntry guideBook[48000];
+   int nOfRecords;
+   int nOfGuideRecords;
+   int moves[100];
+   int nOfChoices;
+   char testString [12];
+   void AddMoveToGuideBook(U64 hash, int move, int val);
+   void AddMoveToMainBook(U64 hash, int move, int val);
+   void AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor);
+   void AddLineToMainBook(sPosition *p, char *ptr, int excludedColor, int verifyDepth);
+   U64 GetBookHash(sPosition *p);
+   int IsInfrequent(int val, int maxFreq);
+   int IsMoveInBook(U64 hashKey, int move);
+   void ParseBookEntry(char * ptr, int line_no);
+   int PrintMissingMoves(sPosition *p);
+   void ReadInternalToGuideBook(sPosition *p);
+   void ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedColor, int verifyDepth);
+   void SaveBookInOwnFormat(char *filename);
+   void SortMainBook(void);
+public:
+   void Init(sPosition *p);
+   int ReadOwnBookFile(char *filename);
+   int ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedColor);
+   void BookDoctor(sPosition * p);
+   void SplitContinousBookFormat(char *fileName);
+   int GetBookMove(sPosition *p, int canPrint, int *flagIsProblem);
+   void FeedMainBook(sPosition *p, int verifyDepth);
 };
 
 extern sBook Book;
