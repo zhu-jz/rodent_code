@@ -32,8 +32,7 @@ struct sHistory {
 	 void OnMoveReduced(int move);
 	 int MoveIsBad(int move);
 	 int GetMoveHistoryValue(int pc, int sq_to);
-	 int GetFirstKiller(int ply);
-	 int GetSecondKiller(int ply);
+	 int GetKiller(int ply, int slot);
 };
 
 extern sHistory History;

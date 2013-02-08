@@ -211,7 +211,7 @@ int sBook::PrintMissingMoves(sPosition *p)
 	int flagMoveType;
 	int isProblem = 0;
 
-    Selector.InitMoves(p, move, MAX_PLY);
+    Selector.InitMoveList(p, move, MAX_PLY);
 
     // LOOP THROUGH THE MOVE LIST
     while ( move = Selector.NextMove(0, &flagMoveType) ) {

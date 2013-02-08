@@ -65,7 +65,7 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
 
   if (best > alpha) alpha = best;
 
-  Selector.InitCaptures(p, move);
+  Selector.InitCaptureList(p, move);
 
   while ( move = Selector.NextCapture() ) {      // on finding next capture...
 

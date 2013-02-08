@@ -82,7 +82,7 @@ int sSearcher::Perft(sPosition *p, int ply, int depth)
 	int refutationSq = 0;
 	int nOfMoves = 0;
 
-    Selector.InitMoves(p, move, ply);
+    Selector.InitMoveList(p, move, ply);
 
     // LOOP THROUGH THE MOVE LIST
     while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) 
@@ -122,7 +122,7 @@ void sSearcher::Divide(sPosition *p, int ply, int depth)
 
 	Timer.SetStartTime();
 
-    Selector.InitMoves(p, move, ply);
+    Selector.InitMoveList(p, move, ply);
 
     // LOOP THROUGH THE MOVE LIST
     while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) 

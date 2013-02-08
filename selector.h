@@ -31,8 +31,8 @@ private:
 	int SelectBest(void);
 public:
 	int BadCapture(sPosition *p, int move);
-	void InitCaptures(sPosition *p, int hashMove);
-	void InitMoves(sPosition *p, int transMove, int ply);
+	void InitCaptureList(sPosition *p, int hashMove);
+	void InitMoveList(sPosition *p, int transMove, int ply);
 	int NextMove(int refutationSq, int *flag);
 	int NextCapture(void);
 };

@@ -34,15 +34,14 @@ and sorting of moves.
 // TODO: try introducing "bad quiet moves"
 
 // initializes data needed for move ordering
-void sSelector::InitMoves(sPosition *p, int transMove, int ply)
+void sSelector::InitMoveList(sPosition *p, int transMove, int ply)
 {
   m->p = p;
   m->phase = 0;
   m->transMove = transMove;
-  m->killer1 = History.GetFirstKiller(ply);
-  m->killer2 = History.GetSecondKiller(ply);
+  m->killer1 = History.GetKiller(ply, 0);
+  m->killer2 = History.GetKiller(ply, 1);
 }
-
 
 int sSelector::NextMove(int refutationSq, int *flag)
 {
@@ -132,10 +131,7 @@ int sSelector::NextMove(int refutationSq, int *flag)
   return 0;
 }
 
-
-// initializes capture list, assigning sorting values to the moves
-
-void sSelector::InitCaptures(sPosition *p, int hashMove)
+void sSelector::InitCaptureList(sPosition *p, int hashMove)
 {
   m->p = p;
   m->last = GenerateCaptures(m->p, m->move);
@@ -174,24 +170,23 @@ void sSelector::ScoreCaptures(int hashMove)
 void sSelector::ScoreQuiet(int refutationSq)
 {
   int *movep, *valuep;
-  int sort_val;
+  int sortVal;
 
   valuep = m->value;
   for (movep = m->move; movep < m->last; movep++) {
     
 	// assign history value
-	sort_val =  History.GetMoveHistoryValue(m->p->pc[Fsq(*movep)], Tsq(*movep) );
+	sortVal =  History.GetMoveHistoryValue(m->p->pc[Fsq(*movep)], Tsq(*movep) );
 
-    // null move refutation is sorted much higher	
+    // null move refutations are sorted much higher	
 	if ( Fsq(*movep) == refutationSq ) { 
 		if ( Swap(m->p, Fsq(*movep), Tsq(*movep) ) >= -100 ) { // TODO: try -50
-		sort_val *= 2;
-		sort_val += 10000;
+		sortVal *= 2;
+		sortVal += 10000;
 		}
 	}
-	// TODO: if capture refuting null move is HxL, promote moves that defend a piece
 
-    *valuep++ = sort_val;
+    *valuep++ = sortVal;
   }
 }
 
@@ -275,7 +270,7 @@ void sFlatMoveList::Init(sPosition * p)
 	UNDO  undoData[1];       // data required to undo a move
 	  int pv[MAX_PLY];
 
-	Selector.InitMoves(p, 0, 0); // prepare move selector
+	Selector.InitMoveList(p, 0, 0); // prepare move selector
 	nOfMoves = 0;
 	bestMove = 0;
 	bestVal = -INF;

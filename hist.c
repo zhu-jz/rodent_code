@@ -92,14 +92,9 @@ int sHistory::GetMoveHistoryValue(int pc, int sq_to)
 	return val;
 }
 
-int sHistory::GetFirstKiller(int ply) 
+int sHistory::GetKiller(int ply, int slot) 
 {
-    return killer[ply][0];
-}
-
-int sHistory::GetSecondKiller(int ply) 
-{
-    return killer[ply][1]; 
+    return killer[ply][slot];
 }
 
 void sHistory::OnMoveReduced(int move) 

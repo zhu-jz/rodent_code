@@ -222,7 +222,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
-  Selector.InitMoves(p, move, ply);
+  Selector.InitMoveList(p, move, ply);
 
   // LOOP THROUGH THE MOVE LIST
   while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) 
@@ -442,7 +442,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
-  Selector.InitMoves(p, move, ply);
+  Selector.InitMoveList(p, move, ply);
 
   // LOOP THROUGH THE MOVE LIST
   while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
