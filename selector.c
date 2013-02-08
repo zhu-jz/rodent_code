@@ -213,23 +213,18 @@ int sSelector::SelectBest(void)
 
 // BadCapture() identifies captures that are likely to lose material
 
-// TODO: split BadCapture() into function for quiescence search 
-// and for main search; the latter might accept sacrifices 
-// in the vicinity of enemy king, captures of passed pawns etc.
-// in order to sort them higher.
-
 int sSelector::BadCapture(sPosition *p, int move) // last change 2012-03-06
 {
   int fsq = Fsq(move);
   int tsq = Tsq(move);
 
-  // Marginal speedup: function saves on some value comparisons and Swap() calls
-  // automatically accepts P x X and minor x minor, including BxN (added 2012-03-06)
+  // Marginal saving on value comparisons and Swap() calls. Here we accept
+  // "pawn takes any" and "minor takes minor", including BxN (added 2012-03-06)
   if ( TpOnSq(p, fsq) == P ) return 0;
   if ( TpOnSq(p, fsq) == N && TpOnSq(p, tsq) != P) return 0;
   if ( TpOnSq(p, fsq) == B && TpOnSq(p, tsq) != P) return 0;
 
-  // Good or equal captures not identified by the above conditions
+  // Remaining good or equal captures identified by piece value
   if (Data.matValue[TpOnSq(p, tsq)] >= Data.matValue[TpOnSq(p, fsq)] )
     return 0;
 
