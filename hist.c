@@ -72,7 +72,7 @@ void sHistory::OnGoodMove(sPosition *p, int move, int depth, int ply)
     return;
 
   // update cutoff table used for reduction decisions
-  cutoff [Fsq(move)] [Tsq(move)] += 8; // 8 and 9 work equally well in self-play, 7 and 10 untested NEW_ENGINE = 10
+  cutoff [Fsq(move)] [Tsq(move)] += 8; // 8 and 9 work equally well in self-play, 7 and 10 untested
 
   // update history table used for move sorting
   int hist_change = depth * depth;
