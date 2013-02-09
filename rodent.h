@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 5
-#define BENCH_8 1901147
+#define BUILD 6
+#define BENCH_8 2002830
 // sets max nodes, used to create Rodent's version for ultra-fast tests
 // #define FAST_TUNING 100000
 
@@ -96,7 +96,7 @@ enum eSquares {
 
 #define SIDE_RANDOM     (~((U64)0))
 
-#define START_POS       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -"
+#define START_POS       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -" // r1bq1rk1/1p2ppbp/p1np2p1/8/2PN2n1/1PN1P1P1/P4PBP/R1BQ1RK1 w - - 0 0
 
 #define Cl(x)           ((x) & 1)
 #define Tp(x)           ((x) >> 1)

@@ -175,8 +175,9 @@ void sSelector::ScoreQuiet(int refutationSq)
   valuep = m->value;
   for (movep = m->move; movep < m->last; movep++) {
     
-	// assign history value
+	// assign base sort value
 	sortVal =  History.GetMoveHistoryValue(m->p->pc[Fsq(*movep)], Tsq(*movep) );
+	//sortVal = Data.pstMg[WHITE][B][Tsq(*movep)] - Data.pstMg[WHITE][B][Fsq(*movep)];
 
     // null move refutations are sorted much higher	
 	if ( Fsq(*movep) == refutationSq ) { 

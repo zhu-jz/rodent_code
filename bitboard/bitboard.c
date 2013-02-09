@@ -94,6 +94,12 @@ int PopNextBit(int side, U64 * bb)
 	return PopLastBit(bb);
 }
 
+int PopNextBitReverse(int side, U64 * bb)
+{
+	if (side == BLACK) return PopFirstBit(bb);
+	return PopLastBit(bb);
+}
+
 int FirstOneAsm(U64 bb)
 { _asm { mov  eax, dword ptr bb[0]
          test eax, eax

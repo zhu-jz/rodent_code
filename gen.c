@@ -198,13 +198,13 @@ int *GenerateQuiet(sPosition *p, int *list)
 	// white pawns
 	bbMoves = ((((bbPc(p, WHITE, P) & bbRANK_2) << 8) & bbEmptySq ) << 8) & bbEmptySq;
     while (bbMoves) {
-      to = PopNextBit(side, &bbMoves);
+      to = PopNextBitReverse(side, &bbMoves);
       *list++ = (EP_SET << 12) | (to << 6) | (to - 16);
     }
 
 	bbMoves = ((bbPc(p, WHITE, P) & ~bbRANK_7) << 8) & bbEmptySq;
     while (bbMoves) {
-      to = PopNextBit(side, &bbMoves);
+      to = PopNextBitReverse(side, &bbMoves);
       *list++ = (to << 6) | (to - 8);
     }
   } else {
@@ -220,12 +220,12 @@ int *GenerateQuiet(sPosition *p, int *list)
 	// black pawns
 	bbMoves = ((((bbPc(p, BLACK, P) & bbRANK_7) >> 8) & bbEmptySq) >> 8) & bbEmptySq;
     while (bbMoves) {
-      to = PopNextBit(side, &bbMoves);
+      to = PopNextBitReverse(side, &bbMoves);
       *list++ = (EP_SET << 12) | (to << 6) | (to + 16);
     }
     bbMoves = ((bbPc(p, BLACK, P) & ~bbRANK_2) >> 8) & bbEmptySq;
     while (bbMoves) {
-      to = PopNextBit(side, &bbMoves);
+      to = PopNextBitReverse(side, &bbMoves);
       *list++ = (to << 6) | (to + 8);
     }
   }
@@ -237,7 +237,7 @@ int *GenerateQuiet(sPosition *p, int *list)
     bbMoves = bbKnightAttacks[from] & bbEmptySq;
 
     while (bbMoves) {
-      to = PopNextBit(side, &bbMoves);
+      to = PopNextBitReverse(side, &bbMoves);
       *list++ = (to << 6) | from;
     }
   }
@@ -249,7 +249,7 @@ int *GenerateQuiet(sPosition *p, int *list)
 	bbMoves = GenCache.GetBishMob(OccBb(p), from) & bbEmptySq;
 
     while (bbMoves) { // serialize moves
-      to = PopNextBit(side, &bbMoves);
+      to = PopNextBitReverse(side, &bbMoves);
       *list++ = (to << 6) | from;
     }
   }
@@ -261,7 +261,7 @@ int *GenerateQuiet(sPosition *p, int *list)
 	bbMoves = GenCache.GetRookMob(OccBb(p), from) & bbEmptySq;
 
     while (bbMoves) { // serialize moves
-      to = PopNextBit(side, &bbMoves);
+      to = PopNextBitReverse(side, &bbMoves);
       *list++ = (to << 6) | from;
     }
 
@@ -274,7 +274,7 @@ int *GenerateQuiet(sPosition *p, int *list)
 	bbMoves = GenCache.GetQueenMob(OccBb(p), from) & bbEmptySq;
 
     while (bbMoves) { // serialize moves
-      to = PopNextBit(side, &bbMoves);
+      to = PopNextBitReverse(side, &bbMoves);
       *list++ = (to << 6) | from;
     }
   }
@@ -283,7 +283,7 @@ int *GenerateQuiet(sPosition *p, int *list)
   bbMoves = bbKingAttacks[KingSq(p, side)] & bbEmptySq;
 
   while (bbMoves) { // serialize moves
-    to = PopNextBit(side, &bbMoves);
+    to = PopNextBitReverse(side, &bbMoves);
     *list++ = (to << 6) | KingSq(p, side);
   }
   return list;
