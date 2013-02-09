@@ -32,46 +32,41 @@ int *GenerateCaptures(sPosition *p, int *list)
 
     bbMoves = ((bbPc(p, WHITE, P) & bbNotA & bbRANK_7) << 7) & p->bbCl[BLACK];
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (Q_PROM << 12) | (to << 6) | (to - 7);
 	  *list++ = (N_PROM << 12) | (to << 6) | (to - 7);
       *list++ = (R_PROM << 12) | (to << 6) | (to - 7);
       *list++ = (B_PROM << 12) | (to << 6) | (to - 7);
-      bbMoves &= bbMoves - 1;
     }
 
     bbMoves = ((bbPc(p, WHITE, P) & bbNotH & bbRANK_7) << 9) & p->bbCl[BLACK];
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (Q_PROM << 12) | (to << 6) | (to - 9);
 	  *list++ = (N_PROM << 12) | (to << 6) | (to - 9);
       *list++ = (R_PROM << 12) | (to << 6) | (to - 9);
       *list++ = (B_PROM << 12) | (to << 6) | (to - 9);
-      bbMoves &= bbMoves - 1;
     }
 
     bbMoves = ((bbPc(p, WHITE, P) & bbRANK_7) << 8) & UnoccBb(p);
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (Q_PROM << 12) | (to << 6) | (to - 8);
 	  *list++ = (N_PROM << 12) | (to << 6) | (to - 8);
       *list++ = (R_PROM << 12) | (to << 6) | (to - 8);
       *list++ = (B_PROM << 12) | (to << 6) | (to - 8);
-      bbMoves &= bbMoves - 1;
     }
 
     bbMoves = ShiftNW(bbPc(p, WHITE, P) & ~bbRANK_7) & p->bbCl[BLACK];
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | (to - 7);
-      bbMoves &= bbMoves - 1;
     }
 
     bbMoves = ShiftNE(bbPc(p, WHITE, P) & ~bbRANK_7) & p->bbCl[BLACK];
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | (to - 9);
-      bbMoves &= bbMoves - 1;
     }
 
 	// en passant capture
@@ -86,46 +81,41 @@ int *GenerateCaptures(sPosition *p, int *list)
 
     bbMoves = ((bbPc(p, BLACK, P) & bbNotA & bbRANK_2) >> 9) & p->bbCl[WHITE];
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (Q_PROM << 12) | (to << 6) | (to + 9);
 	  *list++ = (N_PROM << 12) | (to << 6) | (to + 9);
       *list++ = (R_PROM << 12) | (to << 6) | (to + 9);
       *list++ = (B_PROM << 12) | (to << 6) | (to + 9);
-      bbMoves &= bbMoves - 1;
     }
 
     bbMoves = ((bbPc(p, BLACK, P) & bbNotH & bbRANK_2) >> 7) & p->bbCl[WHITE];
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (Q_PROM << 12) | (to << 6) | (to + 7);
 	  *list++ = (N_PROM << 12) | (to << 6) | (to + 7);
       *list++ = (R_PROM << 12) | (to << 6) | (to + 7);
       *list++ = (B_PROM << 12) | (to << 6) | (to + 7);
-      bbMoves &= bbMoves - 1;
     }
 
     bbMoves = ((bbPc(p, BLACK, P) & bbRANK_2) >> 8) & UnoccBb(p);
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (Q_PROM << 12) | (to << 6) | (to + 8);
 	  *list++ = (N_PROM << 12) | (to << 6) | (to + 8);
       *list++ = (R_PROM << 12) | (to << 6) | (to + 8);
       *list++ = (B_PROM << 12) | (to << 6) | (to + 8);
-      bbMoves &= bbMoves - 1;
     }
 
     bbMoves = ShiftSW(bbPc(p, BLACK, P) & ~bbRANK_2) & p->bbCl[WHITE];
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | (to + 9);
-      bbMoves &= bbMoves - 1;
     }
 
     bbMoves = ShiftSE(bbPc(p, BLACK, P) & ~bbRANK_2) & p->bbCl[WHITE];
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | (to + 7);
-      bbMoves &= bbMoves - 1;
     }
 
     if ((to = p->epSquare) != NO_SQ) {
@@ -138,62 +128,52 @@ int *GenerateCaptures(sPosition *p, int *list)
   
   bbPieces = bbPc(p, side, N);
   while (bbPieces) {
-    from = FirstOne(bbPieces);
+    from = PopNextBit(side, &bbPieces);
     bbMoves = bbKnightAttacks[from] & p->bbCl[Opp(side)];
+
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | from;
-      bbMoves &= bbMoves - 1;
     }
-    bbPieces &= bbPieces - 1;
   }
 
   bbPieces = bbPc(p, side, B);
   while (bbPieces) {
-    from = FirstOne(bbPieces);
+    from = PopNextBit(side, &bbPieces);
 	bbMoves = GenCache.GetBishMob(OccBb(p), from) & p->bbCl[Opp(side)];
 
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | from;
-      bbMoves &= bbMoves - 1;
     }
-
-    bbPieces &= bbPieces - 1;
   }
   
   bbPieces = bbPc(p, side, R);
   while (bbPieces) {
-    from = FirstOne(bbPieces);
+    from = PopNextBit(side, &bbPieces);
 	bbMoves = GenCache.GetRookMob(OccBb(p), from) & p->bbCl[Opp(side)];
     
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | from;
-      bbMoves &= bbMoves - 1;
     }
-
-    bbPieces &= bbPieces - 1;
   }
 
   bbPieces = bbPc(p, side, Q);
   while (bbPieces) {
-    from = FirstOne(bbPieces);
+    from = PopNextBit(side, &bbPieces);
     bbMoves = GenCache.GetQueenMob(OccBb(p), from) & p->bbCl[Opp(side)];
 	
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | from;
-      bbMoves &= bbMoves - 1;
     }
-
-    bbPieces &= bbPieces - 1;
   }
+
   bbMoves = bbKingAttacks[KingSq(p, side)] & p->bbCl[Opp(side)];
   while (bbMoves) {
-    to = FirstOne(bbMoves);
+    to = PopNextBit(side, &bbMoves);
     *list++ = (to << 6) | KingSq(p, side);
-    bbMoves &= bbMoves - 1;
   }
   return list;
 }
