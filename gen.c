@@ -215,18 +215,17 @@ int *GenerateQuiet(sPosition *p, int *list)
       if (!IsAttacked(p, E1, BLACK) && !IsAttacked(p, D1, BLACK))
         *list++ = (CASTLE << 12) | (C1 << 6) | E1;
 
+	// white pawns
 	bbMoves = ((((bbPc(p, WHITE, P) & bbRANK_2) << 8) & bbEmptySq ) << 8) & bbEmptySq;
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (EP_SET << 12) | (to << 6) | (to - 16);
-      bbMoves &= bbMoves - 1;
     }
 
 	bbMoves = ((bbPc(p, WHITE, P) & ~bbRANK_7) << 8) & bbEmptySq;
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | (to - 8);
-      bbMoves &= bbMoves - 1;
     }
   } else {
     
@@ -238,85 +237,74 @@ int *GenerateQuiet(sPosition *p, int *list)
       if (!IsAttacked(p, E8, WHITE) && !IsAttacked(p, D8, WHITE))
         *list++ = (CASTLE << 12) | (C8 << 6) | E8;
     
+	// black pawns
 	bbMoves = ((((bbPc(p, BLACK, P) & bbRANK_7) >> 8) & bbEmptySq) >> 8) & bbEmptySq;
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (EP_SET << 12) | (to << 6) | (to + 16);
-      bbMoves &= bbMoves - 1;
     }
     bbMoves = ((bbPc(p, BLACK, P) & ~bbRANK_2) >> 8) & bbEmptySq;
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | (to + 8);
-      bbMoves &= bbMoves - 1;
     }
   }
 
   // knight moves
   bbPieces = bbPc(p, side, N);
   while (bbPieces) {
-    from = FirstOne(bbPieces);
+    from = PopNextBit(side, &bbPieces);
     bbMoves = bbKnightAttacks[from] & bbEmptySq;
+
     while (bbMoves) {
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | from;
-      bbMoves &= bbMoves - 1;
     }
-    bbPieces &= bbPieces - 1;
   }
 
   // bishop moves
   bbPieces = bbPc(p, side, B);
   while (bbPieces) {
-    from = FirstOne(bbPieces);
+    from = PopNextBit(side, &bbPieces);
 	bbMoves = GenCache.GetBishMob(OccBb(p), from) & bbEmptySq;
 
     while (bbMoves) { // serialize moves
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | from;
-      bbMoves &= bbMoves - 1;
     }
-
-    bbPieces &= bbPieces - 1;
   }
 
   // rook moves
   bbPieces = bbPc(p, side, R);
   while (bbPieces) {
-    from = FirstOne(bbPieces);
+    from = PopNextBit(side, &bbPieces);
 	bbMoves = GenCache.GetRookMob(OccBb(p), from) & bbEmptySq;
 
     while (bbMoves) { // serialize moves
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | from;
-      bbMoves &= bbMoves - 1;
     }
 
-    bbPieces &= bbPieces - 1;
   }
 
   // queen moves
   bbPieces = bbPc(p, side, Q);
   while (bbPieces) {
-    from = FirstOne(bbPieces);
+    from = PopNextBit(side, &bbPieces);
 	bbMoves = GenCache.GetQueenMob(OccBb(p), from) & bbEmptySq;
 
     while (bbMoves) { // serialize moves
-      to = FirstOne(bbMoves);
+      to = PopNextBit(side, &bbMoves);
       *list++ = (to << 6) | from;
-      bbMoves &= bbMoves - 1;
     }
-
-    bbPieces &= bbPieces - 1;
   }
 
   // king moves
   bbMoves = bbKingAttacks[KingSq(p, side)] & bbEmptySq;
 
   while (bbMoves) { // serialize moves
-    to = FirstOne(bbMoves);
+    to = PopNextBit(side, &bbMoves);
     *list++ = (to << 6) | KingSq(p, side);
-    bbMoves &= bbMoves - 1;
   }
   return list;
 }
