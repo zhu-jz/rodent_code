@@ -21,24 +21,18 @@
 #include "../bitboard/bitboard.h"
 #include "eval.h"
 
-int sEvaluator::EvalTrappedRook(sPosition *p) 
+int sEvaluator::EvalTrappedRook(sPosition *p, int side) 
 {
 	int score = 0;
-	const U64 bbWKTrapKs  = SqBb(F1) | SqBb(G1);
-	const U64 bbWRTrapKs  = SqBb(G1) | SqBb(H1) | SqBb(H2);
-	const U64 bbWKTrapQs  = SqBb(C1) | SqBb(B1);
-	const U64 bbWRTrapQs  = SqBb(B1) | SqBb(A1) | SqBb(A2);
-	const U64 bbBKTrapKs  = SqBb(F8) | SqBb(G8);
-	const U64 bbBRTrapKs  = SqBb(G8) | SqBb(H8) | SqBb(H7);
-	const U64 bbBKTrapQs  = SqBb(C8) | SqBb(B8);
-	const U64 bbBRTrapQs  = SqBb(B8) | SqBb(A8) | SqBb(A7);  
+	const U64 bbKTrapKs[2] = { SqBb(F1) | SqBb(G1), SqBb(F8) | SqBb(G8) };
+	const U64 bbRTrapKs[2] = { SqBb(G1) | SqBb(H1) | SqBb(H2), SqBb(G8) | SqBb(H8) | SqBb(H7) };
+	const U64 bbKTrapQs[2] = { SqBb(C1) | SqBb(B1), SqBb(C8) | SqBb(B8) };
+	const U64 bbRTrapQs[2] = { SqBb(B1) | SqBb(A1) | SqBb(A2), SqBb(B8) | SqBb(A8) | SqBb(A7) };
 
   // rook blocked by uncastled king
   // TODO: test lower value
-  if ( ( bbPc(p, WHITE, K) & bbWKTrapKs ) && ( bbPc(p, WHITE, R) & bbWRTrapKs ) ) score -= 50;
-  if ( ( bbPc(p, WHITE, K) & bbWKTrapQs ) && ( bbPc(p, WHITE, R) & bbWRTrapQs ) ) score -= 50;
-  if ( ( bbPc(p, BLACK, K) & bbBKTrapKs ) && ( bbPc(p, BLACK, R) & bbBRTrapKs ) ) score += 50;
-  if ( ( bbPc(p, BLACK, K) & bbBKTrapQs ) && ( bbPc(p, BLACK, R) & bbBRTrapQs ) ) score += 50;
+  if ( ( bbPc(p, side, K) & bbKTrapKs[side] ) && ( bbPc(p, side, R) & bbRTrapKs[side] ) ) score -= 50;
+  if ( ( bbPc(p, side, K) & bbKTrapQs[side] ) && ( bbPc(p, side, R) & bbRTrapQs[side] ) ) score -= 50;
 
   return score;
 }
