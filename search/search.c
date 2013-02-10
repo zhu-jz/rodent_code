@@ -91,12 +91,10 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 	if (flagAbortSearch) break;
 
 	// if score is outside the window, re-search
-	if (curVal >= beta || curVal <= alpha) 
-	{
+	if (curVal >= beta || curVal <= alpha) {
+
         // fail-low, it might be prudent to assign some more time
-        if (curVal < val) { 
-			Timer.SetData(FLAG_ROOT_FAIL_LOW, 1);
-		}
+        if (curVal < val) Timer.SetData(FLAG_ROOT_FAIL_LOW, 1);
 
 		if (curVal >= beta)  beta  = val +3*delta;
 		if (curVal <= alpha) alpha = val -3*delta;
@@ -225,8 +223,8 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
   Selector.InitMoveList(p, move, ply);
 
   // LOOP THROUGH THE MOVE LIST
-  while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) 
-  {
+  while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
+  
 	 // MAKE A MOVE
 	 Manipulator.DoMove(p, move, undoData);    
 	
@@ -347,10 +345,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   move = 0;
 
   // MATE DISTANCE PRUNING
-   alpha = Max(-MATE+ply, alpha);
-   beta  = Min( MATE-ply, beta);
-   if (alpha >= beta)
-       return alpha;
+  alpha = Max(-MATE + ply, alpha);
+  beta  = Min( MATE - ply, beta);
+  if (alpha >= beta) return alpha;
 
   // TRANSPOSITION TABLE READ
   // get transposition table score or at least get a move for sorting purposes
@@ -368,7 +365,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   && flagCanPrune) {
      if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
 	 int evalMargin = 40 * depth;
-	 if ( nodeEval - evalMargin >= beta )
+	 if (nodeEval - evalMargin >= beta)
 		return nodeEval - evalMargin;
   }
 
@@ -394,8 +391,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   && !wasNull
   && p->pieceMat[p->side] > Data.matValue[N]) 
   {
-    if ( beta <= Eval.Return(p, alpha, beta) )
-	{
+    if ( beta <= Eval.Return(p, alpha, beta) ) {
+
       Manipulator.DoNull(p, undoData);
 	  newDepth = SetNullDepth(depth);                             // ALL_NODE
       nullScore = -Search(p, ply + 1, -beta, -beta + 1, newDepth, NEW_NODE(nodeType), WAS_NULL, 0, newPv);

@@ -46,25 +46,25 @@ int sEvaluator::EvalTrappedRook(sPosition *p)
 int sEvaluator::EvalTrappedBishop(sPosition *p) 
 {
 	int score = 0;
-	const U64 bbWBTrap    = SqBb(A7) | SqBb(B8) | SqBb(H7) | SqBb(G8) | SqBb(A6) | SqBb(H6);
-	const U64 bbBBTrap    = SqBb(A2) | SqBb(B1) | SqBb(H2) | SqBb(G1) | SqBb(A3) | SqBb(H3);
+	const U64 bbTrapSq[2] = { SqBb(A7) | SqBb(B8) | SqBb(H7) | SqBb(G8) | SqBb(A6) | SqBb(H6) ,
+		                      SqBb(A2) | SqBb(B1) | SqBb(H2) | SqBb(G1) | SqBb(A3) | SqBb(H3) };
 
-  if ( bbPc(p, WHITE, B) & bbWBTrap ) {
-    if ( ( bbPc(p, WHITE, B) & SqBb(A7) ) && ( bbPc(p, BLACK, P) & SqBb(B6) ) ) score -= 150;
-    if ( ( bbPc(p, WHITE, B) & SqBb(B8) ) && ( bbPc(p, BLACK, P) & SqBb(C7) ) ) score -= 150;
-    if ( ( bbPc(p, WHITE, B) & SqBb(H7) ) && ( bbPc(p, BLACK, P) & SqBb(G6) ) ) score -= 150;
-    if ( ( bbPc(p, WHITE, B) & SqBb(G8) ) && ( bbPc(p, BLACK, P) & SqBb(F7) ) ) score -= 150;
-    if ( ( bbPc(p, WHITE, B) & SqBb(A6) ) && ( bbPc(p, BLACK, P) & SqBb(B5) ) ) score -= 50;
-    if ( ( bbPc(p, WHITE, B) & SqBb(H6) ) && ( bbPc(p, BLACK, P) & SqBb(G5) ) ) score -= 50;
+  if ( bbPc(p, WHITE, B) & bbTrapSq[WHITE] ) {
+     if ( ( bbPc(p, WHITE, B) & SqBb(A7) ) && ( bbPc(p, BLACK, P) & SqBb(B6) ) ) score -= 150;
+     if ( ( bbPc(p, WHITE, B) & SqBb(B8) ) && ( bbPc(p, BLACK, P) & SqBb(C7) ) ) score -= 150;
+     if ( ( bbPc(p, WHITE, B) & SqBb(H7) ) && ( bbPc(p, BLACK, P) & SqBb(G6) ) ) score -= 150;
+     if ( ( bbPc(p, WHITE, B) & SqBb(G8) ) && ( bbPc(p, BLACK, P) & SqBb(F7) ) ) score -= 150;
+     if ( ( bbPc(p, WHITE, B) & SqBb(A6) ) && ( bbPc(p, BLACK, P) & SqBb(B5) ) ) score -= 50;
+     if ( ( bbPc(p, WHITE, B) & SqBb(H6) ) && ( bbPc(p, BLACK, P) & SqBb(G5) ) ) score -= 50;
   }
 
-  if ( bbPc(p, BLACK, B) & bbBBTrap ) {
-    if ( ( bbPc(p, BLACK, B) & SqBb(A2) ) && ( bbPc(p, WHITE, P) & SqBb(B3) ) ) score += 150;
-    if ( ( bbPc(p, BLACK, B) & SqBb(B1) ) && ( bbPc(p, WHITE, P) & SqBb(C2) ) ) score += 150;
-    if ( ( bbPc(p, BLACK, B) & SqBb(H2) ) && ( bbPc(p, WHITE, P) & SqBb(G3) ) ) score += 150;
-    if ( ( bbPc(p, BLACK, B) & SqBb(G1) ) && ( bbPc(p, WHITE, P) & SqBb(F2) ) ) score += 150;
-    if ( ( bbPc(p, BLACK, B) & SqBb(A3) ) && ( bbPc(p, WHITE, P) & SqBb(B4) ) ) score += 50;
-    if ( ( bbPc(p, BLACK, B) & SqBb(H3) ) && ( bbPc(p, WHITE, P) & SqBb(G4) ) ) score += 50;
+  if ( bbPc(p, BLACK, B) & bbTrapSq[BLACK] ) {
+     if ( ( bbPc(p, BLACK, B) & SqBb(A2) ) && ( bbPc(p, WHITE, P) & SqBb(B3) ) ) score += 150;
+     if ( ( bbPc(p, BLACK, B) & SqBb(B1) ) && ( bbPc(p, WHITE, P) & SqBb(C2) ) ) score += 150;
+     if ( ( bbPc(p, BLACK, B) & SqBb(H2) ) && ( bbPc(p, WHITE, P) & SqBb(G3) ) ) score += 150;
+     if ( ( bbPc(p, BLACK, B) & SqBb(G1) ) && ( bbPc(p, WHITE, P) & SqBb(F2) ) ) score += 150;
+     if ( ( bbPc(p, BLACK, B) & SqBb(A3) ) && ( bbPc(p, WHITE, P) & SqBb(B4) ) ) score += 50;
+     if ( ( bbPc(p, BLACK, B) & SqBb(H3) ) && ( bbPc(p, WHITE, P) & SqBb(G4) ) ) score += 50;
   }
 
   return score;
@@ -73,10 +73,10 @@ int sEvaluator::EvalTrappedBishop(sPosition *p)
 int sEvaluator::EvalTrappedKnight(sPosition *p) 
 {
   int score = 0;
-  const U64 bbWNTrap    = SqBb(A7) | SqBb(A6) | SqBb(H7) | SqBb(H6);
-  const U64 bbBNTrap    = SqBb(A2) | SqBb(A3) | SqBb(H2) | SqBb(H3);
+  const U64 bbTrapSq[2] = { SqBb(A7) | SqBb(A6) | SqBb(H7) | SqBb(H6),
+	                        SqBb(A2) | SqBb(A3) | SqBb(H2) | SqBb(H3) };
   
-  if (bbPc(p, WHITE, N) & bbWNTrap) {
+  if (bbPc(p, WHITE, N) & bbTrapSq[WHITE]) {
 
     if ( bbPc(p, WHITE, N) & SqBb(A7) ) {
 	    if ( bbPc(p, BLACK, P) & SqBb(A6) )  {
@@ -101,7 +101,7 @@ int sEvaluator::EvalTrappedKnight(sPosition *p)
     }
   }
 
-  if ( bbPc(p,BLACK,N) & bbBNTrap ) {
+  if ( bbPc(p,BLACK,N) & bbTrapSq[BLACK] ) {
     if ( bbPc(p, BLACK, N) & SqBb(A2) ) {
 	    if ( bbPc(p, WHITE, P) & SqBb(A3) )  {
 		    score += 75;
