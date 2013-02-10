@@ -43,28 +43,19 @@ int sEvaluator::EvalTrappedRook(sPosition *p)
   return score;
 }
 
-int sEvaluator::EvalTrappedBishop(sPosition *p) 
+int sEvaluator::EvalTrappedBishop(sPosition *p, int side) 
 {
 	int score = 0;
 	const U64 bbTrapSq[2] = { SqBb(A7) | SqBb(B8) | SqBb(H7) | SqBb(G8) | SqBb(A6) | SqBb(H6) ,
 		                      SqBb(A2) | SqBb(B1) | SqBb(H2) | SqBb(G1) | SqBb(A3) | SqBb(H3) };
 
-  if ( bbPc(p, WHITE, B) & bbTrapSq[WHITE] ) {
-     if ( ( bbPc(p, WHITE, B) & SqBb(A7) ) && ( bbPc(p, BLACK, P) & SqBb(B6) ) ) score -= 150;
-     if ( ( bbPc(p, WHITE, B) & SqBb(B8) ) && ( bbPc(p, BLACK, P) & SqBb(C7) ) ) score -= 150;
-     if ( ( bbPc(p, WHITE, B) & SqBb(H7) ) && ( bbPc(p, BLACK, P) & SqBb(G6) ) ) score -= 150;
-     if ( ( bbPc(p, WHITE, B) & SqBb(G8) ) && ( bbPc(p, BLACK, P) & SqBb(F7) ) ) score -= 150;
-     if ( ( bbPc(p, WHITE, B) & SqBb(A6) ) && ( bbPc(p, BLACK, P) & SqBb(B5) ) ) score -= 50;
-     if ( ( bbPc(p, WHITE, B) & SqBb(H6) ) && ( bbPc(p, BLACK, P) & SqBb(G5) ) ) score -= 50;
-  }
-
-  if ( bbPc(p, BLACK, B) & bbTrapSq[BLACK] ) {
-     if ( ( bbPc(p, BLACK, B) & SqBb(A2) ) && ( bbPc(p, WHITE, P) & SqBb(B3) ) ) score += 150;
-     if ( ( bbPc(p, BLACK, B) & SqBb(B1) ) && ( bbPc(p, WHITE, P) & SqBb(C2) ) ) score += 150;
-     if ( ( bbPc(p, BLACK, B) & SqBb(H2) ) && ( bbPc(p, WHITE, P) & SqBb(G3) ) ) score += 150;
-     if ( ( bbPc(p, BLACK, B) & SqBb(G1) ) && ( bbPc(p, WHITE, P) & SqBb(F2) ) ) score += 150;
-     if ( ( bbPc(p, BLACK, B) & SqBb(A3) ) && ( bbPc(p, WHITE, P) & SqBb(B4) ) ) score += 50;
-     if ( ( bbPc(p, BLACK, B) & SqBb(H3) ) && ( bbPc(p, WHITE, P) & SqBb(G4) ) ) score += 50;
+  if ( bbPc(p, side, B) & bbTrapSq[side] ) {
+     if ( ( bbPc(p, side, B) & RelSqBb(A7,side) ) && ( bbPc(p, Opp(side), P) & RelSqBb(B6,side) ) ) score -= 150;
+     if ( ( bbPc(p, side, B) & RelSqBb(B8,side) ) && ( bbPc(p, Opp(side), P) & RelSqBb(C7,side) ) ) score -= 150;
+     if ( ( bbPc(p, side, B) & RelSqBb(H7,side) ) && ( bbPc(p, Opp(side), P) & RelSqBb(G6,side) ) ) score -= 150;
+     if ( ( bbPc(p, side, B) & RelSqBb(G8,side) ) && ( bbPc(p, Opp(side), P) & RelSqBb(F7,side) ) ) score -= 150;
+     if ( ( bbPc(p, side, B) & RelSqBb(A6,side) ) && ( bbPc(p, Opp(side), P) & RelSqBb(B5,side) ) ) score -= 50;
+     if ( ( bbPc(p, side, B) & RelSqBb(H6,side) ) && ( bbPc(p, Opp(side), P) & RelSqBb(G5,side) ) ) score -= 50;
   }
 
   return score;

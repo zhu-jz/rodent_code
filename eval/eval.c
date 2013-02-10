@@ -193,7 +193,7 @@ int sEvaluator::Return(sPosition *p, int alpha, int beta)
   EvalPawns(p);
 
   score += EvalTrappedKnight(p);                 
-  score += EvalTrappedBishop(p);                 
+  score += (EvalTrappedBishop(p,WHITE) - EvalTrappedBishop(p,BLACK));                 
   score += EvalTrappedRook(p);  
 
   mgScore += (p->pstMg[WHITE] - p->pstMg[BLACK]);

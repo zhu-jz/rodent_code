@@ -76,7 +76,7 @@ private:
   int  EvalFileShelter(U64 bbOwnPawns, int side);
   int  EvalFileStorm(U64 bbOppPawns, int side);
   int  EvalTrappedKnight(sPosition *p);
-  int  EvalTrappedBishop(sPosition *p);
+  int  EvalTrappedBishop(sPosition *p, int side);
   int  EvalTrappedRook(sPosition *p);
 public:
   int Normalize(int val, int limit);
