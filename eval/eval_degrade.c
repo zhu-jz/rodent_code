@@ -95,16 +95,16 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	      return 32; // 1/2
 
 	  // draw code for rook endgame with edge pawn
-	  if ( ( SqBb(REL_SQ(A7,stronger) ) & bbPc(p, stronger, P) )
-	  &&   ( SqBb(REL_SQ(A8,stronger) ) & bbPc(p, stronger, R) )
+	  if ( ( RelSqBb(A7,stronger) & bbPc(p, stronger, P) )
+	  &&   ( RelSqBb(A8,stronger) & bbPc(p, stronger, R) )
 	  &&   ( bbFILE_A & bbPc(p, weaker, R) )
-	  &&   ( ( SqBb(REL_SQ(H7,stronger)) & bbPc(p, weaker, K) ) || ( SqBb(REL_SQ(G7,stronger) ) & bbPc(p, weaker, K) ) )
+	  &&   ( ( RelSqBb(H7,stronger) & bbPc(p, weaker, K) ) || ( RelSqBb(G7,stronger) & bbPc(p, weaker, K) ) )
 		  ) return 0; // dead draw
 
-	  if ( ( SqBb(REL_SQ(H7,stronger)) & bbPc(p, stronger, P) )
-	  &&   ( SqBb(REL_SQ(H8,stronger)) & bbPc(p, stronger, R) )
+	  if ( ( RelSqBb(H7,stronger) & bbPc(p, stronger, P) )
+	  &&   ( RelSqBb(H8,stronger) & bbPc(p, stronger, R) )
 	  &&   ( bbFILE_H & bbPc(p, weaker, R) )
-	  &&   ( ( SqBb(REL_SQ(A7,stronger)) & bbPc(p, weaker, K) ) || ( SqBb(REL_SQ(B7,stronger)) & bbPc(p, weaker, K) ) )
+	  &&   ( ( RelSqBb(A7,stronger) & bbPc(p, weaker, K) ) || ( RelSqBb(B7,stronger) & bbPc(p, weaker, K) ) )
 		  ) return 0; // dead draw
 
 	  // TODO: back rank defense

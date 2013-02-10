@@ -74,7 +74,8 @@
 #define ShiftSW(x)      ((x & bbNotA)>>9)
 #define ShiftSE(x)      ((x & bbNotH)>>7)
 
-#define REL_SQ(sq,cl) ( sq ^ (cl * 56) )
+#define REL_SQ(sq,cl)   ( sq ^ (cl * 56) )
+#define RelSqBb(sq,cl)  ( SqBb(REL_SQ(sq,cl) ) )
 
 // Compiler and architecture dependent versions of FirstOne() function, 
 // triggered by defines at the top of this file.

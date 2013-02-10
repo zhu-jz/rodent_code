@@ -418,12 +418,12 @@ void sParser::PrintBoard(sPosition *p)
 {
   printf("--------------------------------------------\n");
   for (int i = 0; i < 64; i++) {
-	  if      (p->bbTp[P] & SqBb(REL_SQ(i,BLACK) ) ) { if ( p->bbCl[WHITE] & SqBb(REL_SQ(i,BLACK)) ) printf("P "); else printf("p "); }
-	  else if (p->bbTp[N] & SqBb(REL_SQ(i,BLACK) ) ) { if ( p->bbCl[WHITE] & SqBb(REL_SQ(i,BLACK)) ) printf("N "); else printf("n "); }
-	  else if (p->bbTp[B] & SqBb(REL_SQ(i,BLACK) ) ) { if ( p->bbCl[WHITE] & SqBb(REL_SQ(i,BLACK)) ) printf("B "); else printf("b "); }
-	  else if (p->bbTp[R] & SqBb(REL_SQ(i,BLACK) ) ) { if ( p->bbCl[WHITE] & SqBb(REL_SQ(i,BLACK)) ) printf("R "); else printf("r "); }
-	  else if (p->bbTp[Q] & SqBb(REL_SQ(i,BLACK) ) ) { if ( p->bbCl[WHITE] & SqBb(REL_SQ(i,BLACK)) ) printf("Q "); else printf("q "); }
-	  else if (p->bbTp[K] & SqBb(REL_SQ(i,BLACK) ) ) { if ( p->bbCl[WHITE] & SqBb(REL_SQ(i,BLACK)) ) printf("K "); else printf("k "); }
+	  if      (p->bbTp[P] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("P "); else printf("p "); }
+	  else if (p->bbTp[N] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("N "); else printf("n "); }
+	  else if (p->bbTp[B] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("B "); else printf("b "); }
+	  else if (p->bbTp[R] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("R "); else printf("r "); }
+	  else if (p->bbTp[Q] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("Q "); else printf("q "); }
+	  else if (p->bbTp[K] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("K "); else printf("k "); }
 	  else printf(". ");
 	  if ( (i+1) % 8 == 0) printf(" %d\n", 9 - ((i+1) / 8) );
   }

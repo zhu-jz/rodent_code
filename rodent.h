@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 6
-#define BENCH_8 2002830
+#define BUILD 7
+#define BENCH_8 1948944
 // sets max nodes, used to create Rodent's version for ultra-fast tests
 // #define FAST_TUNING 100000
 

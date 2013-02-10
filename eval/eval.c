@@ -97,10 +97,10 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
  {
 	 int score = 0;
       // "COSMETIC" CODE PREVENTING UGLY OPENING MOVES
-	  if  ( ( bbPc(p, side, N) & SqBb(REL_SQ(C3,side)) )
-	  &&    ( bbPc(p, side, P) & SqBb(REL_SQ(C2,side)) ) 
-	  &&    ( bbPc(p, side, P) & SqBb(REL_SQ(D4,side)) )
-	  &&   !( bbPc(p, side, P) & SqBb(REL_SQ(E4,side)) )
+	  if  ( ( bbPc(p, side, N) & RelSqBb(C3,side) )
+	  &&    ( bbPc(p, side, P) & RelSqBb(C2,side) ) 
+	  &&    ( bbPc(p, side, P) & RelSqBb(D4,side) )
+	  &&   !( bbPc(p, side, P) & RelSqBb(E4,side) )
 	  ) score -= 15;
 
 	 return score;

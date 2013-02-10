@@ -52,12 +52,12 @@ void sEvaluator::EvalPawns(sPosition *p)
 
 void sEvaluator::EvalPawnCenter(sPosition *p, int side)
 {
-      if (bbPc(p, side, P) & SqBb(REL_SQ(D4,side)) ) {
-          if (bbPc(p, side, P) & SqBb(REL_SQ(E3,side)) )  pawnScoreMg[side] += CENT_DEFENSE;
-          if (bbPc(p, side, P) & SqBb(REL_SQ(C3,side)) )  pawnScoreMg[side] += CENT_DEFENSE;
+      if (bbPc(p, side, P) & RelSqBb(D4,side) ) {
+          if (bbPc(p, side, P) & RelSqBb(E3,side) )  pawnScoreMg[side] += CENT_DEFENSE;
+          if (bbPc(p, side, P) & RelSqBb(C3,side) )  pawnScoreMg[side] += CENT_DEFENSE;
       }
 
-      if (bbPc(p, side, P) & SqBb(REL_SQ(E4,side)) && bbPc(p, side, P) & SqBb(REL_SQ(D3,side)) ) 
+      if (bbPc(p, side, P) & RelSqBb(E4,side) && bbPc(p, side, P) & RelSqBb(D3,side) ) 
          pawnScoreMg[side] += CENT_DEFENSE;	
 }
 

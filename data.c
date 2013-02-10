@@ -97,7 +97,7 @@ void sData::InitBadBishop(void)
 void sData::SetBadBishopMask(int bishSq, int pawnSq)
 {
      bbBadBishopMasks[WHITE][bishSq] ^= SqBb(pawnSq);
-	 bbBadBishopMasks[BLACK][ REL_SQ(bishSq,BLACK) ] ^= SqBb( REL_SQ(pawnSq,BLACK) );
+	 bbBadBishopMasks[BLACK][ REL_SQ(bishSq,BLACK) ] ^= RelSqBb(pawnSq, BLACK);
 }
 
 void sData::InitSinglePiece(int pc, int mat, int del, int phase, int att) 
