@@ -71,7 +71,7 @@ int sEvaluator::EvalTrappedKnight(sPosition *p)
     }
 
     if ( bbPc(p, WHITE, N) & SqBb(H7) ) {
-	    if ( bbPc(p, BLACK, P) & SqBb(G6) )  {
+	    if ( bbPc(p, BLACK, P) & SqBb(H6) )  {
 	  	    score -= 75;
 	        if ( bbPc(p, BLACK, P) & SqBb(G7) )  score -= 75;
 	    }
