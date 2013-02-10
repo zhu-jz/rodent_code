@@ -486,8 +486,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // EXTENSIONS might be placed here
 
-	 int flagCanReduce = (nodeType != PV_NODE) && !flagInCheck && !depthChange && (MoveType(move) != CASTLE) 
-		               && (flagMoveType != FLAG_HASH_MOVE) && (flagMoveType != FLAG_KILLER_MOVE);
+	 int flagCanReduce = (nodeType != PV_NODE) && !flagInCheck && !depthChange && AvoidReduction(move, flagMoveType);
 
 	 // FUTILITY PRUNING 
 	 if ( flagCanReduce
@@ -632,6 +631,11 @@ int sSearcher::DrawBy50Moves(sPosition *p)
 int sSearcher::IsMoveOrdinary(int flagMoveType)
 {
     return (!flagMoveType || flagMoveType == FLAG_NULL_EVASION);
+}
+
+int sSearcher::AvoidReduction(int move, int flagMoveType)
+{
+    return (MoveType(move) != CASTLE) && (flagMoveType != FLAG_HASH_MOVE) && (flagMoveType != FLAG_KILLER_MOVE);
 }
 
 void sSearcher::CheckInput(void)
