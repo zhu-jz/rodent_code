@@ -446,10 +446,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
      // SET FUTILITY PRUNING FLAG BEFORE SEARCHING FIRST APPLICABLE MOVE
 	 if (IsMoveOrdinary(flagMoveType) ) {
-		 
-	     normalMoveCnt++;
-	     if (normalMoveCnt == 1) {
-            
+
+	     if (++normalMoveCnt == 1) {   
+
             if ( depth < Data.futilityDepth * ONE_PLY  // we are sufficiently close to the leaf
             && flagCanPrune
             && alpha > -MAX_EVAL ) {
