@@ -96,7 +96,7 @@ enum eSquares {
 
 #define SIDE_RANDOM     (~((U64)0))
 
-#define START_POS       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -" // r1bq1rk1/1p2ppbp/p1np2p1/8/2PN2n1/1PN1P1P1/P4PBP/R1BQ1RK1 w - - 0 0
+#define START_POS       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -"
 
 #define Cl(x)           ((x) & 1)
 #define Tp(x)           ((x) >> 1)

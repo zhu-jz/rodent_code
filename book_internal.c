@@ -22,6 +22,7 @@
 // any other book in its folder.
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "rodent.h"
 #include "book.h"
 
@@ -53,7 +54,7 @@ char *book[] =
 	"c2c4 c7c6 d2d4 d7d5 g1f3 g8f6 b1c3 g7g6? e2e3 f8g7 f1d3",
 	"c2c4 c7c6 e2e4 e7e5? g1f3 d7d6 d2d4 b8d7 b1c3 g8f6 f1e2 f8e7 e1g1 e8g8 d1c2 f8e8 f1d1 e7f8 a1b1 a7a5",
 	"c2c4 c7c6 g1f3 d7d5 d2d4 e7e6",
-	"c2c4 e7e5 b1c3 b8c6? g1f3 g7g6? d2d4 e5d4 f3d4 f8g7 d4c6 b7c6 g2g3 f8g7 f1g2 d7d6 e1g1 e8g8 c1g5",
+	"c2c4 e7e5 b1c3 b8c6? g1f3 g7g6? d2d4 e5d4 f3d4 f8g7 d4c6 b7c6 g2g3 g8e7 f1g2 e8g8 e1g1",
 	"c2c4 e7e5 b1c3 b8c6? g1f3 g8f6",
 	"c2c4 e7e5 b1c3 d7d6? g2g3 g7g6 d2d4 b8d7 f1g2",
 	"c2c4 e7e5 b1c3 g8f6 g1f3 b8c6 d2d3? d7d5 c4d5 f6d5 e2e3 f8e7",
@@ -827,7 +828,7 @@ char *book[] =
 	"e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 b2b4? c5b4 c2c3 b4a5 e1g1? d7d6 d2d4 a5b6 d4e5 d6e5 d1d8 c6d8 f3e5 c8e6",
 	"e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 b2b4? c5b4 c2c3 b4a5 e1g1? d7d6 d2d4 a5b6 d4e5 d6e5 c4f7? e8f7 f3e5 f7e8 d1h5 g7g6 e5g6 g8f6",
 	"e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 b2b4? c5b4 c2c3 b4a5 d2d4 d7d6 d1b3 d8d7 d4e5 a5b6 e1g1 c6a5 b3b4 a5c4 b4c4 d6e5 f3e5 d7e6",
-	"e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 c5b6 d2d4 d8e7 d2d3 d7d6 e1g1 g8f6",
+	"e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 c5b6 d2d4 d8e7 e1g1 g8f6 f1e1 d7d6 a2a4 a7a6 h2h3 e8g8",
 	"e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 d7d6? d2d4 e5d4 c3d4 c5b6 b1c3 g8f6 c1e3 c8g4 c4b3",
 	"e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 d7d6? d2d4 e5d4 c3d4 c5b6 b1c3 g8f6 c1e3 f6e4? c3e4 d6d5 c4b3 d5e4 f3g5",
 	"e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 d8e7 d2d4 c5b6 e1g1 d7d6 a2a4 a7a6 h2h3 g8f6 f1e1 e8g8 b2b4 c6d8 c1a3 f6d7 b4b5 e7f6",
@@ -978,7 +979,7 @@ char *book[] =
 	"g1f3 d7d5 g2g3 g7g6 f1g2 f8g7 c2c4 g8f6 c4d5 f6d5 e1g1 e8g8 b1c3 d5b6",
 	"g1f3 d7d6? d2d4 c8g4 c2c4 g4f3 e2f3 g7g6 g2g3 f8g7 f1g2 e7e6 e1g1",
 	"g1f3 d7d6? d2d4 c8g4? c2c4 b8d7 d1b3 a8b8 h2h3 g4f3 b3f3 e7e5",
-	"g1f3 g7g6? c2c4 g8f6 d2d4 d7d6? g1f3 f8g7 e2e4",
+	"g1f3 g7g6? c2c4 g8f6 d2d4 d7d6? b1c3 f8g7 e2e4",
 	"g1f3 g8f6 c2c4 b7b6? g2g3 c8b7 f1g2 e7e6 d2d4 f8b4? c1d2 d8e7 e1g1 b4d2 d1d2 e8g8 b1c3 d7d5 c4d5",
 	"g1f3 g8f6 c2c4 c7c5 b1c3 b8c6 g2g3 d7d5 c4d5 f6d5 f1g2 e7e6",
 	"g1f3 g8f6 c2c4 c7c5 b1c3 e7e6 g2g3 b7b6 f1g2 c8b7 e1g1 f8e7",
@@ -1011,6 +1012,6 @@ NULL
       nOfGuideRecords = 0; // clear any preexisting guide book
 
 	  for (int i = 0; book[i]; ++i) {
-		  AddLineToGuideBook(p, book[i], NO_CL);
+		  if (AddLineToGuideBook(p, book[i], NO_CL) ) { printf("Guide book error: "); printf(book[i]); printf("\n"); };
 	  }
  }

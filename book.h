@@ -36,7 +36,7 @@ private:
    char testString [12];
    void AddMoveToGuideBook(U64 hash, int move, int val);
    void AddMoveToMainBook(U64 hash, int move, int val);
-   void AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor);
+   int AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor);
    void AddLineToMainBook(sPosition *p, char *ptr, int excludedColor, int verifyDepth);
    U64 GetBookHash(sPosition *p);
    int IsInfrequent(int val, int maxFreq);

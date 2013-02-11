@@ -36,6 +36,11 @@ void sBook::Init(sPosition * p)
 	 Timer.SetStartTime();
 	 nOfRecords = 0;
 	 nOfGuideRecords = 0;
+	  if (START_POS !=  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -") {
+		  printf("Programmer is doing some tests and I, the opening book reader, will take no part in that!");
+		  return;
+	  }
+	 
 	 int hasMainBook  = ReadOwnBookFile("bigbook.wtf"); // read main book
 	 int hasGuideBook = ReadTextFileToGuideBook(p, "guidebook.txt", NO_CL);
 	 if (!hasMainBook && !hasGuideBook) ReadInternalToGuideBook(p);
@@ -302,12 +307,13 @@ int sBook::IsMoveInBook(U64 hashKey, int move)
 	return 0;
 }
 
-void sBook::AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor)
+int sBook::AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor)
 {
   char token[512];
   UNDO u[1];
   int move;
   int freq;
+  int flagIsProblem = 0;
     
   SetPosition(p, START_POS);
 
@@ -332,11 +338,12 @@ void sBook::AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor)
         
 		Manipulator.DoMove(p, move, u);
 	}
-	else break;
+	else { flagIsProblem = 1; break; };
 
     if (p->reversibleMoves == 0)
         p->head = 0;
     }
+    return flagIsProblem;
 }
 
 void sBook::AddLineToMainBook(sPosition *p, char *ptr, int excludedColor, int verifyDepth)
@@ -400,7 +407,7 @@ int sBook::ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedCol
 	  while ( fgets(line, 250, bookFile) ) {
 		    ++line_no;
 		    if(line[0] == ';') continue; // don't process comment lines
-		    AddLineToGuideBook(p, line, excludedColor);
+			if ( AddLineToGuideBook(p, line, excludedColor) ) { printf("Guide book error: "); printf(line); printf("\n"); }
 	  }
 	  fclose(bookFile);
 	  return 1;
