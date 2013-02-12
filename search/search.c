@@ -42,6 +42,7 @@ void sSearcher::Think(sPosition *p, int *pv)
   TransTable.ChangeDate();
   Timer.SetStartTime();
   ClearStats();
+  pv[0] = 0; // for tests where book move is disabled
   pv[0] = Book.GetBookMove(p, 1, &flagBookProblem); 
 
   if (!pv[0] || !IsLegal(p, pv[0]) || Data.isAnalyzing) {

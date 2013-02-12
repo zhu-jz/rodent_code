@@ -84,20 +84,30 @@ int PopFirstBit(U64 * bb)
 int PopLastBit(U64 * bb) 
 {
 	int sq = LastOneAsm(*bb);
+	U64 bbLocal = *bb;
+
     *bb ^= SqBb(sq);
     return sq;
 }
 
-int PopNextBit(int side, U64 * bb)
+int PopFlippedBit(U64 * bb)
 {
-	if (side == WHITE) return PopFirstBit(bb);
-	return PopLastBit(bb);
+   U64 x = *bb;
+   x = x ^ ((x ^ flipVertical(x)) & -1);
+   int sq = FirstOne(x) ^ 56;
+   *bb ^= SqBb(sq);
+   return sq;
 }
 
-int PopNextBitReverse(int side, U64 * bb)
+int PopNextBit(int side, U64 * bb)
 {
-	if (side == BLACK) return PopFirstBit(bb);
-	return PopLastBit(bb);
+   U64 x = *bb;
+   U64 m = (U64)side - 1; // e.g. -1 if white, 0 for black
+   int o = (int)m & 56;
+   x = x ^ ((x ^ flipVertical(x)) & m); // conditional flip
+   int sq = FirstOne(x) ^ o;
+   *bb ^= SqBb(sq);
+   return sq;
 }
 
 int FirstOneAsm(U64 bb)

@@ -133,7 +133,7 @@ U64 GetPawnAttacks(int side, U64 bb);
 int PopFirstBit(U64 *bb);
 int PopLastBit(U64 *bb);
 int PopNextBit(int side, U64 *bb);
-int PopNextBitReverse(int side, U64 *bb);
+int PopFlippedBit(U64 * bb);
 int FirstOneAsm(U64 bb);
 int LastOneAsm(U64 bb);
 
