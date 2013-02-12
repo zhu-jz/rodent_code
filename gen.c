@@ -234,10 +234,10 @@ int *GenerateQuiet(sPosition *p, int *list)
   side = p->side;
   if (side == WHITE) {
     // white castle
-    if ((p->castleFlags & 1) && !(bbOccupied & (U64)0x0000000000000060))
+    if ((p->castleFlags & W_KS) && !(bbOccupied & (U64)0x0000000000000060))
       if (!IsAttacked(p, E1, BLACK) && !IsAttacked(p, F1, BLACK))
         *list++ = (CASTLE << 12) | (G1 << 6) | E1;
-    if ((p->castleFlags & 2) && !(bbOccupied & (U64)0x000000000000000E))
+    if ((p->castleFlags & W_QS) && !(bbOccupied & (U64)0x000000000000000E))
       if (!IsAttacked(p, E1, BLACK) && !IsAttacked(p, D1, BLACK))
         *list++ = (CASTLE << 12) | (C1 << 6) | E1;
 
@@ -256,10 +256,10 @@ int *GenerateQuiet(sPosition *p, int *list)
   } else {
     
 	// black castle
-	if ((p->castleFlags & 4) && !(bbOccupied & (U64)0x6000000000000000))
+	if ((p->castleFlags & B_KS) && !(bbOccupied & (U64)0x6000000000000000))
       if (!IsAttacked(p, E8, WHITE) && !IsAttacked(p, F8, WHITE))
         *list++ = (CASTLE << 12) | (G8 << 6) | E8;
-    if ((p->castleFlags & 8) && !(bbOccupied & (U64)0x0E00000000000000))
+    if ((p->castleFlags & B_QS) && !(bbOccupied & (U64)0x0E00000000000000))
       if (!IsAttacked(p, E8, WHITE) && !IsAttacked(p, D8, WHITE))
         *list++ = (CASTLE << 12) | (C8 << 6) | E8;
 		

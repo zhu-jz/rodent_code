@@ -84,19 +84,19 @@ void SetPosition(sPosition *p, char *epd)
     epd++;
   else {
     if (*epd == 'K') {
-      p->castleFlags |= 1;
+      p->castleFlags |= W_KS;
       epd++;
     }
     if (*epd == 'Q') {
-      p->castleFlags |= 2;
+      p->castleFlags |= W_QS;
       epd++;
     }
     if (*epd == 'k') {
-      p->castleFlags |= 4;
+      p->castleFlags |= B_KS;
       epd++;
     }
     if (*epd == 'q') {
-      p->castleFlags |= 8;
+      p->castleFlags |= B_QS;
       epd++;
     }
   }

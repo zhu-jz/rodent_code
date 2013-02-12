@@ -46,11 +46,11 @@ int IsLegal(sPosition *p, int move)
       if (fsq != E1)
         return 0;
       if (tsq > fsq) {
-        if ((p->castleFlags & 1) && !(OccBb(p) & (U64)0x0000000000000060))
+        if ((p->castleFlags & W_KS) && !(OccBb(p) & (U64)0x0000000000000060))
           if (!IsAttacked(p, E1, BLACK) && !IsAttacked(p, F1, BLACK))
             return 1;
       } else {
-        if ((p->castleFlags & 2) && !(OccBb(p) & (U64)0x000000000000000E))
+        if ((p->castleFlags & W_QS) && !(OccBb(p) & (U64)0x000000000000000E))
           if (!IsAttacked(p, E1, BLACK) && !IsAttacked(p, D1, BLACK))
             return 1;
       }
@@ -58,11 +58,11 @@ int IsLegal(sPosition *p, int move)
       if (fsq != E8)
         return 0;
       if (tsq > fsq) {
-        if ((p->castleFlags & 4) && !(OccBb(p) & (U64)0x6000000000000000))
+        if ((p->castleFlags & B_KS) && !(OccBb(p) & (U64)0x6000000000000000))
           if (!IsAttacked(p, E8, WHITE) && !IsAttacked(p, F8, WHITE))
             return 1;
       } else {
-        if ((p->castleFlags & 8) && !(OccBb(p) & (U64)0x0E00000000000000))
+        if ((p->castleFlags & B_QS) && !(OccBb(p) & (U64)0x0E00000000000000))
           if (!IsAttacked(p, E8, WHITE) && !IsAttacked(p, D8, WHITE))
             return 1;
       }
