@@ -245,11 +245,9 @@ int sEvaluator::Return(sPosition *p, int alpha, int beta)
   }
   else score = temp_score; 
 
-  if (score == 0) score = 1; // so that 0 returned by search means draw
-
   // decrease score for drawish endgames
   if (score > 0) degradation = SetDegradationFactor(p, WHITE);
-  else           degradation = SetDegradationFactor(p, BLACK);
+  if (score < 0) degradation = SetDegradationFactor(p, BLACK);
 
   score *= degradation;
   score /= 64;
@@ -285,7 +283,7 @@ int sEvaluator::ReturnFast(sPosition *p)
 
   // decrease score for drawish endgames
   if (score > 0) degradation = SetDegradationFactor(p, WHITE);
-  else           degradation = SetDegradationFactor(p, BLACK);
+  if (score < 0) degradation = SetDegradationFactor(p, BLACK);
 
   score *= degradation;
   score /= 64;
@@ -299,7 +297,6 @@ int sEvaluator::ReturnFast(sPosition *p)
 
   // normalize_score
   score = Normalize(score, MAX_EVAL);
-  if (score == 0) score = 1; // so that 0 returned by search means draw
 
   // return score relative to the side to move
   return p->side == WHITE ? score : -score;
