@@ -232,6 +232,9 @@ int sSelector::BadCapture(sPosition *p, int move) // last change 2012-03-06
   // En passant capture is equal by definition
   if (MoveType(move) == EP_CAP) return 0;
 
+  // If we are still here, but opponent can recapture by a pawn, capture is bad.
+  if (bbPc(p, Opp(p->side), P) & bbPawnAttacks[p->side][tsq] ) return 1;
+
   // No shortcut worked - we must do expensive static exchange evaluation
   return Swap(p, fsq, tsq) < -Data.goodCaptMargin;
 }
