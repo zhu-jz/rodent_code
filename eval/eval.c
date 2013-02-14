@@ -77,11 +77,18 @@ int sEvaluator::Interpolate(void)
 
 void sEvaluator::ScoreHanging(sPosition *p, int side)
 {
-	U64 bbHanging    = p->bbCl[Opp(side)] & ~bbPawnControl[Opp(side)];
+	U64 bbHanging    = p->bbCl[Opp(side)] & ~bbPawnControl[Opp(side)]; 
 	U64 bbThreatened = p->bbCl[Opp(side)] & bbPawnControl[side];
-	bbHanging |= bbThreatened;
-	bbHanging &= bbAllAttacks[side];
-	bbHanging &= ~bbPc(p, Opp(side), P); 
+	bbHanging |= bbThreatened;            // piece attacked by our pawn isn't well defended
+	bbHanging &= bbAllAttacks[side];      // obviously, hanging piece has to be attacked
+	bbHanging &= ~bbPc(p, Opp(side), P);  // currently we don't evaluate threats against pawns
+
+	U64 bbSpace = UnoccBb(p) & bbAllAttacks[side];
+	bbSpace &= ~rank1[side];              // controlling home ground is not space advantage
+	bbSpace &= ~rank2[side];
+	bbSpace &= ~rank3[side];
+	bbSpace &= ~bbPawnControl[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
+	AddMiscTwo(side, PopCnt(bbSpace), 0);
 	int pc, sq, val;
 
     while (bbHanging) {
@@ -96,7 +103,7 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
  int sEvaluator::ScorePatterns(sPosition *p, int side)
  {
 	 int score = 0;
-      // "COSMETIC" CODE PREVENTING UGLY OPENING MOVES
+      // avoid blocking "c" pawn with a knight
 	  if  ( ( bbPc(p, side, N) & RelSqBb(C3,side) )
 	  &&    ( bbPc(p, side, P) & RelSqBb(C2,side) ) 
 	  &&    ( bbPc(p, side, P) & RelSqBb(D4,side) )

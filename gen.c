@@ -311,7 +311,6 @@ int *GenerateQuiet(sPosition *p, int *list)
       to = PopNextBit(Opp(side), &bbMoves);
       *list++ = (to << 6) | from;
     }
-
   }
 
   // queen moves
