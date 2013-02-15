@@ -57,8 +57,7 @@ void sSearcher::Think(sPosition *p, int *pv)
 void sSearcher::Iterate(sPosition *p, int *pv) 
 {
   int val = 0;
-  int curVal;
-  int alpha, beta, delta;
+  int curVal, alpha, beta, delta;
 
   rootList.Init(p);
   int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
@@ -142,14 +141,16 @@ int sSearcher::VerifyValue(sPosition *p, int depth, int move)
   isReporting = 0;
   if (move != 0) Manipulator.DoMove(p, move, undoData);    
 
-  for (rootDepth = ONE_PLY; rootDepth <= depth * ONE_PLY; rootDepth+=ONE_PLY)
+  for (rootDepth = ONE_PLY; rootDepth <= depth * ONE_PLY; rootDepth+=ONE_PLY) {
       val = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, NO_NULL, 0, pv);
+  }
 
   Data.isAnalyzing = 0;
 
-  if (move != 0) Manipulator.UndoMove(p, move, undoData);
-
-  if (move != 0) return -val;
+  if (move != 0) {
+	  Manipulator.UndoMove(p, move, undoData);
+      return -val;
+  }
   return val;
 }
 

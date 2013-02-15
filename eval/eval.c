@@ -208,7 +208,7 @@ int sEvaluator::Return(sPosition *p, int alpha, int beta)
   
   int temp_score = score + Interpolate();
 
-  // lazy evaluation - we avoid costly procedures
+  // lazy evaluation - avoids costly calculations
   // if score seems already very high/very low
   if (temp_score > alpha - Data.lazyMargin 
   &&  temp_score < beta +  Data.lazyMargin) {
@@ -266,7 +266,6 @@ int sEvaluator::Return(sPosition *p, int alpha, int beta)
 	  score += randomMod;
   }
 
-  // normalize_score
   score = Normalize(score, MAX_EVAL);
 
   // return score relative to the side to move
@@ -302,7 +301,6 @@ int sEvaluator::ReturnFast(sPosition *p)
 	  score += randomMod;
   }
 
-  // normalize_score
   score = Normalize(score, MAX_EVAL);
 
   // return score relative to the side to move

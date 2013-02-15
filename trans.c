@@ -23,6 +23,8 @@
 #include "bitboard/bitboard.h"
 #include "trans.h"
 
+//#define EVAL_SYMMETRY_TEST
+
 // calculates full hash key from scratch
 U64 sTransTable::InitHashKey(sPosition *p)
 {
@@ -89,6 +91,9 @@ void sTransTable::Clear(void)
 
 int sTransTable::Retrieve(U64 key, int *move, int *score, int alpha, int beta, int depth, int ply)
 {
+#ifdef EVAL_SYMMETRY_TEST
+  return 0;
+#endif
   ENTRY *entry;
   int i;
   // TODO: node type as input and return only exact scores in pv nodes
@@ -119,6 +124,9 @@ int sTransTable::Retrieve(U64 key, int *move, int *score, int alpha, int beta, i
 
  void sTransTable::RetrieveMove(U64 key, int *move )
  {
+#ifdef EVAL_SYMMETRY_TEST
+  return;
+#endif
   ENTRY *entry;
   int i;
   *move = 0;
@@ -138,6 +146,9 @@ int sTransTable::Retrieve(U64 key, int *move, int *score, int alpha, int beta, i
 
 int sTransTable::RefineScore(U64 key, int score)
 {
+#ifdef EVAL_SYMMETRY_TEST
+  return score;
+#endif
   ENTRY *entry;
   int i;
   int val;
