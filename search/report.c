@@ -99,8 +99,8 @@ void sSearcher::DisplayPv(int score, int *pv)
           rootDepth/ONE_PLY, time,   nodes,   nps,   type, score, pv_str);
 
   if (flagProtocol == PROTO_TXT)
-  printf("%2d. %3d.%1d %10u %4d %s\n",
-          rootDepth/ONE_PLY, time/1000, (time/100)%10, nodes, score, pv_str);
+  printf("%2d. %3d.%1d %10u %4d %4d %s\n",
+          rootDepth/ONE_PLY, time/1000, (time/100)%10, nodes, nodes / (time+1),  score, pv_str);
 
 }
 
@@ -140,6 +140,6 @@ U32 sSearcher::GetNps(int nodes, int time)
 void sSearcher::PrintTxtHeader(void)
 {
 	 printf("---------------------------------------------------------------\n");
-	 printf("ply  time      nodes  score pv\n");
+	 printf("ply  time      nodes knps  score pv\n");
 	 printf("---------------------------------------------------------------\n");
 }
