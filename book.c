@@ -207,8 +207,7 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
     return 0;
 }
 
-int sBook::PrintMissingMoves(sPosition *p)
-{
+int sBook::PrintMissingMoves(sPosition *p) {
     // show non-book moves leading to book positions
     sSelector Selector;
 	UNDO undoData[1];
@@ -218,7 +217,6 @@ int sBook::PrintMissingMoves(sPosition *p)
 
     Selector.InitMoveList(p, move, MAX_PLY);
 
-    // LOOP THROUGH THE MOVE LIST
     while ( move = Selector.NextMove(0, &flagMoveType) ) {
 
 	   Manipulator.DoMove(p, move, undoData);    
@@ -254,8 +252,8 @@ int sBook::PrintMissingMoves(sPosition *p)
   return isProblem;
 }
 
-void sBook::AddMoveToGuideBook(U64 hashKey, int move, int val) 
-{
+void sBook::AddMoveToGuideBook(U64 hashKey, int move, int val) {
+
     // if move is already in the book, just change its frequency 
 	for (int i = 0; i < nOfGuideRecords; i++ ) {
          if ( guideBook[i].hash == hashKey 
@@ -393,97 +391,91 @@ void sBook::AddLineToMainBook(sPosition *p, char *ptr, int excludedColor, int ve
 
 int sBook::ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedColor)
 {
-	  FILE *bookFile; 
-	  char line[256];
-	  int line_no = 0;
+    FILE *bookFile; 
+	char line[256];
 
-      // exit if book file doesn't exist
-	  if ( (bookFile = fopen(fileName, "r")) == NULL ) 
-		 return 0;
+    // exit if book file doesn't exist
+	if ( (bookFile = fopen(fileName, "r")) == NULL ) return 0;
 
-      nOfGuideRecords = 0; // clear any preexisting guide book
+    nOfGuideRecords = 0; // clear any preexisting guide book
 
-      // process book file line by line 
-	  while ( fgets(line, 250, bookFile) ) {
-		    ++line_no;
-		    if(line[0] == ';') continue; // don't process comment lines
-			if ( AddLineToGuideBook(p, line, excludedColor) ) { printf("Guide book error: "); printf(line); printf("\n"); }
-	  }
-	  fclose(bookFile);
-	  return 1;
+    // process book file line by line 
+	while ( fgets(line, 250, bookFile) ) {
+	  if ( line[0] == ';' ) continue; // don't process comment lines
+	  if ( AddLineToGuideBook(p, line, excludedColor) ) { printf("Guide book error: "); printf(line); printf("\n"); }
+	}
+	fclose(bookFile);
+	return 1;
  }
 
 void sBook::SplitContinousBookFormat(char *fileName)
 {
-	  FILE *inFile, *outFile;
-	  char line[256];
+    FILE *inFile, *outFile;
+	char line[256];
 
-      // exit if input file doesn't exist
-	  if ( (inFile = fopen(fileName, "r")) == NULL ) { printf("File %s not found!\n", fileName); return; };
+    // exit if input file doesn't exist
+	if ( (inFile = fopen(fileName, "r")) == NULL ) { printf("File %s not found!\n", fileName); return; };
 
-	  outFile = fopen("loose.txt","w"); 
+	outFile = fopen("loose.txt","w"); 
 
-      // process input file line by line 
-	  while ( fgets(line, 250, inFile) ) {
-		    if(line[0] == ';') continue; // don't process comment lines
-		    int length=strlen(line);
+    // process input file line by line 
+	while ( fgets(line, 250, inFile) ) {
+	   int length = strlen(line);
 
-			for (int i = 0; i < length;  i++) {
-				printf("%c", line[i]);
-				fprintf(outFile, "%c", line[i]);
-				if ( (i+1) % 4 == 0) fprintf(outFile," ");
-			}
-	  }
-	  fclose(inFile);
-	  fclose(outFile);
+	   for (int i = 0; i < length;  i++) {
+		  printf("%c", line[i]);
+		  fprintf(outFile, "%c", line[i]);
+		  if ( (i+1) % 4 == 0) fprintf(outFile," ");
+	   }
+	}
+	fclose(inFile);
+	fclose(outFile);
  }
 
 void sBook::AddQuotes(char *fileName)
 {
-	  FILE *inFile, *outFile;
-	  char line[256];
+	FILE *inFile, *outFile;
+	char line[256];
 
-      // exit if input file doesn't exist
-	  if ( (inFile = fopen(fileName, "r")) == NULL ) { printf("File %s not found!\n", fileName); return; };
+    // exit if input file doesn't exist
+	if ( (inFile = fopen(fileName, "r")) == NULL ) { printf("File %s not found!\n", fileName); return; };
 
-	  outFile = fopen("quote.txt","w"); 
+	outFile = fopen("quote.txt","w"); 
 
-      // process input file line by line 
-	  while ( fgets(line, 250, inFile) ) {
-		    int length=strlen(line);
-			fprintf(outFile, "%c", '"');
+    // process input file line by line 
+	while ( fgets(line, 250, inFile) ) {
+	   int length=strlen(line);
+	   fprintf(outFile, "%c", '"');
 
-			for (int i = 0; i < length;  i++) {
-				printf("%c", line[i]);
-				fprintf(outFile, "%c", line[i]);
-				if (i== length-2) fprintf(outFile, "%c", '"');
-			}
-	  }
-	  fclose(inFile);
-	  fclose(outFile);
+		  for (int i = 0; i < length;  i++) {
+			 printf("%c", line[i]);
+			 fprintf(outFile, "%c", line[i]);
+			 if (i== length-2) fprintf(outFile, "%c", '"');
+		  }
+	}
+	fclose(inFile);
+	fclose(outFile);
  }
-
 
 void sBook::ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedColor, int verifyDepth)
 {
-	  FILE *bookFile; 
-	  char line[2048];
-	  int line_no = 0;
+	FILE *bookFile; 
+	char line[2048];
+	int line_no = 0;
 
-      // exit if book file doesn't exist
-	  if ( (bookFile = fopen(fileName, "r")) == NULL ) 
-		 return;
+    // exit if book file doesn't exist
+	if ( (bookFile = fopen(fileName, "r")) == NULL ) { printf("File %s not found!\n", fileName); return; };
 
-      // process book file line by line 
-	  while ( fgets(line, 2040, bookFile) ) {
-		    ++line_no;
-			if ( line_no % 100 == 0 ) printf("Adding line no. %d\r",line_no);
-		    if(line[0] == ';') continue; // don't process comment lines
-		    AddLineToMainBook(p, line, excludedColor, verifyDepth);
-	  }
+    // process book file line by line 
+	while ( fgets(line, 2040, bookFile) ) {
+	    ++line_no;
+		if ( line_no % 100 == 0 ) printf("Adding line no. %d\r",line_no);
+	    if(line[0] == ';') continue; // don't process comment lines
+	    AddLineToMainBook(p, line, excludedColor, verifyDepth);
+	}
 
-	  printf("Adding line no. %d\r",line_no);
-	  fclose(bookFile);
+	printf("Adding line no. %d\r",line_no);
+	fclose(bookFile);
  }
 
 
@@ -496,73 +488,72 @@ U64 sBook::GetBookHash(sPosition *p)
 
 void sBook::SaveBookInOwnFormat(char *fileName) 
 {
-	 FILE *bookFile; 
+	FILE *bookFile; 
 
-     bookFile = fopen(fileName,"a+"); 
-	 for (int i = 0; i < nOfRecords; i++ ) {
-		 if (myBook[i].hash != 0)
-		 fprintf(bookFile, "%I64u, %d, %d \n", myBook[i].hash, myBook[i].move, myBook[i].freq);
-	 }
-     fclose(bookFile);
+    bookFile = fopen(fileName,"a+"); 
+	for (int i = 0; i < nOfRecords; i++ ) {
+		if (myBook[i].hash != 0)
+		fprintf(bookFile, "%I64u, %d, %d \n", myBook[i].hash, myBook[i].move, myBook[i].freq);
+	}
+    fclose(bookFile);
 }
 
 int sBook::ReadOwnBookFile(char *fileName)
 {
-	  FILE *bookFile; 
-	  char line[256];
-	  nOfRecords = 0;
+	FILE *bookFile; 
+	char line[256];
+	nOfRecords = 0;
 
-      // exit if book file doesn't exist...
-	  if ( (bookFile = fopen(fileName, "r")) == NULL ) 
-		 return 0;
+    // exit if book file doesn't exist...
+	if ( (bookFile = fopen(fileName, "r")) == NULL ) return 0;
 
-      // ...else process book file line by line 
-	  while ( fgets(line, 250, bookFile) ) {
-		  ParseBookEntry(line, nOfRecords);
-		  ++nOfRecords;
-	  }
+    // ...else process book file line by line 
+	while ( fgets(line, 250, bookFile) ) {
+	   ParseBookEntry(line, nOfRecords);
+	   ++nOfRecords;
+	}
 
-	  fclose(bookFile);
-	  return 1;
+	fclose(bookFile);
+	return 1;
  }
 
 void sBook::ParseBookEntry(char * ptr, int line_no)
 {
-  char token[256];
-  int token_no = 1;
+    char token[256];
+    int token_no = 1;
 
-  for (;;) {
-    ptr = Parser.ParseToken(ptr, token);
-	if (token_no == 1) myBook[line_no].hash = atoull(token);
-	if (token_no == 2) myBook[line_no].move = atoi(token); 
-	if (token_no == 3) myBook[line_no].freq = atoi(token); 
-	token_no++;
+    for (;;) {
+       ptr = Parser.ParseToken(ptr, token);
+	   if (token_no == 1) myBook[line_no].hash = atoull(token);
+	   if (token_no == 2) myBook[line_no].move = atoi(token); 
+	   if (token_no == 3) myBook[line_no].freq = atoi(token); 
+	   token_no++;
 	  
-    if (*token == '\0') break;
-  }
+       if (*token == '\0') break;
+   }
 }
 
 void sBook::SortMainBook(void) {
 	int i, j, change;
 	sBookEntry tmp;
  
-  for (i=0; i<nOfRecords-1; ++i) {
+   for (i=0; i<nOfRecords-1; ++i) {
        if (i % 100 == 0 ) printf ("%d   \r", i);
 
-       change=0;
-       for (j=0; j<nOfRecords-1-i; j++)
-       { 
-		   if (myBook[j+1].hash < myBook[j].hash // comparing neighbours
-		   || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) ) {  
+      change=0;
+      for (j=0; j<nOfRecords-1-i; j++) { 
+		  if (myBook[j+1].hash < myBook[j].hash // comparing neighbours
+		  || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) ) {  
               tmp = myBook[j];      
               myBook[j] = myBook[j+1];
               myBook[j+1] = tmp;    // bubble goes up     
               change=1;
-           }
-       }
-       if(!change) break;      // no changes - book is sorted
+          }
+      }
 
-       for (j=nOfRecords-2; j>1; j--) { 
+      if(!change) break;      // no changes - book is sorted
+
+      for (j=nOfRecords-2; j>1; j--) { 
 		   if (myBook[j+1].hash < myBook[j].hash // comparing neighbours
 		   || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) ) {  
               tmp = myBook[j];      
@@ -570,8 +561,8 @@ void sBook::SortMainBook(void) {
               myBook[j+1] = tmp;    // bubble goes down     
               change=1;
           }
-       }
-  }
+      }
+   }
 };
 
 void sBook::FeedMainBook(sPosition *p, int verifyDepth) 
