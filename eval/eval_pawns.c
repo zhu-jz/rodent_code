@@ -69,25 +69,19 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
   U64 bbPieces = bbPc(p, side, P);
   U64 bbFrontSpan;
  
-  while (bbPieces) 
-  {
+  while (bbPieces) {
     sq = FirstOne(bbPieces);
 
-    // gather information about a pawn
+    // gather information about a pawn that is evaluated
 	bbFrontSpan    = GetFrontSpan(SqBb(sq), side );
     flagIsOpen     = ( ( bbFrontSpan & bbPc(p, Opp(side), P) ) == 0 );
 	flagIsPhalanx  = ShiftEast(SqBb(sq) ) & bbPc(p, side, P);
 	flagIsWeak     = ( ( bbPawnSupport[side][sq] & bbPc(p, side, P) ) == 0);
-
-	if (flagIsPhalanx) {
-		pawnScoreMg[side] += Data.phalanxMg[side][sq];
-		//pawnScoreEg[side] += Data.phalanxEg[side][sq];
-	}
 	
 	// doubled pawn
 	if ( bbFrontSpan & bbPc(p, side, P) ) {
-	  pawnScoreMg[side] += Data.doubledPawnMg;
-	  pawnScoreEg[side] += Data.doubledPawnEg;
+	    pawnScoreMg[side] += Data.doubledPawnMg;
+	    pawnScoreEg[side] += Data.doubledPawnEg;
     }
 
 	if (flagIsOpen) {
@@ -99,8 +93,11 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
            pawnScoreEg[side] += Data.passersEg[side][sq];	
 	    }
 
-	    // can be a candidate passer
+	    // phalanx pawn (can also be a candidate passer)
 		if (flagIsPhalanx) {
+			pawnScoreMg[side] += Data.phalanxMg[side][sq];
+		    //pawnScoreEg[side] += Data.phalanxEg[side][sq];
+
 		    if (PopCntSparse(bbObstacles) == 1) {
            	    pawnScoreMg[side] += Data.candidateMg[side][sq];
                 pawnScoreEg[side] += Data.candidateEg[side][sq];
@@ -111,16 +108,16 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	if (flagIsWeak) {
 		if (!(bbAdjacentMask[File(sq)] & bbPc(p, side, P))) // isolated
 		{ 
-		   pawnScoreMg[side] += Data.isolatedMg[side][sq];
 		   if (flagIsOpen) 
 			   pawnScoreMg[side] += Data.pawnIsolatedOnOpen;
+		   pawnScoreMg[side] += Data.isolatedMg[side][sq];
 		   pawnScoreEg[side] += Data.isolatedEg[side][sq];
 		}
 		else // backward
 		{
-		   pawnScoreMg[side] += Data.backwardMg[side][sq];
 		   if (flagIsOpen) 
 			   pawnScoreMg[side] += Data.pawnBackwardOnOpen;
+		   pawnScoreMg[side] += Data.backwardMg[side][sq];
 		   pawnScoreEg[side] += Data.backwardEg[side][sq];
 		}
 	}
