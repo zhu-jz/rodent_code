@@ -144,11 +144,19 @@ we'll have a beautifully scalable reduction algorithm.
 
 VI. EVALUATION
 
-- Fruit-like piece/square tables and mobility values
+- Fruit-like piece/square tables
+- mobility (excluding squares attacked by pawns in case of minor pieces)
 - Fruit-like weak pawns eval
 - passed pawns eval
-- strong squares (B, N, even R)
+- outposts (B, N, even R), further bonus if defended by a pawn
 - logaritmic, and therefore dynamic King safety evaluation
+  (with bigger bonus for the first attack by a piece) 
+- possibility to give check and safe queen contact checks
+- hanging pieces
+- minor pieces attacked/defended by a pawn (overlaps with hanging pieces)
+- bad bishops (using bitmask of obstructing pawns)
+- (half)open files for rooks with additional bonus if they target enemy king
+- rook on 7th rank cutting off enemy king or attacking pawns
 
 Creating version 0.13 I looked for more aggressive King safety function,
 using Rebel-like additive table approach. I also wanted my function to 

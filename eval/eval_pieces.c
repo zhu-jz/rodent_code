@@ -26,25 +26,6 @@
 #include "../bitboard/gencache.h"
 #include "eval.h"
 
-/*
-Rodent's piece evaluation takes into account following factors:
-
-- mobility (excluding squares attacked by pawns in case of minor pieces)
-- attacks on enemy king zone (bigger bonus for the first attack, 
-  see constants below)
-- possibility to give check and safe queen contact checks
-- hanging pieces
-- minor pieces attacked/defended by a pawn (needs refactoring, overlaps with hanging pieces)
-- outposts ( bishops or knights placed in holes of enemy pawn structure, 
-  further bonus if defended by a pawn)
-- bad bishops (using bitmask of obstructing pawns)
-- (half)open files for rooks with additional bonus if they target enemy king
-- rook on 7th rank cutting off enemy king or attacking pawns
-
-Rook and Bishop mobility is not obstructed by own pieces moving along the same ray;
-The same is the case for all attacks at enemy king zone
-*/
-
   const int att_N[12] = { 0, 4,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15};
   const int att_B[12] = { 0, 4,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15};
   const int att_R[12] = { 0, 7, 11, 15, 19, 22,  24,  26,  28,  30,  31,  32};   
