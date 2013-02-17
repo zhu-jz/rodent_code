@@ -53,14 +53,14 @@ int pondering;
 char ponder_str[6];
 
 // mobility values
-static const int n_mob_mg[28] = { -16, -12, -8,  0,  4,  8,  12, 16, 16};
-static const int n_mob_eg[28] = { -16, -12, -8,  0,  4,  8,  12, 16, 16};
-static const int b_mob_mg[28] = { -16, -12, -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
-static const int b_mob_eg[28] = { -16, -12, -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
-static const int r_mob_mg[28] = {  -6,  -4, -2,  0,  2,  4,  6,  8,  9, 10, 11, 12, 13, 14, 15                                 };
-static const int r_mob_eg[28] = { -12,  -8, -4,  0,  4,  8, 12, 16, 18, 20, 22, 24, 26, 28, 30                                 };
-static const int q_mob_mg[28] = {  -6,  -4, -2,  0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,  5 };
-static const int q_mob_eg[28] = { -12,  -8, -4, -2,  0,  1,  2,  3,  4,  5,  6,  6,  7,  7,  8,  8,  8,  9,  9,  9, 10, 10, 10 };
+static const int n_mob_mg[28] = { -16-4, -12-2, -8,  0,  4,  8,  12, 16, 16};
+static const int n_mob_eg[28] = { -16-4, -12-2, -8,  0,  4,  8,  12, 16, 16};
+static const int b_mob_mg[28] = { -16-4, -12-2, -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
+static const int b_mob_eg[28] = { -16-4, -12-2, -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
+static const int r_mob_mg[28] = {  -6-4,  -4-2, -2,  0,  2,  4,  6,  8,  9, 10, 11, 12, 13, 14, 15                                 };
+static const int r_mob_eg[28] = { -12-4,  -8-2, -4,  0,  4,  8, 12, 16, 18, 20, 22, 24, 26, 28, 30                                 };
+static const int q_mob_mg[28] = {  -6-4,  -4-2, -2,  0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,  5 };
+static const int q_mob_eg[28] = { -12-4,  -8-2, -4, -2,  0,  1,  2,  3,  4,  5,  6,  6,  7,  7,  8,  8,  8,  9,  9,  9, 10, 10, 10 };
 
 
 void sData::InitBadBishop(void)
