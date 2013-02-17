@@ -96,6 +96,8 @@ void sParser::UciLoop(void)
       ParseMoves(p, ptr);
     } else if (strcmp(token, "split") == 0) {
 	  Book.SplitContinousBookFormat("dense.txt");
+    } else if (strcmp(token, "quotes") == 0) {
+	  Book.AddQuotes("noquote.txt");
     } else if (strcmp(token, "feedbook") == 0) {
 	  ptr = ParseToken(ptr, token);
       Book.FeedMainBook(p, atoi(token));

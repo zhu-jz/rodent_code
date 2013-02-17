@@ -415,33 +415,54 @@ int sBook::ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedCol
 
 void sBook::SplitContinousBookFormat(char *fileName)
 {
-	  FILE *bookFile; 
-	  FILE *outFile;
+	  FILE *inFile, *outFile;
 	  char line[256];
-	  int line_no = 0;
 
-      // exit if book file doesn't exist
-	  if ( (bookFile = fopen(fileName, "r")) == NULL ) 
-		 return;
+      // exit if input file doesn't exist
+	  if ( (inFile = fopen(fileName, "r")) == NULL ) { printf("File %s not found!\n", fileName); return; };
 
 	  outFile = fopen("loose.txt","w"); 
 
-      // process book file line by line 
-	  while ( fgets(line, 250, bookFile) ) {
-		    ++line_no;
+      // process input file line by line 
+	  while ( fgets(line, 250, inFile) ) {
 		    if(line[0] == ';') continue; // don't process comment lines
 		    int length=strlen(line);
-			for (int i = 0; i < length;  i++) 
-			{
+
+			for (int i = 0; i < length;  i++) {
 				printf("%c", line[i]);
 				fprintf(outFile, "%c", line[i]);
 				if ( (i+1) % 4 == 0) fprintf(outFile," ");
 			}
 	  }
-
-	  fclose(bookFile);
+	  fclose(inFile);
 	  fclose(outFile);
  }
+
+void sBook::AddQuotes(char *fileName)
+{
+	  FILE *inFile, *outFile;
+	  char line[256];
+
+      // exit if input file doesn't exist
+	  if ( (inFile = fopen(fileName, "r")) == NULL ) { printf("File %s not found!\n", fileName); return; };
+
+	  outFile = fopen("quote.txt","w"); 
+
+      // process input file line by line 
+	  while ( fgets(line, 250, inFile) ) {
+		    int length=strlen(line);
+			fprintf(outFile, "%c", '"');
+
+			for (int i = 0; i < length;  i++) {
+				printf("%c", line[i]);
+				fprintf(outFile, "%c", line[i]);
+				if (i== length-2) fprintf(outFile, "%c", '"');
+			}
+	  }
+	  fclose(inFile);
+	  fclose(outFile);
+ }
+
 
 void sBook::ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedColor, int verifyDepth)
 {

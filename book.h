@@ -53,6 +53,7 @@ public:
    int ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedColor);
    void BookDoctor(sPosition * p);
    void SplitContinousBookFormat(char *fileName);
+   void AddQuotes(char *fileName);
    int GetBookMove(sPosition *p, int canPrint, int *flagIsProblem);
    void FeedMainBook(sPosition *p, int verifyDepth);
 };
