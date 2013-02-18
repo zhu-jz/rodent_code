@@ -84,6 +84,11 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	    pawnScoreEg[side] += Data.doubledPawnEg;
     }
 
+	if (flagIsPhalanx) {
+		pawnScoreMg[side] += Data.phalanxMg[side][sq];
+		//pawnScoreEg[side] += Data.phalanxEg[side][sq];
+	}
+
 	if (flagIsOpen) {
 		U64 bbObstacles = bbPassedMask[side][sq] & bbPc(p, Opp(side), P);
 		
@@ -95,9 +100,6 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 
 	    // phalanx pawn (can also be a candidate passer)
 		if (flagIsPhalanx) {
-			pawnScoreMg[side] += Data.phalanxMg[side][sq];
-		    //pawnScoreEg[side] += Data.phalanxEg[side][sq];
-
 		    if (PopCntSparse(bbObstacles) == 1) {
            	    pawnScoreMg[side] += Data.candidateMg[side][sq];
                 pawnScoreEg[side] += Data.candidateEg[side][sq];
