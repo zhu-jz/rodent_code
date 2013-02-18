@@ -251,8 +251,8 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 
 	// additional evaluation of a passed pawn 
 	if (!bbObstacles) {
-		passUnitMg = Data.passersMg[side][sq] / 5;
-		passUnitEg = Data.passersEg[side][sq] / 5;
+		passUnitMg = Data.passers[MG][side][sq] / 5;
+		passUnitEg = Data.passers[EG][side][sq] / 5;
 
 		// blocked and unblocked passers
 		if (bbStop &~bbOccupied) AddMiscTwo(side,  passUnitMg,  passUnitEg);

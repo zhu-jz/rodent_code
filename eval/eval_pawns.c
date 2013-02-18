@@ -80,12 +80,12 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	
 	// doubled pawn
 	if ( bbFrontSpan & bbPc(p, side, P) ) {
-	    pawnScoreMg[side] += Data.doubledPawnMg;
-	    pawnScoreEg[side] += Data.doubledPawnEg;
+	    pawnScoreMg[side] += Data.doubledPawn[MG];
+	    pawnScoreEg[side] += Data.doubledPawn[EG];
     }
 
 	if (flagIsPhalanx) {
-		pawnScoreMg[side] += Data.phalanxMg[side][sq];
+		pawnScoreMg[side] += Data.phalanx[MG][side][sq];
 		//pawnScoreEg[side] += Data.phalanxEg[side][sq];
 	}
 
@@ -94,15 +94,15 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 		
 	    // passed pawn
 		if (!bbObstacles) {
-	       pawnScoreMg[side] += Data.passersMg[side][sq];	  
-           pawnScoreEg[side] += Data.passersEg[side][sq];	
+	       pawnScoreMg[side] += Data.passers[MG][side][sq];	  
+           pawnScoreEg[side] += Data.passers[EG][side][sq];	
 	    }
 
 	    // phalanx pawn (can also be a candidate passer)
 		if (flagIsPhalanx) {
 		    if (PopCntSparse(bbObstacles) == 1) {
-           	    pawnScoreMg[side] += Data.candidateMg[side][sq];
-                pawnScoreEg[side] += Data.candidateEg[side][sq];
+           	    pawnScoreMg[side] += Data.candidate[MG][side][sq]; 
+				pawnScoreEg[side] += Data.candidate[EG][side][sq];
 		    }
 	    }
 	}
@@ -112,15 +112,15 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 		{ 
 		   if (flagIsOpen) 
 			   pawnScoreMg[side] += Data.pawnIsolatedOnOpen;
-		   pawnScoreMg[side] += Data.isolatedMg[side][sq];
-		   pawnScoreEg[side] += Data.isolatedEg[side][sq];
+		   pawnScoreMg[side] += Data.isolated[MG][side][sq];
+		   pawnScoreEg[side] += Data.isolated[EG][side][sq];
 		}
 		else // backward
 		{
 		   if (flagIsOpen) 
 			   pawnScoreMg[side] += Data.pawnBackwardOnOpen;
-		   pawnScoreMg[side] += Data.backwardMg[side][sq];
-		   pawnScoreEg[side] += Data.backwardEg[side][sq];
+		   pawnScoreMg[side] += Data.backward[MG][side][sq];
+		   pawnScoreEg[side] += Data.backward[EG][side][sq];
 		}
 	}
 	

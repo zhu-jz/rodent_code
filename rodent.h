@@ -43,6 +43,7 @@
 
 enum eColor {WHITE, BLACK, NO_CL};
 enum ePiece {P, N, B, R, Q, K, NO_TP};
+enum eGamePhase {MG, EG};
 enum eProtocol {PROTO_UCI, PROTO_WB, PROTO_TXT};
 
 #define NO_PC 12

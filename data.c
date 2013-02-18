@@ -196,23 +196,23 @@ void sData::InitMaterialValues(void)
 
 void sData::InitEvalVars(void) 
 {
-	 ownMobility    = 110;
-	 oppMobility    = 100;
-	 ownAttack      = 100; 
-	 oppAttack      = 100; 
-	 bishopPair     =  20; // fast tuning: 30
-	 knightPair     = -10;
-	 rookPair       =   0; // fast tuning: -5
-	 doubledPawnMg  = -20; // fast tuning: -15 or -20
-     doubledPawnEg  = -10;
-	 rookOpenMg     = 10;
-     rookOpenEg     = 10;
-	 rookSemiOpenMg = 5;
-	 rookSemiOpenEg = 5;
-	 rookOpenAttack = 10;
+	 ownMobility     = 110;
+	 oppMobility     = 100;
+	 ownAttack       = 100; 
+	 oppAttack       = 100; 
+	 bishopPair      =  20; // fast tuning: 30
+	 knightPair      = -10;
+	 rookPair        =   0; // fast tuning: -5
+	 doubledPawn[MG] = -20; // fast tuning: -15 or -20
+     doubledPawn[EG] = -10;
+	 rookOpenMg      = 10;
+     rookOpenEg      = 10;
+	 rookSemiOpenMg  = 5;
+	 rookSemiOpenEg  = 5;
+	 rookOpenAttack  = 10;
 	 rookSemiOpenAttack = 5;
-	 rookSeventhMg  = 20;
-	 rookSeventhEg  = 20;
+	 rookSeventhMg   = 20;
+	 rookSeventhEg   = 20;
 	 pawnIsolatedOnOpen = -10;
 	 pawnBackwardOnOpen = -10;
 }
