@@ -85,7 +85,7 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
     }
 
 	if (flagIsPhalanx) {
-		pawnScoreMg[side] += Data.phalanx[MG][side][sq];
+		pawnScoreMg[side] += Data.pawnProperty[PHALANX][MG][side][sq];
 		//pawnScoreEg[side] += Data.phalanxEg[side][sq];
 	}
 
@@ -93,17 +93,11 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 		U64 bbObstacles = bbPassedMask[side][sq] & bbPc(p, Opp(side), P);
 		
 	    // passed pawn
-		if (!bbObstacles) {
-	       pawnScoreMg[side] += Data.passers[MG][side][sq];	  
-           pawnScoreEg[side] += Data.passers[EG][side][sq];	
-	    }
+		if (!bbObstacles) AddPawnProperty(PASSED,side,sq);
 
-	    // phalanx pawn (can also be a candidate passer)
+	    // candidate passer
 		if (flagIsPhalanx) {
-		    if (PopCntSparse(bbObstacles) == 1) {
-           	    pawnScoreMg[side] += Data.candidate[MG][side][sq]; 
-				pawnScoreEg[side] += Data.candidate[EG][side][sq];
-		    }
+		    if (PopCntSparse(bbObstacles) == 1) AddPawnProperty(CANDIDATE,side,sq);
 	    }
 	}
     
@@ -112,18 +106,22 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 		{ 
 		   if (flagIsOpen) 
 			   pawnScoreMg[side] += Data.pawnIsolatedOnOpen;
-		   pawnScoreMg[side] += Data.isolated[MG][side][sq];
-		   pawnScoreEg[side] += Data.isolated[EG][side][sq];
+		   AddPawnProperty(ISOLATED,side,sq);
 		}
 		else // backward
 		{
 		   if (flagIsOpen) 
 			   pawnScoreMg[side] += Data.pawnBackwardOnOpen;
-		   pawnScoreMg[side] += Data.backward[MG][side][sq];
-		   pawnScoreEg[side] += Data.backward[EG][side][sq];
+		   AddPawnProperty(BACKWARD,side,sq);
 		}
 	}
 	
 	bbPieces &= bbPieces - 1;
   }
+}
+
+void sEvaluator::AddPawnProperty(int pawnProperty, int side, int sq)
+{
+     pawnScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
+	 pawnScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
 }

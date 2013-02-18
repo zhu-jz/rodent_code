@@ -55,6 +55,7 @@ private:
   void AddMiscOne(int side, int val);
   void AddMiscTwo(int side, int mg, int eg);
   void AddPieceAttack(int side, int val);
+  void AddPawnProperty(int pawnProperty, int side, int sq);
   int CheckmateHelper(sPosition *p);
   void InitStatic(void);            
   void InitDynamic(sPosition *p);            

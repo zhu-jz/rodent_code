@@ -19,7 +19,8 @@
 
 #pragma once
 
-enum ePanelStyle { PANEL_NORMAL, PANEL_POWER };
+enum ePanelStyle   { PANEL_NORMAL, PANEL_POWER };
+enum ePawnProperty { PASSED, CANDIDATE, PHALANX, ISOLATED, BACKWARD, PAWN_PROPERTIES };
 
 struct sData {
 public:
@@ -33,11 +34,7 @@ public:
  int pstMg[2][6][64];
  int pstEg[2][6][64];
  int outpost[2][6][64];
- int phalanx[2][2][64];
- int passers[2][2][64];
- int isolated[2][2][64];
- int backward[2][2][64];
- int candidate[2][2][64];
+ int pawnProperty [PAWN_PROPERTIES][2][2][64];
  int doubledPawn[2];
  int mobBonusMg[6][28];
  int mobBonusEg[6][28];

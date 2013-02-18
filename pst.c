@@ -330,15 +330,15 @@ void sData::InitPstValues(void)
 	  pstEg[side][Q][REL_SQ(i,side)] = pstQueenEg[i];
 	  pstEg[side][K][REL_SQ(i,side)] = pstKingEg[i];
 
-	  phalanx[MG][side][REL_SQ(i,side)]  = pstPhalanxMg[i];
-	  passers[MG][side][REL_SQ(i,side)]  = pstPasserMg[i];
-	  passers[EG][side][REL_SQ(i,side)]  = pstPasserEg[i];
-	  candidate[MG][side][REL_SQ(i,side)]  = pstPasserMg[i] / 3;
-	  candidate[EG][side][REL_SQ(i,side)]  = pstPasserEg[i] / 3;
-	  isolated[MG][side][REL_SQ(i,side)] = pstIsolatedMg[i];
-	  isolated[EG][side][REL_SQ(i,side)] = pstIsolatedEg[i];
-	  backward[MG][side][REL_SQ(i,side)] = pstBackwardMg[i];
-	  backward[EG][side][REL_SQ(i,side)] = pstBackwardEg[i];
+	  pawnProperty[PHALANX]  [MG] [side] [REL_SQ(i,side)]  = pstPhalanxMg[i];
+	  pawnProperty[PASSED]   [MG] [side] [REL_SQ(i,side)]  = pstPasserMg[i];
+	  pawnProperty[PASSED]   [EG] [side] [REL_SQ(i,side)]  = pstPasserEg[i];
+	  pawnProperty[CANDIDATE][MG] [side] [REL_SQ(i,side)]  = pstPasserMg[i] / 3;
+	  pawnProperty[CANDIDATE][EG] [side] [REL_SQ(i,side)]  = pstPasserEg[i] / 3;
+	  pawnProperty[ISOLATED] [MG] [side] [REL_SQ(i,side)] = pstIsolatedMg[i];
+	  pawnProperty[ISOLATED] [EG] [side] [REL_SQ(i,side)] = pstIsolatedEg[i];
+	  pawnProperty[BACKWARD] [MG] [side] [REL_SQ(i,side)] = pstBackwardMg[i];
+	  pawnProperty[BACKWARD] [EG] [side] [REL_SQ(i,side)] = pstBackwardEg[i];
 
 	  outpost[side][N][REL_SQ(i,side)] = pstKnightOutpost[i];
 	  outpost[side][B][REL_SQ(i,side)] = pstBishopOutpost[i];
