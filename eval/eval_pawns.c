@@ -104,15 +104,13 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	if (flagIsWeak) {
 		if (!(bbAdjacentMask[File(sq)] & bbPc(p, side, P))) // isolated
 		{ 
-		   if (flagIsOpen) 
-			   pawnScoreMg[side] += Data.pawnIsolatedOnOpen;
 		   AddPawnProperty(ISOLATED,side,sq);
+		   if (flagIsOpen) pawnScoreMg[side] += Data.pawnIsolatedOnOpen;
 		}
 		else // backward
 		{
-		   if (flagIsOpen) 
-			   pawnScoreMg[side] += Data.pawnBackwardOnOpen;
 		   AddPawnProperty(BACKWARD,side,sq);
+		   if (flagIsOpen) pawnScoreMg[side] += Data.pawnBackwardOnOpen;
 		}
 	}
 	

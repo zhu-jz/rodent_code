@@ -213,8 +213,8 @@ void sData::InitEvalVars(void)
 	 rookSemiOpenAttack = 5;
 	 rookSeventhMg   = 20;
 	 rookSeventhEg   = 20;
-	 pawnIsolatedOnOpen = -10;
-	 pawnBackwardOnOpen = -10;
+	 pawnIsolatedOnOpen = -15; // was -10
+	 pawnBackwardOnOpen = -15; // was -10
 }
 
 // used at the beginning of search to set scaling factors for eval components
