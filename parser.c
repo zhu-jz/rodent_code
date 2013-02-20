@@ -107,6 +107,8 @@ void sParser::UciLoop(void)
       PrintBoard(p);
     } else if (strcmp(token, "eval") == 0) {
       printf(" %d \n", Eval.Return(p, -32000,32000) );
+    } else if (strcmp(token, "signature") == 0) {
+      printf(" Command \"bench 8\" should search %d nodes \n", BENCH_8 );
     } else if (strcmp(token, "bench") == 0) {
 		ptr = ParseToken(ptr, token);
 		Searcher.Bench(atoi(token) );
