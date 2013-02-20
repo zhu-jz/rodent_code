@@ -109,5 +109,5 @@ void sHistory::OnMoveTried(int move)
 
 int sHistory::MoveIsBad(int move) 
 {
-    return (cutoff [Fsq(move)] [Tsq(move)] < 50);
+    return (cutoff [Fsq(move)] [Tsq(move)] < 60); // better than 50
 }

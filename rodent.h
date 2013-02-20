@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 15
-#define BENCH_8 1838187
+#define BUILD 16
+#define BENCH_8 1729593
 // sets max nodes, used to create Rodent's version for ultra-fast tests
 // #define FAST_TUNING 100000
 
@@ -40,32 +40,20 @@
 #endif
 
 #define MAX_ELO 2600
+#define NO_PC 12
 
 enum eColor {WHITE, BLACK, NO_CL};
 enum ePiece {P, N, B, R, Q, K, NO_TP};
+enum eDir   {HOR, VER, DIAG_AH, DIAG_HA};
+enum eFile  {FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H};
+enum eRank  {RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};
+enum eMoveType {NORMAL, CASTLE, EP_CAP, EP_SET, N_PROM, B_PROM, R_PROM, Q_PROM};
+enum eCastleFlag { W_KS = 1, W_QS = 2, B_KS = 4, B_QS = 8};
 enum eGamePhase {MG, EG};
+enum eHashEntry {NONE, UPPER, LOWER, EXACT};
 enum eProtocol {PROTO_UCI, PROTO_WB, PROTO_TXT};
 
-#define NO_PC 12
-
-enum eMoveFlag {
-   FLAG_NORMAL_MOVE = 0,
-   FLAG_NULL_EVASION,
-   FLAG_HASH_MOVE,
-   FLAG_KILLER_MOVE,
-   FLAG_GOOD_CAPTURE,
-   FLAG_BAD_CAPTURE,
-};
-
-enum eCastleFlag { W_KS = 1, W_QS = 2, B_KS = 4, B_QS = 8};
-
-enum eDir  {HOR, VER, DIAG_AH, DIAG_HA};
-enum eFile {FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H};
-enum eRank {RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};
-enum eMoveType {NORMAL, CASTLE, EP_CAP, EP_SET, N_PROM, B_PROM, R_PROM, Q_PROM};
-enum eHashEntry {NONE, UPPER, LOWER, EXACT};
-
-enum eSquares {
+enum eSquare {
   A1, B1, C1, D1, E1, F1, G1, H1,
   A2, B2, C2, D2, E2, F2, G2, H2,
   A3, B3, C3, D3, E3, F3, G3, H3,
@@ -75,6 +63,15 @@ enum eSquares {
   A7, B7, C7, D7, E7, F7, G7, H7,
   A8, B8, C8, D8, E8, F8, G8, H8,
   NO_SQ
+};
+
+enum eMoveFlag {
+   FLAG_NORMAL_MOVE = 0,
+   FLAG_NULL_EVASION,
+   FLAG_HASH_MOVE,
+   FLAG_KILLER_MOVE,
+   FLAG_GOOD_CAPTURE,
+   FLAG_BAD_CAPTURE,
 };
 
 // move macros
