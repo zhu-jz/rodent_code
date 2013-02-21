@@ -2,10 +2,10 @@
 #include "../bitboard/bitboard.h"
 #include "search.h"
 
+int KPKdraw(sPosition *p, int stronger);
+
 int sSearcher::RecognizeDraw(sPosition *p) 
 {
-  U64 bbPawn;
-
   // bare kings or Km vs K are classified as a draw and not searched any further
   if ( p->pcCount[WHITE][P] == 0 && p->pcCount[BLACK][P] == 0 ) {		  
 	  // K(m) vs K
@@ -25,43 +25,35 @@ int sSearcher::RecognizeDraw(sPosition *p)
   // pawns only
   if (p->pieceMat[WHITE] == 0 && p->pieceMat[BLACK] == 0) {
 
-	  // exactly one white pawn
 	  if (p->pcCount[WHITE][P] == 1 && p->pcCount[BLACK][P] == 0) {
-		  bbPawn = bbPc(p, WHITE, P);
-		  
-		  // opposition through a pawn
-		  if ( p->side == WHITE
-		  && (SqBb(p->kingSquare[BLACK]) & ShiftFwd(bbPawn, WHITE) )
-		  && (SqBb(p->kingSquare[WHITE]) & ShiftFwd(bbPawn, BLACK) )
-		  ) return 1;
-
-		  // black can create opposition through a pawn in one move
-		  if ( p->side == BLACK
-		  && (bbKingAttacks[p->kingSquare[BLACK]] & ShiftFwd(bbPawn, WHITE) )
-		  && (SqBb(p->kingSquare[WHITE]) & ShiftFwd(bbPawn, BLACK) )
-		  ) if ( !IllegalPosition(p) ) return 1;
-
+	     return KPKdraw(p, WHITE);
 	  } // exactly one white pawn
 
-	  // exactly one black pawn
 	  if (p->pcCount[BLACK][P] == 1 && p->pcCount[WHITE][P] == 0) {
-		  bbPawn = bbPc(p, BLACK, P);
-
-		  // opposition through a pawn
-		  if ( p->side == BLACK
-		  && (SqBb(p->kingSquare[WHITE]) & ShiftFwd(bbPawn, BLACK) )
-		  && (SqBb(p->kingSquare[BLACK]) & ShiftFwd(bbPawn, WHITE) )
-		  ) return 1;
-
-		  // white can create opposition through a pawn in one move
-		  if ( p->side == WHITE
-		  && ( bbKingAttacks[p->kingSquare[WHITE] ] & ShiftFwd(bbPawn, BLACK) )
-		  && (SqBb(p->kingSquare[BLACK]) & ShiftFwd(bbPawn, WHITE) )
-		  ) if ( !IllegalPosition(p) ) return 1;
-
+         return KPKdraw(p, BLACK);
 	  } // exactly one black pawn
 
   } // pawns only
 
   return 0;
 }
+
+int KPKdraw(sPosition *p, int stronger)
+{
+	int weaker = Opp(stronger);
+    U64 bbPawn = bbPc(p, stronger, P);
+		  
+    // opposition through a pawn
+	if ( p->side == stronger
+	&& (SqBb(p->kingSquare[weaker]) & ShiftFwd(bbPawn, stronger) )
+	&& (SqBb(p->kingSquare[stronger]) & ShiftFwd(bbPawn, weaker) )
+	) return 1;
+
+    // weaker side can create opposition through a pawn in one move
+	if ( p->side == weaker
+	&& (bbKingAttacks[p->kingSquare[weaker]] & ShiftFwd(bbPawn, stronger) )
+	&& (SqBb(p->kingSquare[stronger]) & ShiftFwd(bbPawn, weaker) )
+	) if ( !IllegalPosition(p) ) return 1;
+
+	return 0;
+} 
