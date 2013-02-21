@@ -25,14 +25,11 @@ int sSearcher::RecognizeDraw(sPosition *p)
   // pawns only
   if (p->pieceMat[WHITE] == 0 && p->pieceMat[BLACK] == 0) {
 
-	  if (p->pcCount[WHITE][P] == 1 && p->pcCount[BLACK][P] == 0) {
-	     return KPKdraw(p, WHITE);
-	  } // exactly one white pawn
+	  if (p->pcCount[WHITE][P] == 1 && p->pcCount[BLACK][P] == 0) 
+	     return KPKdraw(p, WHITE);   // exactly one white pawn
 
-	  if (p->pcCount[BLACK][P] == 1 && p->pcCount[WHITE][P] == 0) {
-         return KPKdraw(p, BLACK);
-	  } // exactly one black pawn
-
+	  if (p->pcCount[BLACK][P] == 1 && p->pcCount[WHITE][P] == 0)
+         return KPKdraw(p, BLACK); // exactly one black pawn
   } // pawns only
 
   return 0;
@@ -54,6 +51,8 @@ int KPKdraw(sPosition *p, int stronger)
 	&& (bbKingAttacks[p->kingSquare[weaker]] & ShiftFwd(bbPawn, stronger) )
 	&& (SqBb(p->kingSquare[stronger]) & ShiftFwd(bbPawn, weaker) )
 	) if ( !IllegalPosition(p) ) return 1;
+
+	// TODO: opposition next to a pawn
 
 	return 0;
 } 

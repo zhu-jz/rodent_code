@@ -81,15 +81,6 @@ int PopFirstBit(U64 * bb)
     return FirstOne(bbLocal);
 }
 
-int PopLastBit(U64 * bb) 
-{
-	int sq = LastOneAsm(*bb);
-	U64 bbLocal = *bb;
-
-    *bb ^= SqBb(sq);
-    return sq;
-}
-
 int PopFlippedBit(U64 * bb)
 {
    U64 x = *bb;
@@ -119,17 +110,5 @@ int FirstOneAsm(U64 bb)
 f_hi:    bsf  eax, dword ptr bb[4]
          add  eax, 20h
 f_ret:
-  }
-}
-
-int LastOneAsm(U64 bb)
-{ _asm { mov  eax, dword ptr bb[4]
-         test eax, eax
-         jz   l_lo
-         bsr  eax, eax
-         add  eax, 20h
-         jmp  l_ret
-l_lo:    bsr  eax, dword ptr bb[0]
-l_ret:
   }
 }
