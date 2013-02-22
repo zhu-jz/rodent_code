@@ -61,7 +61,6 @@ void sLearner::ParseLearnEntry(char * ptr, int line_no)
 
 }
 
-
 void sLearner::WriteLearnData(U64 hash, int depth, int val)
 {
     hash = hash / 4;

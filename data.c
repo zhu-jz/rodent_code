@@ -197,7 +197,7 @@ void sData::InitMaterialValues(void)
 void sData::InitEvalVars(void) 
 {
 	 ownMobility     = 110;
-	 oppMobility     = 100;
+	 oppMobility     = 110;
 	 ownAttack       = 100; 
 	 oppAttack       = 100; 
 	 bishopPair      =  20; // fast tuning: 30

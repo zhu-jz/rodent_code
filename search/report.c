@@ -25,8 +25,7 @@
 
 void sSearcher::ClearStats(void)
 {
-	for (int i=0; i < END_OF_STATS; i++) 
-		stat[i] = 0;
+	for (int i=0; i < END_OF_STATS; i++) stat[i] = 0;
 }
 
 void sSearcher::IncStat(int slot) 
@@ -51,10 +50,7 @@ void sSearcher::DisplayRootInfo(void)
 void sSearcher::DisplayCurrmove(int move, int movesTried) 
 {
 	printf("info currmove ");
-	printf("%c",File(Fsq(move)) + 'a');
-	printf("%c",Rank(Fsq(move)) + '1');
-    printf("%c",File(Tsq(move)) + 'a');
-	printf("%c",Rank(Tsq(move)) + '1');
+    PrintMove(move);
 	printf(" currmovenumber %d ", movesTried);
     printf("\n");
 	DisplaySpeed();
