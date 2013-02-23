@@ -28,31 +28,30 @@
 
 int sSearcher::Blunder(sPosition *p, int ply, int depth, int flag, int move, int lastMove, int flagInCheck) 
 {
-	// we're playing the best game we can, so don't bother with weakening
-	// (speed optimization)
+	// we're playing the best game we can, exit this function for speed reasons
 	if (Data.elo == MAX_ELO || !Data.useWeakening ) return 0;
 	
-    // Weaker levels progressively use more and more heuristics 
+	// Stronger levels progressively use more and more heuristics 
 	// that disallow forgetting about certain moves:
 
-	// try to capture the last piece that moved
+	// 1) try to capture the last piece that moved
 	if (Tsq(move) == Tsq(lastMove) && Data.elo > 999) return 0;
 
-	// don't miss captures by a pawn
+	// 2) don't miss captures by a pawn
 	if ( p->pc[Tsq(move)] == P 
 	&& File(Tsq(move)) != File(Fsq(move)) 
 	&& Data.elo > 1199) return 0; 
 
-	// don't miss short captures
+	// 3) don't miss short captures
 	if ( Data.distance[Fsq(move)][Tsq(move)] > 9
 	&& flag > FLAG_KILLER_MOVE 
 	&& flag != FLAG_HASH_MOVE 
 	&& Data.elo > 1299 ) return 0;
-
-    // don't miss queen promotions
+	
+	// 4) don't miss queen promotions
 	if ( MoveType(move) == Q_PROM && Data.elo > 1399) return 0;
 
-	// don't miss check evasions
+	// 5) don't miss check evasions
 	if (flagInCheck && Data.elo > 1499) return 0;
 
 	// Stronger levels progressively push blunders away from the root
