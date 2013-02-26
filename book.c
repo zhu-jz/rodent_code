@@ -24,7 +24,6 @@
 #include "rodent.h"
 #include "data.h"
 #include "parser.h"
-#include "selector.h"
 #include "trans.h"
 #include "search/search.h"
 #include "book.h"

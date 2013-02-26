@@ -22,7 +22,6 @@
 #include "../rodent.h"
 #include "../trans.h"
 #include "../hist.h"
-#include "../selector.h"
 #include "../timer.h"
 #include "search.h"
 

@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include "../rodent.h"
 #include "../data.h"
-#include "../selector.h"
 #include "../timer.h"
 #include "../trans.h"
 #include "search.h"
@@ -74,7 +73,7 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
 	if ( best + Data.deltaValue[ TpOnSq(p, Tsq(move) ) ] < alpha) continue;
 
 	// 2) (expensive) this capture appears to lose material
-	if (Selector.BadCapture(p, move)) continue;  
+	if (Selector.CaptureIsBad(p, move)) continue;  
 	  
     Manipulator.DoMove(p, move, undoData);
     

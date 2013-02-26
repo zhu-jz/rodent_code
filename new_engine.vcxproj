@@ -100,7 +100,6 @@
     <ClInclude Include="parser.h" />
     <ClInclude Include="rodent.h" />
     <ClInclude Include="search\search.h" />
-    <ClInclude Include="selector.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="trans.h" />
   </ItemGroup>

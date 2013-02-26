@@ -174,6 +174,22 @@ typedef struct  // set of move lists subdivided into move classes
   int bad[MAX_MOVES];
 } MOVES;
 
+struct sSelector // class that holds move lists and returns moves in predefined order
+{
+private:
+	MOVES m[1];  // move list
+	int MvvLva(sPosition *p, int move);
+	void ScoreCaptures(int hashMove);
+	void ScoreQuiet(int refutationSq);
+	int PickBestMove(void);
+public:
+	int CaptureIsBad(sPosition *p, int move);
+	void InitCaptureList(sPosition *p, int hashMove);
+	void InitMoveList(sPosition *p, int transMove, int ply);
+	int NextMove(int refutationSq, int *flag);
+	int NextCapture(void);
+};  // implemented in selector.c
+
 typedef struct // move list without classification, but with scoring methods, used at root
 {
   int moves[MAX_MOVES];
@@ -188,7 +204,7 @@ typedef struct // move list without classification, but with scoring methods, us
   void ClearUsed(int bestMove);
   void ScoreLastMove(int move, int val);
   int GetNextMove(void);
-} sFlatMoveList; // selector.c
+} sFlatMoveList; // implemented in selector.c
 
 typedef struct 
 {

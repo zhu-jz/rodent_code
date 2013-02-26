@@ -28,7 +28,6 @@ and sorting of moves.
 #include "bitboard/bitboard.h"
 #include "search/search.h"
 #include "hist.h"
-#include "selector.h"
 
 // TODO: try bad captures as killers
 // TODO: try introducing "bad quiet moves"
@@ -66,11 +65,11 @@ int sSelector::NextMove(int refutationSq, int *flag)
 
   case 2: // return good or equal captures
     while (m->next < m->last) {
-      move = SelectBest();
+      move = PickBestMove();
       if (move == m->transMove) continue; // hash move already tried
 
       // save bad captures for later
-	  if (BadCapture(m->p, move) ) {
+	  if (CaptureIsBad(m->p, move) ) {
         *m->badp++ = move;
         continue;
       }
@@ -107,7 +106,7 @@ int sSelector::NextMove(int refutationSq, int *flag)
 
   case 6: // return next quiet move
     while (m->next < m->last) {
-      move = SelectBest();
+      move = PickBestMove();
 
       if (move == m->transMove 
       ||  move == m->killer1 
@@ -145,7 +144,7 @@ int sSelector::NextCapture(void)
   int move;
 
   while (m->next < m->last) {
-    move = SelectBest();                  // find next best move
+    move = PickBestMove();                  // find next best move
     return move;
   }
   return 0;
@@ -191,9 +190,7 @@ void sSelector::ScoreQuiet(int refutationSq)
   }
 }
 
-// pick the best remaining move
-
-int sSelector::SelectBest(void)
+int sSelector::PickBestMove(void)
 {
   int *movep, *valuep, aux;
 
@@ -212,9 +209,7 @@ int sSelector::SelectBest(void)
   return *m->next++;
 }
 
-// BadCapture() identifies captures that are likely to lose material
-
-int sSelector::BadCapture(sPosition *p, int move) // last change 2012-03-06
+int sSelector::CaptureIsBad(sPosition *p, int move)
 {
   int fsq = Fsq(move);
   int tsq = Tsq(move);
@@ -277,7 +272,7 @@ void sFlatMoveList::ScoreLastMove( int move, int val)
 
 int sFlatMoveList::GetNextMove() 
 {
-	int bestVal = -INF;
+	int bestVal  = -INF;
 	int bestMove = 0;
 	for (int i = 0; i < nOfMoves; i++) {
 		if ( value[i] > bestVal && !used[i]) {
@@ -296,7 +291,7 @@ void sFlatMoveList::Init(sPosition * p)
 	int move;
 	int unusedFlag;
 	UNDO  undoData[1];       // data required to undo a move
-	  int pv[MAX_PLY];
+	int pv[MAX_PLY];
 
 	Selector.InitMoveList(p, 0, 0); // prepare move selector
 	nOfMoves = 0;
