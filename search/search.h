@@ -70,6 +70,7 @@ private:
 	int rootDepth;
 	sFlatMoveList rootList;
 public:
+	int bestMove;
 	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int *pv); // for sFlatMoveList
 	void Think(sPosition *, int *);
 	void ShowPerft(sPosition *p, int depth);

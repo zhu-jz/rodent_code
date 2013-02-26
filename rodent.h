@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 17
-#define BENCH_8 1594379
+#define BUILD 18
+#define BENCH_8 1827451
 // sets max nodes, used to create Rodent's version for ultra-fast tests
 // #define FAST_TUNING 100000
 
@@ -138,8 +138,7 @@ enum eMoveFlag {
 #define BAttacks(o, x)  (AHDAttacks(o, x) | HADAttacks(o, x))
 #define QAttacks(o, x)  (RAttacks(o, x)   | BAttacks(o, x))
 
-// board representation
-typedef struct 
+typedef struct         // board representation:
 {
   U64 bbCl[2];         // color bitboard
   U64 bbTp[6];         // piece type bitboard
@@ -175,19 +174,20 @@ typedef struct  // set of move lists subdivided into move classes
   int bad[MAX_MOVES];
 } MOVES;
 
-typedef struct
+typedef struct // move list without classification, but with scoring methods, used at root
 {
   int moves[MAX_MOVES];
   int value[MAX_MOVES];
+  int used[MAX_MOVES];
   int bestMove;
   int bestVal;
   int nOfMoves;
   int currMoveIndex;
   void Init(sPosition *p);
   void AddMove(int move);
-  void Sort();
-  void ScoreLastMove(int val);
-  int GetNextMove();
+  void ClearUsed(int bestMove);
+  void ScoreLastMove(int move, int val);
+  int GetNextMove(void);
 } sFlatMoveList; // selector.c
 
 typedef struct 
@@ -238,8 +238,7 @@ extern U64 bbLineMask[4][64];
 
 extern U64 attacks[4][64][64];
 /* first slot denotes direction: 0 is -, 1 is |, 2 is / and 3 is \
-/  second slot denotes a start square
-/  third slot denotes occupancy mask */
+   second slot = start square, third slot = occupancy mask */
 
 extern U64 bbPawnAttacks[2][64];
 extern U64 bbKnightAttacks[64];

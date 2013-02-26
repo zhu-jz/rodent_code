@@ -100,7 +100,7 @@ int StrToMove(sPosition *p, char *moveString)
   int from, to, type;
 
   from = Sq(moveString[0] - 'a', moveString[1] - '1');
-  to = Sq(moveString[2] - 'a', moveString[3] - '1');
+  to   = Sq(moveString[2] - 'a', moveString[3] - '1');
   type = NORMAL;
   if (TpOnSq(p, from) == K && Abs(to - from) == 2)
     type = CASTLE;

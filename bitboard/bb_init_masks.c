@@ -34,11 +34,11 @@ void InitPassedMask()
 
 void InitAdjacentMask() 
 {
-     for (int i = 0; i < 8; i++) {
-         bbAdjacentMask[i] = 0;
-         if (i > 0) bbAdjacentMask[i] |= bbFILE_A << (i - 1);
-         if (i < 7) bbAdjacentMask[i] |= bbFILE_A << (i + 1);
-     }
+  for (int i = 0; i < 8; i++) {
+    bbAdjacentMask[i] = 0;
+    if (i > 0) bbAdjacentMask[i] |= bbFILE_A << (i - 1);
+    if (i < 7) bbAdjacentMask[i] |= bbFILE_A << (i + 1);
+  }
 }
 
 void InitPossibleAttacks() 

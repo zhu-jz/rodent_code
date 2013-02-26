@@ -151,7 +151,7 @@ int sSelector::NextCapture(void)
   return 0;
 }
 
-// order captures using MvvLva() function
+// order captures using MvvLva() function and putting hash move first
 
 void sSelector::ScoreCaptures(int hashMove)
 {
@@ -249,8 +249,8 @@ int sSelector::MvvLva(sPosition *p, int move)
   if (p->pc[Tsq(move)] != NO_PC)
     return TpOnSq(p, Tsq(move)) * 6 + 5 - TpOnSq(p, Fsq(move));
   
-  if (IsProm(move))
-    return PromType(move) - 5;
+  if (IsProm(move)) 
+	return PromType(move) - 5;
 
   return 5;
 }
@@ -259,6 +259,35 @@ void sFlatMoveList::AddMove(int move)
 {
 	 moves[nOfMoves] = move;
 	 nOfMoves++;
+}
+
+void sFlatMoveList::ClearUsed(int bestMove)
+{
+     for (int i = 0; i < nOfMoves; i++) {
+		used[i] = 0;
+		if (moves[i] == bestMove) value[i] = INF;
+	 }
+}
+
+void sFlatMoveList::ScoreLastMove( int move, int val)
+{
+	 for (int i = 0; i < nOfMoves; i++)
+		 if (moves[i] == move) value[i] = val;
+}
+
+int sFlatMoveList::GetNextMove() 
+{
+	int bestVal = -INF;
+	int bestMove = 0;
+	for (int i = 0; i < nOfMoves; i++) {
+		if ( value[i] > bestVal && !used[i]) {
+			bestVal = value[i];
+			bestMove = moves[i];
+			currMoveIndex = i;
+		}
+	}
+	used[currMoveIndex] = 1;
+	return bestMove;
 }
 
 void sFlatMoveList::Init(sPosition * p)
@@ -291,5 +320,4 @@ void sFlatMoveList::Init(sPosition * p)
 	  AddMove(move);
 	  Manipulator.UndoMove(p, move, undoData);
 	}
-
 }

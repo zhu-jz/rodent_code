@@ -32,8 +32,11 @@
 #include "search.h"
 #include "../eval/eval.h"
 
+int nodesPerBranch = 0;
+
 void sSearcher::Think(sPosition *p, int *pv)
 {
+  bestMove = 0;
   int flagBookProblem = 0;
   isReporting         = 1;
   nodes               = 0;
@@ -88,6 +91,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
     
 	// first use aspiration window around the value from the last completed depth
 	curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, NO_NULL, 0, pv);
+	bestMove = pv[0];
 	if (flagAbortSearch) break;
 
 	// if score is outside the window, re-search
@@ -100,11 +104,13 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 		if (curVal <= alpha) alpha = val -3*delta;
 
 		curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, NO_NULL, 0, pv);
+		bestMove = pv[0];
         if (flagAbortSearch) break;
 
 		// the second window
 		if (curVal >= beta || curVal <= alpha) 
             curVal = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, NO_NULL, 0, pv);
+		    bestMove = pv[0];
         if (flagAbortSearch) break;
 	}
 
@@ -143,6 +149,7 @@ int sSearcher::VerifyValue(sPosition *p, int depth, int move)
 
   for (rootDepth = ONE_PLY; rootDepth <= depth * ONE_PLY; rootDepth+=ONE_PLY) {
       val = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, NO_NULL, 0, pv);
+	  bestMove = pv[0];
   }
 
   Data.isAnalyzing = 0;
@@ -222,13 +229,16 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
+  rootList.ClearUsed(bestMove);
   Selector.InitMoveList(p, move, ply);
 
   // LOOP THROUGH THE MOVE LIST
-  while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
+  //while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
+  while( move = rootList.GetNextMove() ) {
   
 	 // MAKE A MOVE
-	 Manipulator.DoMove(p, move, undoData);    
+	 Manipulator.DoMove(p, move, undoData);   
+	 nodesPerBranch = 0;
 	
 	 // UNDO ILLEGAL MOVES
 	 if (IllegalPosition(p)) { 
@@ -255,6 +265,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
      }
 
      Manipulator.UndoMove(p, move, undoData);
+	 rootList.ScoreLastMove(move, nodesPerBranch);
 
 	 if (!ply && nodeType == PV_NODE) Timer.SetData(FLAG_NO_FIRST_MOVE, 0);
 
@@ -332,6 +343,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, pv);
 
   nodes++;
+  nodesPerBranch++;
   CheckInput();
 
   // REUSING LEARNED DATA ABOUT SCORE OF SPECIFIC POSITIONS

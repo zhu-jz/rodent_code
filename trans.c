@@ -200,6 +200,7 @@ void sTransTable::Store(U64 key, int move, int score, int flags, int depth, int 
   replace->depth = depth;
 }
 
-void sTransTable::ChangeDate() {
+void sTransTable::ChangeDate() 
+{
   tt_date = (tt_date + 1) & 255;
 }

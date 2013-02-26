@@ -32,8 +32,7 @@ void sLearner::Init(char *fileName)
 	 learnSize = 0;
 
       // exit if learn file doesn't exist
-	  if ( (learnFile = fopen(fileName, "r")) == NULL ) 
-		 return;
+	  if ( (learnFile = fopen(fileName, "r")) == NULL ) return;
      
 	 // TODO: read learn file line by line, increasing age of each entry
 	  	  while ( fgets(line, 256, learnFile) ) {
