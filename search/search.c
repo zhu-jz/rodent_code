@@ -173,7 +173,6 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 
   // NODE INITIALIZATION
   int movesTried     = 0;       // count of moves that initiated new searches
-  int nodeEval       = INVALID; // we have not called evaluation function at this node yet 
   int flagInCheck    = InCheck(p); // are we in check at the beginning of the search?
 
   // at root we keep track whether a move has been found; if not, we let the engine
@@ -239,7 +238,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 	 }
 
 	 movesTried++;                     // increase legal move count
-	 if (Data.verbose) DisplayCurrmove(move, movesTried);
+	 if (Data.verbose && !pondering) DisplayCurrmove(move, movesTried);
 	 depthChange    = 0;               // no depth modification so far
 	 History.OnMoveTried(move);
 
