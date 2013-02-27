@@ -135,13 +135,12 @@ void sSelector::InitCaptureList(sPosition *p, int hashMove)
   m->next = m->move;
 }
 
-// used in Quiesce()
-int sSelector::NextCapture(void)
+int sSelector::NextCapture(void)  // used in Quiesce()
 {
   int move;
 
   while (m->next < m->last) {
-    move = PickBestMove();                  // find next best move
+    move = PickBestMove();
     return move;
   }
   return 0;
@@ -178,10 +177,10 @@ void sSelector::ScoreQuiet(int refutationSq)
     // null move refutations are sorted much higher	
 	if ( Fsq(*movep) == refutationSq ) { 
 		if ( Swap(m->p, Fsq(*movep), Tsq(*movep) ) >= -100 ) { // TODO: try -50
-		sortVal *= 2;
-		sortVal += 10000;
+		   sortVal *= 2;
+		   sortVal += 10000;
 		}
-	}
+    }
 
     *valuep++ = sortVal;
   }
@@ -254,25 +253,27 @@ void sFlatMoveList::AddMove(int move)
 
 void sFlatMoveList::ClearUsed(int bestMove)
 {
-     for (int i = 0; i < nOfMoves; i++) {
+     for (int i = 0; i < nOfMoves; i++)
 		used[i] = 0;
-		if (moves[i] == bestMove) value[i] = MAX_INT;
-	 }
 }
 
 void sFlatMoveList::ScoreLastMove( int move, int val)
 {
 	 for (int i = 0; i < nOfMoves; i++)
-		 if (moves[i] == move) value[i] = val;
+		 if (moves[i] == move) value[i] += val;
 }
 
 int sFlatMoveList::GetNextMove() 
 {
+	int tempVal;
 	int bestVal  = -INF;
 	int bestMove = 0;
 	for (int i = 0; i < nOfMoves; i++) {
-		if ( value[i] > bestVal && !used[i]) {
-			bestVal = value[i];
+		if (moves[i] == Searcher.bestMove ) tempVal = MAX_INT;
+		else                                tempVal = value[i];
+
+		if ( tempVal > bestVal && !used[i]) {
+			bestVal = tempVal;
 			bestMove = moves[i];
 			currMoveIndex = i;
 		}

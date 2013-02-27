@@ -29,11 +29,11 @@ int IsLegal(sPosition *p, int move)
   int ftp  = TpOnSq(p, fsq); // moving piece
   int ttp  = TpOnSq(p, tsq); // captured piece
 
-  // must move own piece
+  // we must move own piece
   if (ftp == NO_TP || Cl(p->pc[fsq]) != side)
     return 0;
   
-  // cannot capture own piece
+  // we cannot capture own piece
   if (ttp != NO_TP && Cl(p->pc[tsq]) == side)
     return 0;
 

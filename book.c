@@ -540,7 +540,7 @@ void sBook::SortMainBook(void) {
        if (i % 100 == 0 ) printf ("%d   \r", i);
 
       change = 0;
-      for (j=0; j<nOfRecords-1-i; j++) { 
+      for (j = 0; j<nOfRecords-1-i; j++) { 
 		  if (myBook[j+1].hash < myBook[j].hash // comparing neighbours
 		  || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) ) {  
               tmp = myBook[j];      

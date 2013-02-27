@@ -63,11 +63,8 @@ void sSearcher::DisplayDepth(void)
 
 void sSearcher::DisplaySettings(void)
 {
-     printf("info string Searched by Rodent, level ");
-	 printf(Data.currLevel);
-	 printf(", style ");
-	 printf(Data.currStyle);
-	 printf("\n");
+     printf("info string Searched by Rodent, level %s", Data.currLevel);
+	 printf(", style %s\n", Data.currStyle);
 }
 
 void sSearcher::DisplayPv(int score, int *pv)
@@ -97,7 +94,6 @@ void sSearcher::DisplayPv(int score, int *pv)
   if (flagProtocol == PROTO_TXT)
   printf("%2d. %3d.%1d %10u %4d %4d %s\n",
           rootDepth/ONE_PLY, time/1000, (time/100)%10, nodes, nodes / (time+1),  score, pv_str);
-
 }
 
 void sSearcher::DisplaySavedIterationTime(void) 
