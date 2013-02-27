@@ -172,14 +172,8 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
     UNDO  undoData[1];          // data required to undo a move
 
   // NODE INITIALIZATION
-  int nullScore      = 0;       // result of a null move search
-  int nullRefutation = 0;       // a capture that refuted a null move
-  int refutationSq   = NO_SQ;   // target square of that capture
   int movesTried     = 0;       // count of moves that initiated new searches
-  int blunderCount   = 0;       // forces the engine to try one of the top moves in weakening mode
   int nodeEval       = INVALID; // we have not called evaluation function at this node yet 
-  int flagIsReduced  = 0;       // are we in a reduced search? (guides re-searches)
-  int flagCanPrune   = 0;       // can we statically prune in this node
   int flagInCheck    = InCheck(p); // are we in check at the beginning of the search?
 
   // at root we keep track whether a move has been found; if not, we let the engine
@@ -245,7 +239,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 	 }
 
 	 movesTried++;                     // increase legal move count
-	 flagIsReduced  = 0;               // this move has not been reduced (yet)
+	 if (Data.verbose) DisplayCurrmove(move, movesTried);
 	 depthChange    = 0;               // no depth modification so far
 	 History.OnMoveTried(move);
 
@@ -409,9 +403,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	  newDepth = SetNullDepth(depth);                             // ALL_NODE
       nullScore = -Search(p, ply + 1, -beta, -beta + 1, newDepth, NEW_NODE(nodeType), WAS_NULL, 0, newPv);
 
-	  // Extract refutation of a null move from transposition table; 
-	  // most of the time it will be capture and we will use this information
-	  // to sort an evasion much higher than other quiet moves.
+	  // extract refutation of a null move from transposition table; usually 
+	  // it will be a capture and we will sort safe evasions above other quiet moves.
 	  TransTable.Retrieve(p->hashKey, &nullRefutation, &score, alpha, beta, depth, ply);
 	  
 	  // get target square of null move refutation to sort escape moves a bit higher

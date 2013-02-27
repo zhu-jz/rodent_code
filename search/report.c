@@ -51,8 +51,7 @@ void sSearcher::DisplayCurrmove(int move, int movesTried)
 {
 	printf("info currmove ");
     PrintMove(move);
-	printf(" currmovenumber %d ", movesTried);
-    printf("\n");
+	printf(" currmovenumber %d \n", movesTried);
 	DisplaySpeed();
 }
 
