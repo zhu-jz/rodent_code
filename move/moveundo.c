@@ -23,13 +23,11 @@
 
 void sManipulator::UndoMove(sPosition *p, int move, UNDO *u)
 {
-  int side, fsq, tsq, ftp, ttp;
-
-  side = Opp(p->side);   // moving side
-  fsq  = Fsq(move);      // start square
-  tsq  = Tsq(move);      // target square
-  ftp  = TpOnSq(p, tsq); // moving piece
-  ttp  = u->ttp;         // captured piece
+  int side = Opp(p->side);   // moving side
+  int fsq  = Fsq(move);      // start square
+  int tsq  = Tsq(move);      // target square
+  int ftp  = TpOnSq(p, tsq); // moving piece
+  int ttp  = u->ttp;         // captured piece
 
   U64 bbMove = SqBb(fsq) | SqBb(tsq); // optimization from Stockfish
 

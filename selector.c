@@ -29,9 +29,6 @@ and sorting of moves.
 #include "search/search.h"
 #include "hist.h"
 
-// TODO: try bad captures as killers
-// TODO: try introducing "bad quiet moves"
-
 // initializes data needed for move ordering
 void sSelector::InitMoveList(sPosition *p, int transMove, int ply)
 {
@@ -234,10 +231,9 @@ int sSelector::CaptureIsBad(sPosition *p, int move)
   return Swap(p, fsq, tsq) < -Data.goodCaptMargin;
 }
 
-// MvvLva()  (most valuable victim - least valuable  attacker)
-// function  is  used to sort captures; main consideration  is 
-// the value of a captured piece (victim), with the capturer's
-// value used as a tie-break (the lower the better)
+// MvvLva() (stands for most valuable victim - least valuable attacker)
+// sorts captures according to the value of a captured piece (victim), 
+// with the capturer's value used as a tie-break (the lower the better)
 
 int sSelector::MvvLva(sPosition *p, int move)
 {  
@@ -260,7 +256,7 @@ void sFlatMoveList::ClearUsed(int bestMove)
 {
      for (int i = 0; i < nOfMoves; i++) {
 		used[i] = 0;
-		if (moves[i] == bestMove) value[i] = INF;
+		if (moves[i] == bestMove) value[i] = MAX_INT;
 	 }
 }
 

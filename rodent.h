@@ -39,6 +39,7 @@
    #define CDECL
 #endif
 
+#define MAX_INT 2147483646
 #define MAX_ELO 2600
 #define NO_PC 12
 

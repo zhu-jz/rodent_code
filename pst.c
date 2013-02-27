@@ -23,7 +23,8 @@
 
 #define PE    10 // endgame material gain of a pawn
 
-int pstPawnMg[64] = {
+const int pstPawnMg[64] = 
+{
 	0,   0,   0,   0,   0,   0,   0,   0,
   -15,  -5,   0,   5,   5,   0,  -5, -15,
   -15,  -5,   5,  15,  15,   5,  -5, -15,
@@ -34,8 +35,7 @@ int pstPawnMg[64] = {
     0,   0,   0,   0,   0,   0,   0,   0
 };
 
-// material endgame bonus only
-const int pstPawnEg[64] = 
+const int pstPawnEg[64] = // material endgame bonus only
 {    
     PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE,
     PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE,

@@ -53,6 +53,7 @@ private:
 	U32  GetNps(int nodes, int time);
 
 	// search.c
+	int nodesPerBranch;
 	int DrawBy50Moves(sPosition *p);
 	void Iterate(sPosition *p, int *);
 	int IsRepetition(sPosition *p);

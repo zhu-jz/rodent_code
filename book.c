@@ -539,14 +539,14 @@ void sBook::SortMainBook(void) {
    for (i=0; i<nOfRecords-1; ++i) {
        if (i % 100 == 0 ) printf ("%d   \r", i);
 
-      change=0;
+      change = 0;
       for (j=0; j<nOfRecords-1-i; j++) { 
 		  if (myBook[j+1].hash < myBook[j].hash // comparing neighbours
 		  || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) ) {  
               tmp = myBook[j];      
               myBook[j] = myBook[j+1];
               myBook[j+1] = tmp;    // bubble goes up     
-              change=1;
+              change = 1;
           }
       }
 
@@ -558,7 +558,7 @@ void sBook::SortMainBook(void) {
               tmp = myBook[j];      
               myBook[j] = myBook[j+1];
               myBook[j+1] = tmp;    // bubble goes down     
-              change=1;
+              change = 1;
           }
       }
    }

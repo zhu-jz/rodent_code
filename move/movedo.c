@@ -23,13 +23,11 @@
 
 void sManipulator::DoMove(sPosition *p, int move, UNDO *u)
 {
-  int side, fsq, tsq, ftp, ttp;
-
-  side = p->side;         // moving side 
-  fsq  = Fsq(move);       // start square
-  tsq  = Tsq(move);       // target square
-  ftp  = TpOnSq(p, fsq);  // moving piece
-  ttp  = TpOnSq(p, tsq);  // captured piece
+  int side = p->side;         // moving side 
+  int fsq  = Fsq(move);       // start square
+  int tsq  = Tsq(move);       // target square
+  int ftp  = TpOnSq(p, fsq);  // moving piece
+  int ttp  = TpOnSq(p, tsq);  // captured piece
 
   U64 bbMove = SqBb(fsq) | SqBb(tsq); // optimization from Stockfish
 

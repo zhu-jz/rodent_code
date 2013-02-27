@@ -36,7 +36,7 @@
 
 void sTimer::Clear(void) 
 {
-  iterationTime = 999999000; // TODO: change it to real max_int
+  iterationTime = MAX_INT;
   SetData(MAX_DEPTH, MAX_PLY);
   moveTime = -1;
   maxMoveTime = -1;

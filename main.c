@@ -52,7 +52,6 @@ int main()
   flagProtocol = PROTO_TXT;
   Init();
   Parser.ReadIniFile("rodent.ini"); // initialize variables governing how the engine appears to a GUI
-  //PrintBb( RookAttacks(SqBb(D4), ~SqBb(D7) ) ); // test
   History.OnNewGame();
   Learner.Init("lrn.dat");
   Book.Init(&p);

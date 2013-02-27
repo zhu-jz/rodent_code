@@ -31,10 +31,9 @@
 #include "search.h"
 #include "../eval/eval.h"
 
-int nodesPerBranch = 0;
-
 void sSearcher::Think(sPosition *p, int *pv)
 {
+  nodesPerBranch = 0;
   bestMove = 0;
   int flagBookProblem = 0;
   isReporting         = 1;
