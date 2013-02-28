@@ -19,6 +19,8 @@
 
 #pragma once
 
+enum eFileTasks {SPLIT_CONTINOUS, ADD_QUOTES};
+
 struct sBookEntry {
   U64 hash;
   int move;
@@ -52,8 +54,7 @@ public:
    int ReadOwnBookFile(char *filename);
    int ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedColor);
    void BookDoctor(sPosition * p);
-   void SplitContinousBookFormat(char *fileName);
-   void AddQuotes(char *fileName);
+   void FileFixer(char *inFileName, char *outFileName, int task);
    int GetBookMove(sPosition *p, int canPrint, int *flagIsProblem);
    void FeedMainBook(sPosition *p, int verifyDepth);
 };
