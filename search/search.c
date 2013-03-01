@@ -166,8 +166,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 	  move,                     // a move we are searching right now
 	  depthChange,              // extension/reduction value
 	  newDepth,                 // depth of a new search started in this node
-	  newPv[MAX_PLY],           // new main line
-      flagMoveType;             // move type flag, supplied by NextMove()
+	  newPv[MAX_PLY];           // new main line
   sSelector Selector;           // an object responsible for maintaining move list and picking moves 
     UNDO  undoData[1];          // data required to undo a move
 
@@ -223,23 +222,17 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
   rootList.ClearUsed(bestMove);
   Selector.InitMoveList(p, move, ply);
 
-  // LOOP THROUGH THE MOVE LIST
-  //while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
+  // LOOP THROUGH THE MOVE LIST 
+  // (note that rootList supplies legal moves only)
   while( move = rootList.GetNextMove() ) {
   
 	 // MAKE A MOVE
 	 Manipulator.DoMove(p, move, undoData);   
 	 nodesPerBranch = 0;
 	
-	 // UNDO ILLEGAL MOVES
-	 if (IllegalPosition(p)) { 
-	 	 Manipulator.UndoMove(p, move, undoData); 
-		 continue; 
-	 }
-
-	 movesTried++;                     // increase legal move count
+	 movesTried++;    // increase legal move count
 	 if (Data.verbose && !pondering) DisplayCurrmove(move, movesTried);
-	 depthChange    = 0;               // no depth modification so far
+	 depthChange = 0; // no depth modification so far
 	 History.OnMoveTried(move);
 
 	 // EXTENSIONS might be placed here
