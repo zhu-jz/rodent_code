@@ -71,6 +71,12 @@ static const int imbalance[9][9] = {
   {   0,    0,    0,    0,   Rk,    A,    A,    A,    A }  // R = +4 
 };
 
+#define NP 6 // values as close as possible to LK formula (1/16 and 1/32 of a pawn)
+#define RP 3
+
+static const int N_adj[9] = { -4*NP, -3*NP, -2*NP, -NP,  0,  NP,  2*NP,  3*NP,  4*NP };
+static const int R_adj[9] = {  4*RP,  3*RP,  2*RP,  RP,  0, -RP, -2*RP, -3*RP, -4*RP };
+
 int sEvaluator::GetMaterialScore(sPosition *p) 
 {
   // piece material
@@ -87,18 +93,23 @@ int sEvaluator::GetMaterialScore(sPosition *p)
   if ( p->pcCount[WHITE][N] > 1) score += Data.knightPair;
   if ( p->pcCount[BLACK][N] > 1) score -= Data.knightPair;
 
-  //if ( p->pcCount[WHITE][R] > 1) score += Data.rookPair;
- // if ( p->pcCount[BLACK][R] > 1) score -= Data.rookPair;
+  if ( p->pcCount[WHITE][R] > 1) score += Data.rookPair;
+  if ( p->pcCount[BLACK][R] > 1) score -= Data.rookPair;
+
+  // rook/knight adjustment based on no. of pawns
+  score += ( N_adj[ p->pcCount[WHITE][P] ] * p->pcCount[WHITE] [N] );
+  score -= ( N_adj[ p->pcCount[BLACK][P] ] * p->pcCount[BLACK] [N] );
+  score += ( R_adj[ p->pcCount[WHITE][P] ] * p->pcCount[WHITE] [R] );
+  score -= ( R_adj[ p->pcCount[BLACK][P] ] * p->pcCount[BLACK] [R] );
 
   // material imbalance table
-  int x, y;
   int minorBalance = p->pcCount[WHITE][N] - p->pcCount[BLACK][N] + p->pcCount[WHITE][B]   - p->pcCount[BLACK][B];
   int majorBalance = p->pcCount[WHITE][R] - p->pcCount[BLACK][R] + 2*p->pcCount[WHITE][Q] - 2*p->pcCount[BLACK][Q];
 
-  x = Max( majorBalance + 4, 0 );
+  int x = Max( majorBalance + 4, 0 );
   if (x > 8) x = 8;
 
-  y = Max(minorBalance + 4, 0);
+  int y = Max(minorBalance + 4, 0);
   if (y > 8) y = 8;
 
   score += imbalance [x] [y];

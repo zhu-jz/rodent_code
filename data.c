@@ -200,10 +200,10 @@ void sData::InitEvalVars(void)
 	 oppMobility     = 110;
 	 ownAttack       = 100; 
 	 oppAttack       = 100; 
-	 bishopPair      =  20; // fast tuning: 30
-	 knightPair      = -10;
-	 rookPair        =   0; // fast tuning: -5
-	 doubledPawn[MG] = -20; // fast tuning: -15 or -20
+	 bishopPair      =  50; 
+	 knightPair      =   0; // untuned
+	 rookPair        =   0; // untuned
+	 doubledPawn[MG] = -20;
      doubledPawn[EG] = -10;
 	 rookOpenMg      = 10;
      rookOpenEg      = 10;
@@ -213,8 +213,8 @@ void sData::InitEvalVars(void)
 	 rookSemiOpenAttack = 5;
 	 rookSeventhMg   = 20;
 	 rookSeventhEg   = 20;
-	 pawnIsolatedOnOpen = -15; // was -10
-	 pawnBackwardOnOpen = -15; // was -10
+	 pawnIsolatedOnOpen = -15;
+	 pawnBackwardOnOpen = -15;
 }
 
 // used at the beginning of search to set scaling factors for eval components
