@@ -45,8 +45,6 @@ public:
  int ownAttack;
  int oppAttack;
  int bishopPair;
- int knightPair;
- int rookPair;
  int badBishopPenalty[2][64];
  int rookOpenMg;
  int rookOpenEg;

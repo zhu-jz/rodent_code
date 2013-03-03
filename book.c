@@ -36,7 +36,7 @@ void sBook::Init(sPosition * p)
 	 nOfRecords = 0;
 	 nOfGuideRecords = 0;
 	  if (START_POS !=  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -") {
-		  printf("Programmer is doing some tests and I, the opening book reader, will take no part in that!");
+		  printf("Unusual start position, opening book disabled!");
 		  return;
 	  }
 	 
@@ -54,7 +54,7 @@ void sBook::BookDoctor(sPosition * p) {
      doctorFile = fopen("doctor.txt","a+"); 
 
 	 int flagIsProblem = 0;
-	 printf("Book doctor launched. It looks for a line that might need Your decision and saves it to doctor.txt\n");
+	 printf("First line that might need Your decision will be saved to doctor.txt\n");
 	 
 	 for (int i = 0; i < 10000; i++ ) {
 		 SetPosition(p, START_POS);
@@ -81,11 +81,11 @@ void sBook::BookDoctor(sPosition * p) {
 
 int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 	int i;
-	int floorVal   = 0;
-	int curVal     = 0;
-	int bestVal    = 0;
-	int choice     = 0;
-	int maxFreq    = 0;
+	int floorVal = 0;
+	int curVal   = 0;
+	int bestVal  = 0;
+	int choice   = 0;
+	int maxFreq  = 0;
 	int values[100];
 	U64 localHash = GetBookHash(p);
 
@@ -296,10 +296,10 @@ int sBook::IsMoveInBook(U64 hashKey, int move)
 	if (nOfRecords == 0) return 0;
 
 	for (int i = 0; i < nOfRecords; i++ ) {
-         if ( myBook[i].hash == hashKey 
-			 &&   myBook[i].move == move) {
+		if ( myBook[i].hash == hashKey 
+		&&   myBook[i].move == move) {
 		 return 1;
-		 }
+		}
 	}
 	return 0;
 }

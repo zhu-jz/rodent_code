@@ -24,8 +24,8 @@
 void PrintBb( U64 bbTest) 
 {
   for (int i = 0; i < 64; i++) {
-      if (bbTest & RelSqBb(i,BLACK) ) printf("+ ");
-	  else									printf(". ");
+	  if (bbTest & RelSqBb(i,BLACK) ) printf("+ ");
+	  else                            printf(". ");
 	  if ( (i+1) % 8 == 0) printf(" %d\n", 9 - ((i+1) / 8) );
   }
   printf("\na b c d e f g h\n");
@@ -53,13 +53,11 @@ U64 GetRearSpan(U64 bb, int side)
 	                   return FillNorthExcl(bb);
 }
 
-U64 GetWPControl(U64 bb) 
-{
+U64 GetWPControl(U64 bb) {
     return ( ShiftNE(bb) | ShiftNW(bb) );
 }
 
-U64 GetBPControl(U64 bb) 
-{
+U64 GetBPControl(U64 bb) {
     return ( ShiftSE(bb) | ShiftSW(bb) );
 }
 
@@ -69,7 +67,8 @@ U64 GetPawnAttacks(int side, U64 bb)
 	                   return GetBPControl(bb);    
 }
 
-U64 ShiftFwd(U64 bb, int side) {
+U64 ShiftFwd(U64 bb, int side) 
+{
 	if (side == WHITE) return ShiftNorth(bb);
 	                   return ShiftSouth(bb);
 }

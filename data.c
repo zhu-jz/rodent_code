@@ -201,8 +201,6 @@ void sData::InitEvalVars(void)
 	 ownAttack       = 100; 
 	 oppAttack       = 100; 
 	 bishopPair      =  50; 
-	 knightPair      =   0; // untuned
-	 rookPair        =   0; // untuned
 	 doubledPawn[MG] = -20;
      doubledPawn[EG] = -10;
 	 rookOpenMg      = 10;
