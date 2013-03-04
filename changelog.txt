@@ -1,14 +1,8 @@
 CHANGES AFTER 2013-01-23 recorded on GitHub, https://github.com/nescitus/rodent_code/commits/
 
-BEST GAUNTLET SCORE: 47,3%
+2013-01-20: less cluttered display of search lines in console mode
 
-2013-01-20
-
-- less cluttered display of search lines in console mode
-
-2013-01-19
-
-- introducing color-independent EvalPatterns() (currently only code for a knight blocking c-pawn moved there)
+2013-01-19: color-independent EvalPatterns() (currently only code for a knight blocking c-pawn moved there)
 
 2013-01-17
 
@@ -21,9 +15,7 @@ BEST GAUNTLET SCORE: 47,3%
 - fixed silly sign bug in go nodes command
 - internal iterative deepening at cut nodes passed self-play test and awaits for a gauntlet
 
-2013-01-15
-
-- node type detection based on Fruit
+2013-01-15: node type detection based on Fruit
 
 2013-01-13
 
@@ -64,21 +56,13 @@ BEST GAUNTLET SCORE: 47,3%
 - FAILED with pawn pst emphasizing center (45,5% / 2200 games)
 - implemented "go movetime" and "go nodes" commands
 
-2013-01-02
+2013-01-02: FAILED with simultaneous pawn pst change and attackable knight eval (44,2% / 2100 games)
 
-- FAILED with simultaneous pawn pst change and attackable knight eval (44,2% / 2100 games)
+2012-12-xx: FAILED with razoring a la DiscoCheck (perhaps better qs would be needed)
 
-2012-12-xx
+2012-12-30: aspiration window correction: 46,5% / 2000 games
 
-- FAILED with razoring a la DiscoCheck (perhaps better qs would be needed)
-
-2012-12-30
-
-- aspiration window correction: 46,5% / 2000 games
-
-2012-12-25
-
-- Eval pruning similar to that of DiscoCheck replaces Static null move: 46,2% / 2440 games
+2012-12-25: Eval pruning similar to that of DiscoCheck replaces Static null move: 46,2% / 2440 games
 
 2012-12-21
 
@@ -87,13 +71,9 @@ BEST GAUNTLET SCORE: 47,3%
   now we have EvalMaterial() which does all the material adjustements 
   and CheckmateHelper() for pushing enemy king towards the rim and KBNK stuff
 
-2012-12-20
+2012-12-20: confirmed that midgame eval of candidate passers is useful
 
-- confirmed that midgame eval of candidate passers is useful
-
-2012-12-19
-
-- first attempt at candidate passer eval already gains a little: 46,0% / 1740 games
+2012-12-19: first attempt at candidate passer eval already gains a little: 46,0% / 1740 games
 
 2012-12-18
 
@@ -111,9 +91,7 @@ BEST GAUNTLET SCORE: 47,3%
   and reducing more when difference between static eva and beta is big)
   no improvement and no weakening from either of these formulas, so we stay conservative
 
-2012-12-15
-
-- null move fix 45,7% / 2330 games
+2012-12-15: null move fix 45,7% / 2330 games
 
 2012-12-14
 
@@ -126,29 +104,17 @@ BEST GAUNTLET SCORE: 47,3%
 - speedup due to different updating scheme of reversible moves counter (thx Kestutis Gasaitis!)
 - failed with Kestitis' suggestion that reduction of null move verification search is too big  
 
-2012-10-07
+2012-10-07: fixed sign bug in "checkmate help" in eval.material, added code for KBNK mate
 
-- fixed sign bug in "checkmate help" in eval.material, added code for KBNK mate
+2012-10-03: reporting nps every now and then in verbose mode
 
-2012-10-03
+2012-10-02: separating strength and style settings
 
-- reporting nps every now and then in verbose mode
+2012-09-24: faster function for loading just a move fom TT used in internal iterative deepening (thx Kestutis)
 
-2012-10-02
+2012-09-21: pawn shelter halved on 4 central files (new gauntlet: 45,4%, 2172 games)
 
-- separating strength and style settings
-
-2012-09-24
-
-- faster function for loading just a move fom TT used in internal iterative deepening (thx Kestutis)
-
-2012-09-21
-
-- pawn shelter halved on 4 central files (new gauntlet: 45,4%, 2172 games)
-
-2012-09-14
-
-- changing tt date of used entries (thx Kestutis)
+2012-09-14: changing tt date of used entries (thx Kestutis)
 
 2012-09-12
 
@@ -160,50 +126,30 @@ BEST GAUNTLET SCORE: 47,3%
 - small speedup due to different updating scheme of remaining moves
 - separating sManipulator class for doing/undoing moves
 
-2012-09-07
+2012-09-07: refined score stays
 
-- refined score stays
+2012-09-05: determined that full eval for null move is better
 
-2012-09-05
+2012-09-03: FAILED with two set of values for candidate passers
 
-- determined that full eval for null move is better
+2012-09-02: FAILED with pawn phalanx code, should try again with different values
 
-2012-09-03
+2012-08-28: reimplementing book loading and personality loading
 
-- FAILED with two set of values for candidate passers (next time will try different definition: phalanx or defended)
-
-2012-09-02
-
-- FAILED with pawn phalanx code, should try again with different values
-
-2012-08-28
-
-- reimplementing book loading and personality loading
-
-2012-08-27
-
-- detection of missing book moves separated into a function and applied also in out of book positions
+2012-08-27: detection of missing book moves separated into a function and applied also in out of book positions
 
 2012-08-25
 
 - FAILED with king danger table
 - opening book detects alternative moves leading to book positions (on finding a move only)
 
-2012-08-23
+2012-08-23: FAILED change location of a line keeping history score within bounds
 
-- FAILED change location of a line keeping history score within bounds
+2012-08-22: PASSED narrowly with using hash information for sorting qs moves (thx Kestutis Gasaitis!)
 
-2012-08-22
+2012-08-21: FAILED with null move verification (but added Kestutis' ply bugfix)
 
-- PASSED narrowly with using hash information for sorting qs moves (thx Kestutis Gasaitis!)
-
-2012-08-21
-
-- FAILED with null move verification (but added Kestutis' ply bugfix)
-
-2012-08-18
-
-- FIXED side to move error that switched off black trapped bishop value
+2012-08-18: FIXED side to move error that switched off black trapped bishop value
 
 2012-08-17
 
@@ -219,7 +165,6 @@ BEST GAUNTLET SCORE: 47,3%
 
 - FAILED with Fruit values for pawn storm
 - re-implemented learning code
-
 
 2012-08-07
 
@@ -241,6 +186,4 @@ BEST GAUNTLET SCORE: 47,3%
 - adding parser features from discarded version
 - TESTING to estimate base score vs Fruit: 28,6%
 
-2012-03-12 
-
-- BUGFIX in SetMoveTiming(), constraints on maxMoveTime
+2012-03-12: BUGFIX in SetMoveTiming(), constraints on maxMoveTime

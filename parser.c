@@ -70,6 +70,8 @@ void sParser::UciLoop(void)
 		Data.useWeakening = (strstr(command, "value true") != 0);
 	if (strstr(command, "setoption name Analyse value"))
 		Data.isAnalyzing = (strstr(command, "value true") != 0);
+	if (strstr(command, "setoption name UseBook value"))
+		Data.useBook = (strstr(command, "value true") != 0);
 	if (strstr(command, "setoption name PositionLearning value"))
 		Data.useLearning = (strstr(command, "value true") != 0);
 	if (strstr(command, "setoption name Verbose value"))
@@ -252,6 +254,7 @@ void sParser::PrintUciOptions()
 
 	printf("option name Verbose type check default false\n", Data.verbose);
 	printf("option name Analyse type check default false\n", Data.isAnalyzing);
+	printf("option name UseBook type check default true\n", Data.useBook);
 	printf("option name PositionLearning type check default false\n", Data.useLearning);
     printf("option name Hash type spin default 16 min 1 max 4096\n");
     printf("option name Clear Hash type button\n");
@@ -413,7 +416,7 @@ void sParser::ReadIniFile(char *fileName)
 
 void sParser::PrintEngineHeader() 
 {
-    printf("id name Rodent 0.19.");
+    printf("id name Rodent 1.0");
 	printf("%d\n", BUILD);
     printf("id author Pawel Koziol (based on Sungorus by Pablo Vazquez)\n");
 }

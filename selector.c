@@ -294,7 +294,7 @@ void sFlatMoveList::Init(sPosition * p)
 	nOfMoves = 0;
 	bestMove = 0;
 	bestVal = -INF;
-
+	
 	while ( move = Selector.NextMove(0, &unusedFlag) ) {
 
       Manipulator.DoMove(p, move, undoData);

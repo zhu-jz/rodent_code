@@ -155,7 +155,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	   )  AddMiscTwo(side, Data.rookSeventhMg, Data.rookSeventhEg);
 	}
 
-    // check threats (with false positive due to queen/rook transparency)
+    // check threats (including false positives due to queen/rook transparency)
 	if (bbControl & kingStraightChecks[Opp(side)] )
 		attCount[side] += canCheckWith[R];
 

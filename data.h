@@ -75,6 +75,7 @@ public:
  int verbose;          // shall we output more information about search than bare minimum?
  int useLearning;      // shall we use position learning?
  int isAnalyzing;
+ int useBook;
 
  // modus operandi
  char styleList[512];

@@ -44,7 +44,7 @@ void sSearcher::Think(sPosition *p, int *pv)
   Timer.SetStartTime();
   ClearStats();
   pv[0] = 0; // for tests where book move is disabled
-  pv[0] = Book.GetBookMove(p, 1, &flagBookProblem); 
+  if (Data.useBook) pv[0] = Book.GetBookMove(p, 1, &flagBookProblem); 
 
   if (!pv[0] || !IsLegal(p, pv[0]) || Data.isAnalyzing) {
 	   if (flagProtocol == PROTO_TXT) PrintTxtHeader();

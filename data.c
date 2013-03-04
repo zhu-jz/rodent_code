@@ -170,6 +170,7 @@ void sData::InitSearchData(void)
 	 verbose          = 0;       // no additional display
 	 elo              = MAX_ELO; // no weakening
 	 isAnalyzing      = 0;
+	 useBook          = 1;
 	 useWeakening     = 0;
 	 useLearning      = 0;
 }

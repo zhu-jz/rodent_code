@@ -69,7 +69,6 @@ III. Project goals:
 3. Providing an engine that is fun to play against, with adjustable
    strength and different personalities.
    
-      
 IV. The most important changes (comparing with Sungorus 1.4) include:
 
 - making most of the code object-oriented (in progress)
