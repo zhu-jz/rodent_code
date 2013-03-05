@@ -35,10 +35,6 @@ void sBook::Init(sPosition * p)
 	 Timer.SetStartTime();
 	 nOfRecords = 0;
 	 nOfGuideRecords = 0;
-	  if (START_POS !=  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -") {
-		  printf("Unusual start position, opening book disabled!");
-		  return;
-	  }
 	 
 	 int hasMainBook  = ReadOwnBookFile("bigbook.wtf"); // read main book
 	 int hasGuideBook = ReadTextFileToGuideBook(p, "guidebook.txt", NO_CL);
