@@ -25,8 +25,8 @@
 
 #pragma once
 
-// #define USE_MM_POPCNT
-// #define USE_FIRST_ONE_INTRINSICS
+//#define USE_MM_POPCNT
+//#define USE_FIRST_ONE_INTRINSICS
 #define USE_FIRST_ONE_ASM
 
 // portable definition of an unsigned 64-bit integer

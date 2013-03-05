@@ -100,8 +100,14 @@ int PopNextBit(int side, U64 * bb)
    return sq;
 }
 
+
+
 int FirstOneAsm(U64 bb)
-{ _asm { mov  eax, dword ptr bb[0]
+{
+#if defined(__GNUC__)
+return __builtin_ffsll(bb) - 1;
+#else
+_asm { mov  eax, dword ptr bb[0]
          test eax, eax
          jz   f_hi
          bsf  eax, eax
@@ -109,5 +115,6 @@ int FirstOneAsm(U64 bb)
 f_hi:    bsf  eax, dword ptr bb[4]
          add  eax, 20h
 f_ret:
-  }
+}
+#endif
 }

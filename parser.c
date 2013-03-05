@@ -218,6 +218,9 @@ void sParser::SetOption(char *ptr)
 
 void sParser::PrintUciOptions() 
 {
+	
+	Data.panelStyle = PANEL_POWER;
+	
 	if (Data.panelStyle == PANEL_POWER) {
 	printf("option name Queen type spin default %d min 0 max 1200\n", Data.matValue[Q] );
 	printf("option name Rook type spin default %d min 0 max 1200\n", Data.matValue[R] );

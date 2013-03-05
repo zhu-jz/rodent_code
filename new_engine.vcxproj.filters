@@ -33,7 +33,13 @@
     <ClInclude Include="hist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="init.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="learn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="move\move.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="parser.h">
@@ -43,6 +49,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="search\search.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="selector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="timer.h">

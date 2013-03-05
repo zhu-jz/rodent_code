@@ -71,20 +71,18 @@ III. Project goals:
    
 IV. The most important changes (comparing with Sungorus 1.4) include:
 
-- making most of the code object-oriented (in progress)
+- making most of the code object-oriented
 - enabling fractional extensions and reductions
 - rewriting piece/square code, so that we can use asymmetric pst tables 
   and interpolate between midgame and endgame scores
 - adding futility pruning
 - adding "sliding LMR" (see section on search)
 - adding eval pruning (inspired by DiscoCheck)  
-- adding many evaluation features and weights as described 
-  in Toga LOG user manual  
+- adding many evaluation features and weights from Toga LOG user manual  
 - adding logarithmic king safety function  
 - some speed optimizations, including pawn hash table and specialized
   PopCnt functions (many thanks to Dann Corbit for his patch making use
   of advanced 64-bit instructions)
-- about 300 Elo gain over the original
 - opening book in a silly proprietary format
 - position learning
 - weaker levels of play
@@ -118,21 +116,19 @@ QUARTER_PLY * ( (moves_tried / 5)+3 )
 
 where moves_tried counts moves accepted by search as legal. Thus the first 
 reduction occurs much later under normal scheme, but as the search proceeds, 
-the effect of accumulated quarter ply reductions more than compensates for 
-it, without hurting the playing strength. This kind of reduction has a chance 
-of being much less detrimental to the tactical ability of the engine. After 
-all, it is geared towards reducing more deeply when the engine encounters 
-a series of moves that have low probability of changing the node value 
-(move ordering, especially using history heuristic, is a measure of 
-that probability).
+the effect of accumulated quarter ply reductions compensates for it, without 
+hurting the playing strength. This kind of reduction has a chance of being 
+much less detrimental to the tactical ability of the engine. After all, 
+it is geared towards reducing more deeply when the engine encounters a series 
+of moves that have low probability of changing the node value (move ordering, 
+especially using history heuristic, is a measure of that probability).
 
-Imagine a tactical shot requiring two quiet moves, the rest being
-forcing and therefore exempt from reduction. Both are sorted around
-move 20. Under normal scheme both would get reduced, the new one 
-reduces just one. Instead, it trims the lines where many moves are 
-sorted down the list. It's true that finding really deep combintations, 
-full of quiet moves, is equally difficult under both schemes. However,
-probability of such a combination is  
+Imagine a tactical shot requiring two quiet moves, the rest being forcing 
+and therefore exempt from reduction. Both are sorted around move 20. Under 
+normal scheme both would get reduced, the new one reduces just one. Instead, 
+it trims the lines where many moves are sorted down the list. Finding really 
+deep combintations, full of quiet moves, is equally difficult under both 
+schemes. However, probability of such a combination is  
 
 P(one_move_cuts) * P(next_move_cuts) ... * P(last_required_move_cuts) 
 
@@ -175,14 +171,14 @@ exact mobility calculation.
 VII. OPENING BOOK
 
 Since version 0.14 Rodent uses its own opening book, encoded in a rather
-inefficient manner. At startup, it reads two files: book.txt written in
-a human readable format, and bigbook.wtf using Rodent's own ugly format
-(hence the file extension). 
+inefficient manner. At startup, it reads two files: one of guide books 
+written in a human readable format, stored in books folder, and bigbook.wtf 
+using Rodent's own ugly format (hence the file extension). 
 
-Rodent first looks for moves from the book.txt, and if none is found, it 
-falls back to big main book.
+Rodent first looks for moves from the guide book, and if none is found, 
+it falls back to big main book.
 
-book.txt encodes one opening in each line, and its format looks like that:
+guide books encodes one opening in each line, and its format looks like that:
 
 e2e4 a7a6? d2d4 b7b5 a2a4 c8b7 b1d2
 e2e4 d7d5!! e4d5 d8d5 b1c3 d8d6!
