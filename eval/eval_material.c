@@ -23,49 +23,47 @@
 #include "eval.h"
 
 	static const int BN_wb[64] = {
-		0,    0,  15,  30,  45,  60,   85, 100,
-		0,   15,  30,  45,  60,  85,  100,  85,
-		15,  30,  45,  60,  85, 100,   85,  60,
-		30,  45,  60,  85, 100,  85,   60,  45,
-		45,  60,  85, 100,  85,  60,   45,  30,
-		60,  85, 100,  85,  60,  45,   30,  15,
-		85, 100,  85,  60,  45,  30,   15,   0,
-		100, 85,  60,  45,  30,  15,    0,   0
+		0,    0,  15,  30,  45,  60,  85, 100,
+		0,   15,  30,  45,  60,  85, 100,  85,
+		15,  30,  45,  60,  85, 100,  85,  60,
+		30,  45,  60,  85, 100,  85,  60,  45,
+		45,  60,  85, 100,  85,  60,  45,  30,
+		60,  85, 100,  85,  60,  45,  30,  15,
+		85, 100,  85,  60,  45,  30,  15,   0,
+	   100,  85,  60,  45,  30,  15,   0,   0
 	};
 
 	static const int BN_bb[64] = {
-		100, 85,  60,  45,  30,   15,   0,   0,
-		85, 100,  85,  60,  45,   30,  15,   0,
-		60,  85, 100,  85,  60,   45,  30,  15,
-		45,  60,  85, 100,  85,   60,  45,  30,
-		30,  45,  60,  85,  100,  85,  60,  45,
-		15,  30,  45,  60,  85,  100,  85,  60,
-		0,   15,  30,  45,  60,   85, 100,  85,
-		0,   0,   15,  30,  45,   60,  85, 100
+		100, 85,  60,  45,  30,  15,   0,   0,
+		85, 100,  85,  60,  45,  30,  15,   0,
+		60,  85, 100,  85,  60,  45,  30,  15,
+		45,  60,  85, 100,  85,  60,  45,  30,
+		30,  45,  60,  85, 100,  85,  60,  45,
+		15,  30,  45,  60,  85, 100,  85,  60,
+		0,   15,  30,  45,  60,  85, 100,  85,
+		0,   0,   15,  30,  45,  60,  85, 100
 	};
-
 
 // TODO: move to data struct
 static const int pawnMat[9] = {-40, 90, 180, 270, 360, 450, 540, 630, 720};
 
-/**********************************************************************
-/  Crafty-like material imbalance table indexed by difference         /
-/  in major piece material (R) and minor piece material (n)           /
-**********************************************************************/
+//  Crafty-like material imbalance table indexed by difference         
+//  in major piece material (R) and minor piece material (n) :          
 
 #define A  80 // advantage in both major and minor pieces
 #define Rk 50 // advantage in major pieces only
 #define Nt 40 // advantage in minor pieces only
 #define Ex 10 // exchange disadvantage, tuned within 5 cp
+#define Mm 60 // two minors for a rook 
 
 static const int imbalance[9][9] = {
 /* n=-4  n=-3  n=-2  n=-1  n=0   n=+1  n=+2  n=+3  n=+4 */
   {  -A,   -A,   -A,   -A,  -Rk,    0,    0,    0,    0 }, // R = -4 
   {  -A,   -A,   -A,   -A,  -Rk,    0,    0,    0,    0 }, // R = -3 
   {  -A,   -A,   -A,   -A,  -Rk,    0,    0,    0,    0 }, // R = -2 
-  {  -A,   -A,   -A,   -A,  -Rk,  -Ex,   60,    0,    0 }, // R = -1 
-  { -Nt,   -Nt,  -Nt,  -Nt,   0,   Nt,   Nt,   Nt,   Nt }, // R =  0 
-  {   0,    0,  -60,   Ex,   Rk,    A,    A,    A,    A }, // R = +1 
+  {  -A,   -A,   -A,   -A,  -Rk,  -Ex,   Mm,    0,    0 }, // R = -1 
+  { -Nt,   -Nt, -Nt,  -Nt,    0,   Nt,   Nt,   Nt,   Nt }, // R =  0 
+  {   0,    0,  -Mm,   Ex,   Rk,    A,    A,    A,    A }, // R = +1 
   {   0,    0,    0,    0,   Rk,    A,    A,    A,    A }, // R = +2 
   {   0,    0,    0,    0,   Rk,    A,    A,    A,    A }, // R = +3 
   {   0,    0,    0,    0,   Rk,    A,    A,    A,    A }  // R = +4 
