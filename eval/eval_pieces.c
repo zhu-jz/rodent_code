@@ -46,7 +46,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
   U64 bbPieces = bbPc(p, side, N);
 
   while (bbPieces) {
-    sq = FirstOne(bbPieces);          // square occupied by evaluated piece
+    sq = PopFirstBit(&bbPieces);      // square occupied by evaluated piece
 	bbControl = bbKnightAttacks[sq];  // set control bitboard
 	bbAllAttacks[side] |= bbControl;  // update attack data
 	bbControl &= ~p->bbCl[side];      // exclude squares occupied by own pieces
@@ -64,8 +64,6 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 
 	bbControl &= ~bbPawnControl[Opp(side)];      // exclude squares controlled by enemy pawns
 	AddMobility(N, side, PopCnt15(bbControl) );  // evaluate mobility
-    
-	bbPieces &= bbPieces - 1;
   }
 }
 
@@ -77,7 +75,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
   U64 bbOccupied    = OccBb(p) ^ bbPc(p, side, Q);   // accept mobility through own queen
 
   while (bbPieces) {
-    sq = FirstOne(bbPieces);                         // square occupied by evaluated piece
+    sq = PopFirstBit(&bbPieces);                     // square occupied by evaluated piece
 	bbControl = GenCache.GetBishMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                 // update attack data
 
@@ -109,8 +107,6 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	// penalize bishop blocked by own pawns
 	if ( bbBadBishopMasks[side][sq] & bbPc(p, side, P) )
        AddMiscOne(side, Data.badBishopPenalty[side][sq]);
-    
-	bbPieces &= bbPieces - 1;
   }
 }
 
@@ -124,7 +120,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
   const U64 bbEighth [2] = { bbRANK_8, bbRANK_1};
 
   while (bbPieces) {
-    sq = FirstOne(bbPieces);                          // square occupied by evaluated piece              
+    sq = PopFirstBit(&bbPieces);                      // square occupied by evaluated piece              
 	bbControl = GenCache.GetRookMob(bbOccupied, sq);  // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                  // update attack data
 
@@ -167,8 +163,6 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	}
 	
 	AddMobility(R, side, PopCnt15(bbControl) );
-	
-	bbPieces &= bbPieces - 1;
   }
 }
 
@@ -181,7 +175,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
   U64 bbTransparent = bbPc(p, side, R) | bbPc(p, side, B);
 
   while (bbPieces) {
-    sq = FirstOne(bbPieces);                          // square occupied by evaluated piece   
+    sq = PopFirstBit(&bbPieces);                      // square occupied by evaluated piece   
 	bbControl = GenCache.GetQueenMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                  // update attack data
 
@@ -193,13 +187,12 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
         // contact checks
 	    bbContact = bbControl & bbKingAttacks[ p->kingSquare[Opp(side)] ];
 	    while (bbContact) {
-           contactSq = FirstOne(bbContact);
+           contactSq = PopFirstBit(&bbContact);
 
 	       if ( Swap(p, sq, contactSq) >= 0 ) {
               attCount[side] += QUEEN_CONTACT_CHECK; 
 		      break;
 	       }
-	       bbContact &= bbContact - 1;
 	    }
 	}
 
@@ -219,8 +212,6 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	}
 	
 	AddMobility(Q, side, PopCnt(bbControl) );
-	    	
-	bbPieces &= bbPieces - 1;
   }
 }
 
@@ -233,7 +224,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
   int passUnitMg, passUnitEg; 
 
   while (bbPieces) {
-    sq = FirstOne(bbPieces);
+    sq = PopFirstBit(&bbPieces);
 	bbStop = ShiftFwd(SqBb(sq), side);
 
 	if (bbStop &~bbOccupied) {           // this pawn is mobile
@@ -259,8 +250,6 @@ void sEvaluator::ScoreP(sPosition *p, int side)
            if (bbStop & bbAllAttacks[side] ) AddMiscTwo(side,  passUnitMg,  passUnitEg);
 		}
 	}
-	    	
-	bbPieces &= bbPieces - 1;
   }
 }
 

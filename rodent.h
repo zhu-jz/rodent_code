@@ -20,7 +20,7 @@
 #pragma once
 
 #define BUILD 1
-#define BENCH_8 1578761
+#define BENCH_8 1608757
 // #define FAST_TUNING 100000 // node limit for ultra-past tests
 
 #undef CDECL
@@ -101,6 +101,7 @@ enum eMoveFlag {
 #define Cl(x)           ((x) & 1)
 #define Tp(x)           ((x) >> 1)
 #define Pc(x, y)        (((y) << 1) | (x))
+#define Opp(x)          ((x) ^ 1)           // other color
 
 #define File(x)         ((x) & 7)           // file on which square "x" is placed
 #define Rank(x)         ((x) >> 3)          // rank on which square "x" is placed
@@ -112,8 +113,6 @@ enum eMoveFlag {
 #define Map0x88(x)      (((x) & 7) | (((x) & ~7) << 1))
 #define Unmap0x88(x)    (((x) & 7) | (((x) & ~7) >> 1))
 #define Sq0x88Off(x)    ((unsigned)(x) & 0x88)
-
-#define Opp(x)          ((x) ^ 1)
 
 #define InCheck(p)      IsAttacked(p, KingSq(p, p->side), Opp(p->side))
 #define IllegalPosition(p)  IsAttacked(p, KingSq(p, Opp(p->side)), p->side)
