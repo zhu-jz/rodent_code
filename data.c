@@ -160,6 +160,7 @@ void sData::InitSearchData(void)
 	 minimalLmrDepth  = 2 * ONE_PLY;
 	 moveIsLate       = 6;
 	 lmrStep          = 4; 
+	 lmrHistLimit     = 70;      // 70 is better than 60
 	 futilityBase     = 100;
 	 futilityStep     = 20;
 	 futilityDepth    = 4;

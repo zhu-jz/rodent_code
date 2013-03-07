@@ -228,7 +228,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 {
   int sq;
   U64 bbPieces = bbPc(p, side, P);
-  U64 bbOccupied    = OccBb(p);
+  U64 bbOccupied = OccBb(p);
   U64 bbStop, bbObstacles;
   int passUnitMg, passUnitEg; 
 

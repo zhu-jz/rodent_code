@@ -18,6 +18,7 @@
 */
 
 #include "rodent.h"
+#include "data.h"
 #include "hist.h"
 
 void sHistory::OnNewSearch(void)
@@ -109,5 +110,5 @@ void sHistory::OnMoveTried(int move)
 
 int sHistory::MoveIsBad(int move) 
 {
-    return (cutoff [Fsq(move)] [Tsq(move)] < 60); // better than 50
+    return (cutoff [Fsq(move)] [Tsq(move)] < Data.lmrHistLimit);
 }

@@ -55,9 +55,7 @@ __forceinline int PopCntSparse(U64 bb) {
 
 #else
 
-// General purpose population count
-
-int PopCnt(U64 bb)
+int PopCnt(U64 bb) // general purpose population count
 {
     U64 k1 = (U64)0x5555555555555555;
     U64 k2 = (U64)0x3333333333333333;
@@ -70,9 +68,8 @@ int PopCnt(U64 bb)
     return (bb * k4) >> 56;
 }
 
-// Faster version assuming that there are not more than  15  bits  set,
-// used in knight/bishop/rook mobility calculation, posted on CCC forum
-// by Marco Costalba of the Stockfish team
+// faster version assuming not more than 15 bits set, used in mobility
+// eval, posted on CCC forum by Marco Costalba of Stockfish team
 
 int PopCnt15(U64 bb) {
     unsigned w = unsigned(bb >> 32), v = unsigned(bb);
@@ -85,9 +82,7 @@ int PopCnt15(U64 bb) {
     return int(v >> 28);
 }
 
-// Version that is clearly faster on sparsely populated bitboards
-
-int PopCntSparse(U64 bb)
+int PopCntSparse(U64 bb) // version faster on sparsely populated bitboards
 {
     int count = 0;
     while (bb) {
