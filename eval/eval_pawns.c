@@ -70,7 +70,7 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
   U64 bbFrontSpan;
  
   while (bbPieces) {
-    sq = FirstOne(bbPieces);
+    sq = PopFirstBit(&bbPieces);
 
     // gather information about a pawn that is evaluated
 	bbFrontSpan    = GetFrontSpan(SqBb(sq), side );
@@ -113,8 +113,6 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 		   if (flagIsOpen) pawnScoreMg[side] += Data.pawnBackwardOnOpen;
 		}
 	}
-	
-	bbPieces &= bbPieces - 1;
   }
 }
 

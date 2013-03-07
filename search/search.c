@@ -639,8 +639,7 @@ void sSearcher::CheckInput(void)
     char command[80];
 
     if (Data.verbose) {
-        // report search speed every now and then
-        if (!( nodes % 500000) ) DisplaySpeed();
+        if (!( nodes % 500000) ) DisplaySpeed(); // report search speed
     }
 
     if (nodes & 4095 || rootDepth == ONE_PLY) return;

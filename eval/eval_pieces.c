@@ -46,7 +46,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
   U64 bbPieces = bbPc(p, side, N);
 
   while (bbPieces) {
-    sq = PopFirstBit(&bbPieces);      // square occupied by evaluated piece
+    sq = PopFirstBit(&bbPieces);      // set piece location and clear it from bbPieces
 	bbControl = bbKnightAttacks[sq];  // set control bitboard
 	bbAllAttacks[side] |= bbControl;  // update attack data
 	bbControl &= ~p->bbCl[side];      // exclude squares occupied by own pieces
@@ -75,7 +75,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
   U64 bbOccupied    = OccBb(p) ^ bbPc(p, side, Q);   // accept mobility through own queen
 
   while (bbPieces) {
-    sq = PopFirstBit(&bbPieces);                     // square occupied by evaluated piece
+    sq = PopFirstBit(&bbPieces);                     // set piece location and clear it from bbPieces
 	bbControl = GenCache.GetBishMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                 // update attack data
 
@@ -120,9 +120,9 @@ void sEvaluator::ScoreR(sPosition *p, int side)
   const U64 bbEighth [2] = { bbRANK_8, bbRANK_1};
 
   while (bbPieces) {
-    sq = PopFirstBit(&bbPieces);                      // square occupied by evaluated piece              
-	bbControl = GenCache.GetRookMob(bbOccupied, sq);  // set control/mobility bitboard
-	bbAllAttacks[side] |= bbControl;                  // update attack data
+    sq = PopFirstBit(&bbPieces);                     // set piece location and clear it from bbPieces
+	bbControl = GenCache.GetRookMob(bbOccupied, sq); // set control/mobility bitboard
+	bbAllAttacks[side] |= bbControl;                 // update attack data
 
 	ScoreOutpost(p, side, R, sq);
 
@@ -170,19 +170,20 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 {
   int sq, contactSq;
   U64 bbControl, bbAttacks, bbContact, bbAttZone;
-  U64 bbPieces      = bbPc(p, side, Q); // real occupancy, since we'll look for contact checks
-  U64 bbOccupied    = OccBb(p);
+  U64 bbPieces      = bbPc(p, side, Q); 
+  U64 bbOccupied    = OccBb(p); // real occupancy, since we'll look for contact checks
   U64 bbTransparent = bbPc(p, side, R) | bbPc(p, side, B);
+  U64 bbCanCheckFrom = kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)];
 
   while (bbPieces) {
-    sq = PopFirstBit(&bbPieces);                      // square occupied by evaluated piece   
+    sq = PopFirstBit(&bbPieces);                      // set piece location and clear it from bbPieces 
 	bbControl = GenCache.GetQueenMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                  // update attack data
 
-	if (bbControl & ( kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)] ) ) {
+	if (bbControl & bbCanCheckFrom ) {
 
 		// queen check threats (unlike with other pieces, we *count the number* of possible checks here)
-		attCount[side] += PopCntSparse( bbControl & ( kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)] ) ) * canCheckWith[Q];
+		attCount[side] += PopCntSparse( bbControl & bbCanCheckFrom ) * canCheckWith[Q];
 
         // contact checks
 	    bbContact = bbControl & bbKingAttacks[ p->kingSquare[Opp(side)] ];
@@ -279,11 +280,11 @@ void sEvaluator::AddMiscTwo(int side, int mg, int eg)
 
 void sEvaluator::ScoreOutpost(sPosition *p, int side, int piece, int sq) 
 {
-	// piece sits in a hole of enemy pawn structure
+	// constant bonus if piece occupies hole of enemy pawn structure
 	if ( SqBb(sq) & ~bbPawnCanControl[Opp(side)] ) {
 		AddMiscOne(side, outpostBase[piece] );
 
-	   // additional bonus if defended by a pawn
+	   // additional pst bonus if defended by a pawn
 	   if ( SqBb(sq) & bbPawnControl[side] ) 
 		   AddMiscOne(side, Data.outpost[side][piece][sq] );
 	}
