@@ -49,8 +49,7 @@ void sTimer::Clear(void)
   SetData(MOVES_TO_GO, 40);
 }
 
-void sTimer::SetStartTime(void) 
-{
+void sTimer::SetStartTime(void) {
   startTime = GetMS();
 }
 
@@ -124,18 +123,15 @@ int sTimer::GetMS(void)
 #endif
 }
 
-int sTimer::GetElapsedTime(void) 
-{
+int sTimer::GetElapsedTime(void) {
     return (GetMS() - startTime);
 }
 
-int sTimer::GetSavedIterationTime(void) 
-{
+int sTimer::GetSavedIterationTime(void) {
     return ( moveTime - (GetMS() - startTime) );
 }
 
-int sTimer::IsInfiniteMode(void) 
-{
+int sTimer::IsInfiniteMode(void) {
     return( !(moveTime >= 0) );
 }
 
@@ -153,13 +149,11 @@ int sTimer::TimeHasElapsed(void)
 	return (GetElapsedTime() >= moveTime);
 }
 
-int sTimer::GetData(int slot) 
-{
+int sTimer::GetData(int slot) {
     return data[slot];
 }
 
-void sTimer::SetData(int slot, int val) 
-{
+void sTimer::SetData(int slot, int val) {
     data[slot] = val;
 }
 

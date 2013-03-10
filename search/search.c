@@ -311,14 +311,14 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   int flagInCheck    = InCheck(p); // are we in check at the beginning of the search?
   int normalMoveCnt  = 0;       // counter used to delay futility pruning initialization
 
-  // CHECK EXTENSION
-  if (flagInCheck) depth += ONE_PLY;
-
   // EARLY EXIT / DRAW CONDITIONS
   if ( flagAbortSearch )                  return 0;
   if ( IsRepetition(p) )                  return 0; 
   if ( DrawBy50Moves(p) )                 return 0;
   if ( !flagInCheck && RecognizeDraw(p) ) return 0;
+
+  // CHECK EXTENSION
+  if (flagInCheck) depth += ONE_PLY;
   
   // QUIESCENCE SEARCH ENTRY POINT
   if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, pv);
@@ -473,8 +473,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      }
 
 	 movesTried++;                     // increase legal move count
-	 flagIsReduced  = 0;               // this move has not been reduced (yet)
-	 depthChange    = 0;               // no depth modification so far
+	 flagIsReduced = 0;                // this move has not been reduced (yet)
+	 depthChange   = 0;                // no depth modification so far
 	 History.OnMoveTried(move);
 
 	 // EXTENSIONS might be placed here
@@ -616,18 +616,15 @@ int sSearcher::IsRepetition(sPosition *p)
     return 0;
 }
 
-int sSearcher::DrawBy50Moves(sPosition *p) 
-{
-    return( p->reversibleMoves > 100);
+int sSearcher::DrawBy50Moves(sPosition *p) { 
+	return( p->reversibleMoves > 100);
 }
 
-int sSearcher::IsMoveOrdinary(int flagMoveType)
-{
+int sSearcher::IsMoveOrdinary(int flagMoveType) {
     return (!flagMoveType || flagMoveType == FLAG_NULL_EVASION);
 }
 
-int sSearcher::AvoidReduction(int move, int flagMoveType)
-{
+int sSearcher::AvoidReduction(int move, int flagMoveType) {
     return (MoveType(move) != CASTLE) && (flagMoveType != FLAG_HASH_MOVE) && (flagMoveType != FLAG_KILLER_MOVE);
 }
 

@@ -70,8 +70,7 @@ void sEvaluator::SetScaleFactor(sPosition *p)
 }
 
 // Interpolate between mgScore and egScore, depending on remaining material 
-int sEvaluator::Interpolate(void) 
-{
+int sEvaluator::Interpolate(void) {
     return ( (mgFact * mgScore ) / 24 ) + ( (egFact * egScore ) / 24 );
 }
 

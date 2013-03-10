@@ -15,12 +15,6 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-  This file is LOCKED as of 2012-03-14. This means that code is stable
-  and highly unlikely to be changed.
-  
-  Code functionality has not changed since 2012-02-17. At that date
-  code within USE_MM_POPCNT, supplied by Dann Corbit, has been added.
 */
 
 #include "../rodent.h"
