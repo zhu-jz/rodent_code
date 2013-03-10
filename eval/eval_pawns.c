@@ -67,6 +67,7 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
   int flagIsOpen, flagIsWeak;
   U64 flagIsPhalanx;
   U64 bbPieces = bbPc(p, side, P);
+  U64 bbOwnPawns = bbPieces;
   U64 bbFrontSpan;
  
   while (bbPieces) {
@@ -75,11 +76,11 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
     // gather information about a pawn that is evaluated
 	bbFrontSpan    = GetFrontSpan(SqBb(sq), side );
     flagIsOpen     = ( ( bbFrontSpan & bbPc(p, Opp(side), P) ) == 0 );
-	flagIsPhalanx  = ShiftEast(SqBb(sq) ) & bbPc(p, side, P);
-	flagIsWeak     = ( ( bbPawnSupport[side][sq] & bbPc(p, side, P) ) == 0);
+	flagIsPhalanx  = ShiftEast(SqBb(sq) ) & bbOwnPawns;
+	flagIsWeak     = ( ( bbPawnSupport[side][sq] & bbOwnPawns ) == 0);
 	
 	// doubled pawn
-	if ( bbFrontSpan & bbPc(p, side, P) ) {
+	if ( bbFrontSpan & bbOwnPawns ) {
 	    pawnScoreMg[side] += Data.doubledPawn[MG];
 	    pawnScoreEg[side] += Data.doubledPawn[EG];
     }
@@ -102,7 +103,7 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	}
     
 	if (flagIsWeak) {
-		if (!(bbAdjacentMask[File(sq)] & bbPc(p, side, P))) // isolated
+		if (!(bbAdjacentMask[File(sq)] & bbOwnPawns)) // isolated
 		{ 
 		   AddPawnProperty(ISOLATED,side,sq);
 		   if (flagIsOpen) pawnScoreMg[side] += Data.pawnIsolatedOnOpen;

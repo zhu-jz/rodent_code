@@ -170,9 +170,9 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 {
   int sq, contactSq;
   U64 bbControl, bbAttacks, bbContact, bbAttZone;
-  U64 bbPieces      = bbPc(p, side, Q); 
-  U64 bbOccupied    = OccBb(p); // real occupancy, since we'll look for contact checks
-  U64 bbTransparent = bbPc(p, side, R) | bbPc(p, side, B);
+  U64 bbPieces       = bbPc(p, side, Q); 
+  U64 bbOccupied     = OccBb(p); // real occupancy, since we'll look for contact checks
+  U64 bbTransparent  = bbPc(p, side, R) | bbPc(p, side, B);
   U64 bbCanCheckFrom = kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)];
 
   while (bbPieces) {
@@ -185,7 +185,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 		// queen check threats (unlike with other pieces, we *count the number* of possible checks here)
 		attCount[side] += PopCntSparse( bbControl & bbCanCheckFrom ) * canCheckWith[Q];
 
-        // contact checks
+        // safe contact checks
 	    bbContact = bbControl & bbKingAttacks[ p->kingSquare[Opp(side)] ];
 	    while (bbContact) {
            contactSq = PopFirstBit(&bbContact);

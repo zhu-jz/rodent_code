@@ -88,7 +88,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 	else                          { alpha = val-delta; beta = val+delta; }
     
 	// first use aspiration window around the value from the last completed depth
-	curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, NO_NULL, 0, pv);
+	curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, pv);
 	bestMove = pv[0];
 	if (flagAbortSearch) break;
 
@@ -101,13 +101,13 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 		if (curVal >= beta)  beta  = val +3*delta;
 		if (curVal <= alpha) alpha = val -3*delta;
 
-		curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, NO_NULL, 0, pv);
+		curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, pv);
 		bestMove = pv[0];
         if (flagAbortSearch) break;
 
 		// the second window
 		if (curVal >= beta || curVal <= alpha) 
-            curVal = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, NO_NULL, 0, pv);
+            curVal = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, pv);
 		    bestMove = pv[0];
         if (flagAbortSearch) break;
 	}
@@ -146,7 +146,7 @@ int sSearcher::VerifyValue(sPosition *p, int depth, int move)
   if (move != 0) Manipulator.DoMove(p, move, undoData);    
 
   for (rootDepth = ONE_PLY; rootDepth <= depth * ONE_PLY; rootDepth+=ONE_PLY) {
-      val = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, NO_NULL, 0, pv);
+      val = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, pv);
 	  bestMove = pv[0];
   }
 
@@ -159,7 +159,7 @@ int sSearcher::VerifyValue(sPosition *p, int depth, int move)
   return val;
 }
 
-int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv)
+int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int *pv)
 {
   int best,                     // best value found at this node
 	  score,                    // score returned by a search started in this node
