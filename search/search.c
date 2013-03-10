@@ -178,11 +178,8 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
   // search for a bit longer, as this might indicate a fail-high/fail-low
   if (!ply && nodeType == PV_NODE) Timer.SetData(FLAG_NO_FIRST_MOVE, 1);
 
-  // CHECK EXTENSION
+  // CHECK EXTENSION (no QS entry later as SearchRoot is called with depth >= 1 ply)
   if (flagInCheck) depth += ONE_PLY;
-  
-  // QUIESCENCE SEARCH ENTRY POINT
-  if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, pv);
 
   nodes++;
   CheckInput();
