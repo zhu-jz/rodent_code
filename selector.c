@@ -157,10 +157,9 @@ void sSelector::ScoreCaptures(int hashMove)
     *valuep++ = (MvvLva(m->p, *movep) + (1000 * (*movep == hashMove) ) );
 }
 
-// ScoreQuiet() sorts quiet moves by history heuristic, 
-// increasing the value of a move that evades a capture 
-// which  had  refuted  null  move  in  the  same  node 
-// and doesn't cause large material losses.
+// ScoreQuiet() sorts quiet moves by history heuristic, increasing 
+// the value of a move that evades a capture which  had  refuted  
+// null move in the same node and doesn't cause large material losses.
 
 void sSelector::ScoreQuiet(int refutationSq)
 {

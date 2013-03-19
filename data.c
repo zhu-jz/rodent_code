@@ -164,7 +164,6 @@ void sData::InitSearchData(void)
 	 futilityBase     = 100;
 	 futilityStep     = 20;
 	 futilityDepth    = 4;
-	 useDeltaPruning  = 1;
 	 deltaMargin      = 150;
 	 goodCaptMargin   = 30;      // BxN is OK, RxB isn't
 	 lazyMargin       = 180;

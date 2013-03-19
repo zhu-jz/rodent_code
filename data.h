@@ -69,7 +69,6 @@ public:
  int futilityBase;     // initial value of futility margin
  int futilityStep;     // margin is incremented by this value for every 1/4 ply
  int futilityDepth;
- int useDeltaPruning;  // shall we use delta pruning in the quiescence search?
  int deltaMargin;      // margin for a delta pruning in quiescence search 
  int goodCaptMargin;   // margin of a loss that can be incurred without classifying capture as "bad"
  int lazyMargin;       // margin for lazy evaluation cutoff

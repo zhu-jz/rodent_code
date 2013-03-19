@@ -523,8 +523,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
             depthChange -= HALF_PLY;
  	        flagIsReduced = 1;
 	     }
-		
 	 } // end of late move reduction code
+     // NOTE: there are actually two "sweet spots": current setup and uniform one ply reduction 
+	 // starting from move 3, with no reduction of bad captures
 
 	 newDepth = depth - ONE_PLY + depthChange; // determine new depth
 
