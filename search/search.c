@@ -200,10 +200,9 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
        return alpha;
 
   // TRANSPOSITION TABLE READ
-  // get transposition table score or at least get a move for sorting purposes
+  // at root we only get a move for sorting purposes
 
-  if (TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply))
-     return score;
+  TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply);
   
   // safeguard against hitting max ply limit
   if (ply >= MAX_PLY - 1) return Eval.Return(p, alpha, beta);
@@ -420,16 +419,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, newPv);
 	  TransTable.RetrieveMove(p->hashKey, &move);
   }
-
-  // TODO: if passes gauntlet test, merge with the iid code, using ? operator
-  /*
-  if (nodeType == CUT_NODE && !move && depth >= 8*ONE_PLY && !flagInCheck ) {
-	  if (Eval.ReturnFast(p)+50 >= beta) { 
-	     Search(p, ply, alpha, beta, depth/2, CUT_NODE, NO_NULL, 0, newPv);
-	     TransTable.RetrieveMove(p->hashKey, &move);
-	  }
-  }
-  /**/
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;

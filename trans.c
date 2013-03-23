@@ -109,7 +109,7 @@ int sTransTable::Retrieve(U64 key, int *move, int *score, int alpha, int beta, i
         else if (*score > MAX_EVAL)
           *score -= ply;
         if ((entry->flags & UPPER && *score <= alpha) ||
-            (entry->flags & LOWER && *score >= beta))
+            (entry->flags & LOWER && *score >= beta) )
 		    {
             entry->date = tt_date; // refreshing entry
             return 1;
