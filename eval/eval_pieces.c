@@ -29,7 +29,7 @@
   const int att_N[12] = { 0, 4,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15};
   const int att_B[12] = { 0, 4,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15};
   const int att_R[12] = { 0, 8, 12, 16, 19, 22,  24,  26,  28,  30,  31,  32};   
-  const int att_Q[12] = { 0, 9, 15, 21, 27, 33,  39,  46,  50,  52,  54,  56};   
+  const int att_Q[12] = { 0, 10, 16, 22, 27, 33,  39,  46,  50,  52,  54,  56};  
 
   #define QUEEN_CONTACT_CHECK   30
   #define MINOR_ATTACKED_BY_P  -10
