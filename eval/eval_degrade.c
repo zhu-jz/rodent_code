@@ -35,9 +35,60 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	if ( p->pieceMat[weaker] > 1400
 	||   p->pcCount[weaker][P] > 2 ) return 64;
 
-	// no pawns for stronger side
-	if (p->pcCount[stronger][P] == 0) {
-       // no win if stronger side has just one minor piece
+	const U64 bbKingBlockH[2] = {SqBb(H8) | SqBb(H7) | SqBb(G8) | SqBb(G7) ,
+	                             SqBb(H1) | SqBb(H2) | SqBb(G1) | SqBb(G2)};
+	const U64 bbKingBlockA[2] = {SqBb(A8) | SqBb(A7) | SqBb(B8) | SqBb(B7) ,
+	                             SqBb(A1) | SqBb(A2) | SqBb(B1) | SqBb(B2)};
+
+	if ( p->pieceMat[stronger] < Data.matValue[R] ) {
+
+	   // KPK with edge pawn (else KBPK recognizer would break)
+	   if (p->pieceMat[stronger] == 0
+	   &&  p->pieceMat[weaker]   == 0
+	   &&  p->pcCount[stronger][P]  == 1
+	   &&  p->pcCount[weaker][P]  == 0) {
+
+	      if (bbPc(p, stronger, P) & bbFILE_H
+          && bbPc(p, weaker, K)  & bbKingBlockH[stronger]) return 0;
+
+	      if (bbPc(p, stronger, P) & bbFILE_A
+          && bbPc(p, weaker, K)  & bbKingBlockA[stronger]) return 0;
+	}
+
+	   // KBPK(P) draws with edge pawn and wrong bishop
+	   if (p->pieceMat[stronger] == Data.matValue[B]
+	   &&  p->pieceMat[weaker]   == 0
+	   &&  p->pcCount[stronger][P]  == 1
+	   /*&&  p->pcCount[weaker][P]  == 0*/) {
+
+	      if (bbPc(p, stronger, P) & bbFILE_H
+          && NotOnBishColor(p, stronger, REL_SQ(H8,stronger))
+          && bbPc(p, weaker, K)  & bbKingBlockH[stronger]) return 0;
+
+	      if (bbPc(p, stronger, P) & bbFILE_A
+          && NotOnBishColor(p, stronger, REL_SQ(A8,stronger))
+          && bbPc(p, weaker, K)  & bbKingBlockA[stronger]) return 0;
+	   }
+
+	   // KBP vs Km is drawn when defending king stands on pawn's path 
+       // and cannot be driven out by a Bishop
+       if (MaterialBishop(p, stronger)
+       &&  MaterialMinor(p, weaker)
+       &&  p->pcCount[stronger][P] == 1
+       &&  p->pcCount[weaker][P] == 0
+       &&  ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) )
+       &&  NotOnBishColor(p, stronger, p->kingSquare[weaker])
+       ) return 0;
+
+       // decrease score in pure opposite bishops ending
+       if (MaterialBishop(p, stronger) 
+       && MaterialBishop(p, weaker)
+       && BishopsAreDifferent(p) ) return 32; // 1/2
+
+	} // stronger side has no more than a minor piece
+
+	// no win if stronger side has just one minor piece and no pawns
+	if (p->pcCount[stronger][P] == 0) {   
        if ( p->pieceMat[stronger] < 400 ) return 0;
 	}
 
@@ -54,35 +105,20 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	  if ( MaterialBB(p, stronger) && ( MaterialBishop(p, weaker) || MaterialRook(p, weaker) ) ) return 8;
 	}
 
-    // it's hard to win with a bare rook against a minor/minor + pawn
-    if (p->pcCount[stronger][P] == 0 
-    && p->pieceMat[stronger] == Data.matValue[R] 
-    && p->pieceMat[weaker] > 0 ) return 16; // 1/4
+	if (p->pcCount[stronger][P] == 0 ) {
 
-    // it's hard to win with a rook and a minor against a rook/rook + pawns
-    if (p->pcCount[stronger][P] == 0 
-    && MaterialRookMinor(p, stronger) 
-    && MaterialRook(p, weaker) ) return 16; // 1/4
+       // it's hard to win with a bare rook against a minor/minor + pawn
+       if (p->pieceMat[stronger] == Data.matValue[R] 
+       && p->pieceMat[weaker] > 0 ) return 16; // 1/4
 
-    // it's hard to win with a queen and a minor against a queen/queen + pawns
-    if (p->pcCount[stronger][P] == 0 
-    && MaterialQueenMinor(p, stronger) 
-    && MaterialQueen(p, weaker) ) return 32; // 1/2
+       // it's hard to win with a rook and a minor against a rook/rook + pawns
+       if (MaterialRookMinor(p, stronger) 
+       && MaterialRook(p, weaker) ) return 16; // 1/4
 
-    // KBP vs Km is drawn when defending king stands on pawn's path 
-    // and cannot be driven out by a Bishop
-    if (MaterialBishop(p, stronger)
-    &&  MaterialMinor(p, weaker)
-    &&  p->pcCount[stronger][P] == 1
-    &&  p->pcCount[weaker][P] == 0
-    &&  ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) )
-    &&  NotOnBishColor(p, stronger, p->kingSquare[weaker])
-    ) return 0;
-
-    // decrease score in pure opposite bishops ending
-    if (MaterialBishop(p, stronger) 
-    && MaterialBishop(p, weaker)
-    && BishopsAreDifferent(p) ) return 32; // 1/2
+       // it's hard to win with a queen and a minor against a queen/queen + pawns
+       if ( MaterialQueenMinor(p, stronger) 
+       && MaterialQueen(p, weaker) ) return 32; // 1/2
+	}
 
     // some special rules for rook endgame with one pawn
     if (MaterialRook(p, stronger)
@@ -111,8 +147,6 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	}
 
     // TODO: KRPPKRP, no passers
-    // TODO: KPK draws with edge pawn
-    // TODO: KBPK draws with edge pawn and wrong bishop
     // TODO: KBPKP with blockade and wrong bishop
 
 	return 64; // no degradation

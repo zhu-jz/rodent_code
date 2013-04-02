@@ -354,7 +354,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   int flagCanPrune = (nodeType != PV_NODE) && (beta < MAX_EVAL) && !flagInCheck;
 
-  // EVAL PRUNING (inspired by DiscoCheck by Lucas Braesch)
+  // EVAL PRUNING (inspired by DiscoCheck by Lucas Braesch) 
   if (depth <= 3*ONE_PLY
   && flagCanPrune) {
      if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
