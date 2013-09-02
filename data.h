@@ -103,6 +103,7 @@ public:
  void SetBadBishopMask(int bishSq, int pawnSq);
  int GetPawnMgPst(int sq);
  int GetPawnEgPst(int sq);
+ int GetKnightEgPst(int sq);
  int GetRookEgPst(int sq);
  int GetQueenMgPst(int sq);
  int GetPasserPstMg(int sq);

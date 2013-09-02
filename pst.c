@@ -21,8 +21,9 @@
 #include "data.h"
 #include "bitboard/bitboard.h"
 
-const int neutral[8] = {-3, -1, 1, 3, 3, 1, -1, -3};
-const int pawnAdv[8] = { 0,  1, 1, 3, 5, 8, 12,  0};
+const int neutral[8]  = {-3, -1, 1, 3, 3, 1, -1, -3};
+const int knightEg[8] = {-4, -2, 0, 1, 1, 0, -2, -4};
+const int pawnAdv[8]  = { 0,  1, 1, 3, 5, 8, 12,  0};
 
 const int pstKnightMg[64] = 
 {
@@ -34,18 +35,6 @@ const int pstKnightMg[64] =
     -5,   5,  15,  20,  20,  15,   5,  -5,
    -20, -10,   0,   5,   5,   0, -10, -20,
   -135, -25, -15, -10, -10, -15, -25, -135
-};
-
-const int pstKnightEg[64] = 
-{
-   -40, -30, -20, -15, -15, -20, -30, -40,
-   -30, -20, -10,  -5,  -5, -10, -20, -30,
-   -20, -10,   0,   5,   5,   0, -10, -20,
-   -15,  -5,   5,  10,  10,   5,  -5, -15,
-   -15,  -5,   5,  10,  10,   5,  -5, -15,
-   -20, -10,   0,   5,   5,   0, -10, -20,
-   -30, -20, -10,  -5,  -5, -10, -20, -30,
-   -40, -30, -20, -15, -15, -20, -30, -40
 };
 
 const int pstBishopMg[64] =  
@@ -253,7 +242,7 @@ void sData::InitPstValues(void)
 	  pstMg[side][K][REL_SQ(sq,side)] = pstKingMg[sq];
 
 	  pstEg[side][P][REL_SQ(sq,side)] = GetPawnEgPst(sq);
-	  pstEg[side][N][REL_SQ(sq,side)] = pstKnightEg[sq];
+	  pstEg[side][N][REL_SQ(sq,side)] = GetKnightEgPst(sq);
 	  pstEg[side][B][REL_SQ(sq,side)] = pstBishopEg[sq];
 	  pstEg[side][R][REL_SQ(sq,side)] = GetRookEgPst(sq);
 	  pstEg[side][Q][REL_SQ(sq,side)] = pstQueenEg[sq];
@@ -291,6 +280,11 @@ int sData::GetPawnMgPst(int sq)
 int sData::GetPawnEgPst(int sq)
 {
     return 10;
+}
+
+int sData::GetKnightEgPst(int sq)
+{
+    return 5 * ( knightEg[Rank(sq)] + knightEg[File(sq)] );
 }
 
 int sData::GetRookEgPst(int sq)
