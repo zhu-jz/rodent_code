@@ -21,31 +21,8 @@
 #include "data.h"
 #include "bitboard/bitboard.h"
 
-#define PE    10 // endgame material gain of a pawn
-
-const int pstPawnMg[64] = 
-{
-	0,   0,   0,   0,   0,   0,   0,   0,
-  -15,  -5,   0,   5,   5,   0,  -5, -15,
-  -15,  -5,   5,  15,  15,   5,  -5, -15,
-  -15,  -5,   5,  25,  25,   5,  -5, -15,
-  -15,  -5,   5,  15,  15,   5,  -5, -15,
-  -15,  -5,   5,   5,   5,   5,  -5, -15,
-  -15,  -5,   5,   5,   5,   5,  -5, -15,
-    0,   0,   0,   0,   0,   0,   0,   0
-};
-
-const int pstPawnEg[64] = // material endgame bonus only
-{    
-    PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE,
-    PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE,
-    PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE,
-    PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE,
-    PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE,
-    PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE,
-    PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE,
-    PE,  PE,  PE,  PE,  PE,  PE,  PE,  PE
-};
+const int neutral[8] = {-3, -1, 1, 3, 3, 1, -1, -3};
+const int pawnAdv[8] = { 0,  1, 1, 3, 5, 8, 12,  0};
 
 const int pstKnightMg[64] = 
 {
@@ -107,30 +84,6 @@ const int pstRookMg[64] =
      4,   4,   4,   4,   4,   4,   4,   4
 };
 
-const int pstRookEg[64] =  
-{
-	 0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-	 0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0
-};
-
-const int pstQueenMg[64] = 
-{ 
-    -5,  -5,  -5,  -5,  -5,  -5,  -5,  -5,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0
-};
-
 const int pstQueenEg[64] = 
 {
    -24, -16, -12,  -8,  -8, -12, -16, -24,
@@ -188,30 +141,6 @@ const int pstPhalanxEg[64] = // on modifying this table please uncomment a line 
      0,   0,   0,   0,   0,   0,   0,   0,
      0,   0,   0,   0,   0,   0,   0,   0,
 	 0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0
-};
-
-const int pstPasserMg[64] = 
-{   
-	 0,   0,   0,   0,  0,    0,   0,   0,
-    10,  10,  10,  10,  10,  10,  10,  10,
-    10,  10,  10,  10,  10,  10,  10,  10,
-    30,  30,  30,  30,  30,  30,  30,  30,
-    50,  50,  50,  50,  50,  50,  50,  50,
-    80,  80,  80,  80,  80,  80,  80,  80,
-   120, 120, 120, 120, 120, 120, 120, 120,
-     0,   0,   0,   0,   0,   0,   0,   0
-};
-
-const int pstPasserEg[64] = 
-{   
-	 0,   0,   0,   0,  0,    0,   0,   0,
-    12,  12,  12,  12,  12,  12,  12,  12,
-    12,  12,  12,  12,  12,  12,  12,  12,
-    38,  38,  38,  38,  38,  38,  38,  38,
-    63,  63,  63,  63,  63,  63,  63,  63,
-   100, 100, 100, 100, 100, 100, 100, 100,
-   150, 150, 150, 150, 150, 150, 150, 150,
      0,   0,   0,   0,   0,   0,   0,   0
 };
 
@@ -313,37 +242,74 @@ const int pstBadBishop[64] =
 
 void sData::InitPstValues(void)
 {
-  for (int i = 0; i < 64; i++) {  
+  for (int sq = 0; sq < 64; sq++) {  
 	for (int side = 0; side < 2; side++) {
 
-	  pstMg[side][P][REL_SQ(i,side)] = pstPawnMg[i];
-	  pstMg[side][N][REL_SQ(i,side)] = pstKnightMg[i];
-	  pstMg[side][B][REL_SQ(i,side)] = pstBishopMg[i];
-	  pstMg[side][R][REL_SQ(i,side)] = pstRookMg[i];
-	  pstMg[side][Q][REL_SQ(i,side)] = pstQueenMg[i];
-	  pstMg[side][K][REL_SQ(i,side)] = pstKingMg[i];
+	  pstMg[side][P][REL_SQ(sq,side)] = GetPawnMgPst(sq);
+	  pstMg[side][N][REL_SQ(sq,side)] = pstKnightMg[sq];
+	  pstMg[side][B][REL_SQ(sq,side)] = pstBishopMg[sq];
+	  pstMg[side][R][REL_SQ(sq,side)] = pstRookMg[sq];
+	  pstMg[side][Q][REL_SQ(sq,side)] = GetQueenMgPst(sq);
+	  pstMg[side][K][REL_SQ(sq,side)] = pstKingMg[sq];
 
-	  pstEg[side][P][REL_SQ(i,side)] = pstPawnEg[i];
-	  pstEg[side][N][REL_SQ(i,side)] = pstKnightEg[i];
-	  pstEg[side][B][REL_SQ(i,side)] = pstBishopEg[i];
-	  pstEg[side][R][REL_SQ(i,side)] = pstRookEg[i];
-	  pstEg[side][Q][REL_SQ(i,side)] = pstQueenEg[i];
-	  pstEg[side][K][REL_SQ(i,side)] = pstKingEg[i];
+	  pstEg[side][P][REL_SQ(sq,side)] = GetPawnEgPst(sq);
+	  pstEg[side][N][REL_SQ(sq,side)] = pstKnightEg[sq];
+	  pstEg[side][B][REL_SQ(sq,side)] = pstBishopEg[sq];
+	  pstEg[side][R][REL_SQ(sq,side)] = GetRookEgPst(sq);
+	  pstEg[side][Q][REL_SQ(sq,side)] = pstQueenEg[sq];
+	  pstEg[side][K][REL_SQ(sq,side)] = pstKingEg[sq];
 
-	  pawnProperty[PHALANX]  [MG] [side] [REL_SQ(i,side)]  = pstPhalanxMg[i];
-	  pawnProperty[PASSED]   [MG] [side] [REL_SQ(i,side)]  = pstPasserMg[i];
-	  pawnProperty[PASSED]   [EG] [side] [REL_SQ(i,side)]  = pstPasserEg[i];
-	  pawnProperty[CANDIDATE][MG] [side] [REL_SQ(i,side)]  = pstPasserMg[i] / 3;
-	  pawnProperty[CANDIDATE][EG] [side] [REL_SQ(i,side)]  = pstPasserEg[i] / 3;
-	  pawnProperty[ISOLATED] [MG] [side] [REL_SQ(i,side)] = pstIsolatedMg[i];
-	  pawnProperty[ISOLATED] [EG] [side] [REL_SQ(i,side)] = pstIsolatedEg[i];
-	  pawnProperty[BACKWARD] [MG] [side] [REL_SQ(i,side)] = pstBackwardMg[i];
-	  pawnProperty[BACKWARD] [EG] [side] [REL_SQ(i,side)] = pstBackwardEg[i];
+	  pawnProperty[PHALANX]  [MG] [side] [REL_SQ(sq,side)]  = pstPhalanxMg[sq];
+	  pawnProperty[PASSED]   [MG] [side] [REL_SQ(sq,side)]  = GetPasserPstMg(sq);
+	  pawnProperty[PASSED]   [EG] [side] [REL_SQ(sq,side)]  = GetPasserPstEg(sq);
+	  pawnProperty[CANDIDATE][MG] [side] [REL_SQ(sq,side)]  = GetPasserPstMg(sq) / 3;
+	  pawnProperty[CANDIDATE][EG] [side] [REL_SQ(sq,side)]  = GetPasserPstEg(sq) / 3;
+	  pawnProperty[ISOLATED] [MG] [side] [REL_SQ(sq,side)] = pstIsolatedMg[sq];
+	  pawnProperty[ISOLATED] [EG] [side] [REL_SQ(sq,side)] = pstIsolatedEg[sq];
+	  pawnProperty[BACKWARD] [MG] [side] [REL_SQ(sq,side)] = pstBackwardMg[sq];
+	  pawnProperty[BACKWARD] [EG] [side] [REL_SQ(sq,side)] = pstBackwardEg[sq];
 
-	  outpost[side][N][REL_SQ(i,side)] = pstKnightOutpost[i];
-	  outpost[side][B][REL_SQ(i,side)] = pstBishopOutpost[i];
-	  outpost[side][R][REL_SQ(i,side)]   = pstRookOutpost[i];
-	  badBishopPenalty[side] [REL_SQ(i,side)] = pstBadBishop[i];
+	  outpost[side][N][REL_SQ(sq,side)] = pstKnightOutpost[sq];
+	  outpost[side][B][REL_SQ(sq,side)] = pstBishopOutpost[sq];
+	  outpost[side][R][REL_SQ(sq,side)]   = pstRookOutpost[sq];
+	  badBishopPenalty[side] [REL_SQ(sq,side)] = pstBadBishop[sq];
     }
   }
+}
+
+int sData::GetPawnMgPst(int sq)
+{
+	if ( sq == C2 || sq == F2 ) return 0;
+	if ( sq == D2 || sq == E2 ) return 5;
+	if ( sq == D4 || sq == E4 ) return 25;
+	if ( sq == D6 || sq == E6 ) return 5;
+	if ( sq == D7 || sq == E7 ) return 5;
+
+    return neutral[File(sq)] * 5;
+}
+
+int sData::GetPawnEgPst(int sq)
+{
+    return 10;
+}
+
+int sData::GetRookEgPst(int sq)
+{
+    return 0;
+}
+
+int sData::GetQueenMgPst(int sq)
+{
+    if ( Rank(sq) == RANK_1) return -5;
+	else                     return 0;
+}
+
+int sData::GetPasserPstMg(int sq)
+{
+    return pawnAdv[Rank(sq)] * 10;
+}
+
+int sData::GetPasserPstEg(int sq)
+{
+    return pawnAdv[Rank(sq)] * 13;
 }

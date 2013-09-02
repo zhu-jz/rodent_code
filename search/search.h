@@ -72,7 +72,8 @@ private:
 	sFlatMoveList rootList;
 public:
 	int bestMove;
-	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int *pv); // for sFlatMoveList
+	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int isRoot, int *pv);
+	int QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int beta, int isRoot, int *pv); 
 	void Think(sPosition *, int *);
 	void ShowPerft(sPosition *p, int depth);
 	void Divide(sPosition *p, int ply, int depth);

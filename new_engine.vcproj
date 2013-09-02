@@ -227,10 +227,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\selector.h"
-				>
-			</File>
-			<File
 				RelativePath=".\timer.h"
 				>
 			</File>
@@ -267,10 +263,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\bitboard\bb_shift.c"
-				>
-			</File>
-			<File
 				RelativePath=".\bitboard\bitboard.c"
 				>
 			</File>
@@ -280,6 +272,10 @@
 			</File>
 			<File
 				RelativePath=".\book.c"
+				>
+			</File>
+			<File
+				RelativePath=".\book_internal.c"
 				>
 			</File>
 			<File

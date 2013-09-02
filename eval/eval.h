@@ -19,6 +19,8 @@
 
 #pragma once
 
+#define GRAIN_SIZE 4
+
 struct sPawnHashEntry {
   U64 pawnKey;
   int mgPawns;

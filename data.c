@@ -53,14 +53,17 @@ int pondering;
 char ponder_str[6];
 
 // mobility values
-static const int n_mob_mg[28] = { -16-4, -12-2, -8,  0,  4,  8,  12, 16, 16};
-static const int n_mob_eg[28] = { -16-4, -12-2, -8,  0,  4,  8,  12, 16, 16};
-static const int b_mob_mg[28] = { -16-4, -12-2, -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
-static const int b_mob_eg[28] = { -16-4, -12-2, -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
-static const int r_mob_mg[28] = {  -6-4,  -4-2, -2,  0,  2,  4,  6,  8,  9, 10, 11, 12, 13, 14, 15                                 };
-static const int r_mob_eg[28] = { -12-4,  -8-2, -4,  0,  4,  8, 12, 16, 18, 20, 22, 24, 26, 28, 30                                 };
-static const int q_mob_mg[28] = {  -6-4,  -4-2, -2,  0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,  5 };
-static const int q_mob_eg[28] = { -12-4,  -8-2, -4, -2,  0,  1,  2,  3,  4,  5,  6,  6,  7,  7,  8,  8,  8,  9,  9,  9, 10, 10, 10 };
+static const int n_mob_mg[28] = { -16-4, -12-2,  -8,  0,  4,  8,  12, 16, 16};
+static const int n_mob_eg[28] = { -16-4, -12-2,  -8,  0,  4,  8,  12, 16, 16};
+static const int b_mob_mg[28] = { -16-4, -12-2,  -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
+static const int b_mob_eg[28] = { -16-4, -12-2,  -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
+static const int r_mob_mg[28] = { -10-4,  -8-2,  -6,  4,  2,  0,  2,  4,  6,  8, 10, 10, 11, 12, 13,                                };
+static const int r_mob_eg[28] = { -20-4, -16-2, -12,  8,  4,  0,  4,  8, 12, 16, 20, 20, 22, 24, 26,                                };
+static const int q_mob_mg[28] = {  -6-4,  -4-2,  -2,  0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,  5 };
+static const int q_mob_eg[28] = { -12-4,  -8-2,  -4, -2,  0,  1,  2,  3,  4,  5,  6,  6,  7,  7,  8,  8,  8,  9,  9,  9, 10, 10, 10 };
+
+//static const int q_mob_mg[28] = { -10-4,  -9-2,  -8,  -7,  -6, -5,  -4, -3, -2, -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 10, 10 };
+//static const int q_mob_eg[28] = { -20-4, -18-2, -16, -14, -12, -10, -8, -6, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 16, 18, 20, 20, 20 };
 
 
 void sData::InitBadBishop(void)
@@ -140,7 +143,7 @@ void sData::InitAttackBonus(void)
 
 void sData::InitCastleMask(void) 
 {
-  for (int i = 0; i < 64; i++) castleMask[i] = 15;
+  for (int sq = 0; sq < 64; sq++) castleMask[sq] = 15;
   castleMask[A1] = 13;
   castleMask[E1] = 12;
   castleMask[H1] = 14;
@@ -152,14 +155,14 @@ void sData::InitCastleMask(void)
 void sData::InitSearchData(void) 
 {
      // History of moveIsLate:lmrStep tuning:
-	 // 10:5 best, 8:4 best, 8:5 fails, 6:4 best, 5:4 fails)
+	 // 10:5 best, 8:4 best, 8:5 fails, 6:4 best, 5:4 fails, 6:3 best)
 
      aspiration       = 30;
 	 useNull          = 1;
 	 minimalNullDepth = ONE_PLY;
 	 minimalLmrDepth  = 2 * ONE_PLY;
 	 moveIsLate       = 6;
-	 lmrStep          = 4; 
+	 lmrStep          = 3; 
 	 lmrHistLimit     = 60;      // 70 is better in very fast games (10s per game)
 	 futilityBase     = 100;
 	 futilityStep     = 20;

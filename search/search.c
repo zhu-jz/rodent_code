@@ -320,7 +320,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   if (flagInCheck) depth += ONE_PLY;
   
   // QUIESCENCE SEARCH ENTRY POINT
-  if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, pv);
+  if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, 0, pv);
 
   nodes++;
   nodesPerBranch++;
@@ -344,14 +344,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   if (alpha >= beta) return alpha;
 
   // TRANSPOSITION TABLE READ
-  // get transposition table score or at least get a move for sorting purposes
-
   if (TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply))
      return score;
   
-  // safeguard against hitting max ply limit
+  // SAFEGUARD AGAINST HITTING MAX PLY LIMIT
   if (ply >= MAX_PLY - 1) return Eval.Return(p, alpha, beta);
 
+  // DETERMINE IF WE CAN APPLY PRUNING
   int flagCanPrune = (nodeType != PV_NODE) && (beta < MAX_EVAL) && !flagInCheck;
 
   // EVAL PRUNING (inspired by DiscoCheck by Lucas Braesch) 
@@ -370,7 +369,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   && !wasNull
   && p->pieceMat[p->side] > Data.matValue[N]) {
      Manipulator.DoNull(p, undoData);
-     score = -Quiesce(p, ply, 0, -beta, -beta+1, pv);
+     score = -Quiesce(p, ply, 0, -beta, -beta+1, 0, pv);
 	 Manipulator.UndoNull(p, undoData);
 
 	 if (score >= beta) return score;
@@ -468,6 +467,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // EXTENSIONS might be placed here
 
+	 // DETERMINE IF A MOVE CAN BE REDUCED
 	 int flagCanReduce = (nodeType != PV_NODE) && !flagInCheck && !depthChange && AvoidReduction(move, flagMoveType);
 
 	 // FUTILITY PRUNING 
@@ -493,14 +493,14 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 		    { Manipulator.UndoMove(p, move, undoData); continue; }
 	 }
 
-	 // LATE MOVE REDUCTION (lmr)
+	 // LATE MOVE REDUCTION
 	 if  ( flagCanReduce
-     &&  depth > Data.minimalLmrDepth   // we have some depth left
+     &&  Data.minimalLmrDepth           // we have some depth left
 	 &&  movesTried > Data.moveIsLate   // it is sufficiently down the move list
      &&  !InCheck(p)                    // we're not giving check
 	 &&  History.MoveIsBad(move)        // current move has bad history score
 	 ) {
-		 // big reduction of a quiet move (hash and killer moves excluded)
+		 // big reduction of quiet moves (hash and killer moves excluded)
 		 if ( IsMoveOrdinary(flagMoveType) ) {                 
 		    depthChange -= ( SetLmrDepth(move,movesTried) );
 		    History.OnMoveReduced(move);
@@ -513,8 +513,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
  	        flagIsReduced = 1;
 	     }
 	 } // end of late move reduction code
-     // NOTE: there are actually two "sweet spots": current setup and uniform one ply reduction 
-	 // starting from move 3, with no reduction of bad captures
 
 	 newDepth = depth - ONE_PLY + depthChange; // determine new depth
 

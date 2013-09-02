@@ -23,6 +23,7 @@ Its core function is NextMove(), implementing staged move generation
 and sorting of moves.
 */
 
+#include <stdio.h>
 #include "rodent.h"
 #include "data.h"
 #include "bitboard/bitboard.h"
@@ -302,7 +303,8 @@ void sFlatMoveList::Init(sPosition * p)
 		  continue; 
 	  }
  
-	  value[nOfMoves] = -Searcher.Quiesce(p, 0, 0, -INF, INF, pv);
+	  value[nOfMoves] = Max( -INF+1, -Searcher.QuiesceSmart(p, 0, 0, -INF, INF, 1, pv) );
+	  //value[nOfMoves] = -Searcher.Quiesce(p, 0, 0, -INF, INF, 1, pv);
 	  if (value[nOfMoves] > bestVal) {
 		  bestVal = value[nOfMoves];
 		  bestMove = move;

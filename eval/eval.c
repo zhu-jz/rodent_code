@@ -267,6 +267,10 @@ int sEvaluator::Return(sPosition *p, int alpha, int beta)
 
   score = Normalize(score, MAX_EVAL);
 
+  // grain
+  score /= GRAIN_SIZE;
+  score *= GRAIN_SIZE;
+
   // return score relative to the side to move
   return p->side == WHITE ? score : -score;
 }
@@ -301,6 +305,10 @@ int sEvaluator::ReturnFast(sPosition *p)
   }
 
   score = Normalize(score, MAX_EVAL);
+
+  // grain
+  score /= GRAIN_SIZE;
+  score *= GRAIN_SIZE;
 
   // return score relative to the side to move
   return p->side == WHITE ? score : -score;

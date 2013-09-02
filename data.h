@@ -101,6 +101,12 @@ public:
  void InitBadBishop(void);
  void InitAsymmetric(int side);
  void SetBadBishopMask(int bishSq, int pawnSq);
+ int GetPawnMgPst(int sq);
+ int GetPawnEgPst(int sq);
+ int GetRookEgPst(int sq);
+ int GetQueenMgPst(int sq);
+ int GetPasserPstMg(int sq);
+ int GetPasserPstEg(int sq);
 };
 
 extern struct sData Data;

@@ -25,6 +25,7 @@
 #include "../data.h"
 #include "../bitboard/gencache.h"
 #include "eval.h"
+#include <stdio.h>
 
   const int att_N[12] = { 0,  4,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15}; // increasing hurts
   const int att_B[12] = { 0,  4,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15}; // increasing hurts

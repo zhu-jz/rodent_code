@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 5
-#define BENCH_8 1622577
+#define BUILD 10
+#define BENCH_8 1520231
 // #define FAST_TUNING 100000 // node limit for ultra-past tests
 
 #undef CDECL

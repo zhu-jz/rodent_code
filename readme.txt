@@ -50,7 +50,8 @@ making use of advanced 64-bit instructions and first bit intrinsics
 an important time management bug in version 0.12, 
 affecting repeated time controls.
 
-*Dann Corbit* and *Denis Mendoza* supplied me with 64-bit compiles.
+*Jim Ablett*, *Dann Corbit* and *Denis Mendoza* supplied me 
+with 64-bit compiles.
 
 III. Project goals:
 
