@@ -101,12 +101,12 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
  int sEvaluator::ScorePatterns(sPosition *p, int side)
  {
 	 int score = 0;
-      // avoid blocking "c" pawn with a knight
-	  if  ( ( bbPc(p, side, N) & RelSqBb(C3,side) )
-	  &&    ( bbPc(p, side, P) & RelSqBb(C2,side) ) 
-	  &&    ( bbPc(p, side, P) & RelSqBb(D4,side) )
-	  &&   !( bbPc(p, side, P) & RelSqBb(E4,side) )
-	  ) score -= 15;
+      
+	 if  ( ( bbPc(p, side, N) & RelSqBb(C3,side) )
+	 &&    ( bbPc(p, side, P) & RelSqBb(C2,side) ) 
+	 &&    ( bbPc(p, side, P) & RelSqBb(D4,side) )
+	 &&   !( bbPc(p, side, P) & RelSqBb(E4,side) )
+	 ) score -= 15; // avoid blocking "c" pawn with a knight
 
 	 return score;
  }
@@ -318,22 +318,17 @@ void sEvaluator::ScaleValue(int * value, int factor)
 void sEvaluator::DebugPst(sPosition *p) 
 {
 	 int sq, mg = 0, eg = 0;
+	 const int clMult[2] = {1, -1};
 	 U64 bbPieces;
 
-	 for (int pc = 0; pc <= 5; pc++)  {
-
-	     bbPieces = bbPc(p, WHITE, pc);
+	 for (int cl = 0; cl <= 1; cl++)
+	 for (int pc = 0; pc <= 5; pc++)  
+	 {
+	     bbPieces = bbPc(p, cl, pc);
 	     while (bbPieces) {
            sq = PopFirstBit(&bbPieces);
-	       mg += Data.pstMg[WHITE][pc][sq];
-		   eg += Data.pstEg[WHITE][pc][sq];
-	     }
-
-	     bbPieces = bbPc(p, BLACK, pc);
-	     while (bbPieces) {
-           sq = PopFirstBit(&bbPieces);
-	       mg -= Data.pstMg[BLACK][pc][sq];
-		   eg -= Data.pstEg[BLACK][pc][sq];
+	       mg += Data.pstMg[cl][pc][sq] * clMult[cl];
+		   eg += Data.pstEg[cl][pc][sq] * clMult[cl];
 	     }
 	 }
 	 printf("Recalculated pst : mg %d eg %d\n", mg, eg);
