@@ -251,12 +251,7 @@ int sEvaluator::Return(sPosition *p, int alpha, int beta)
   }
   else score = temp_score; 
 
-  // decrease score for drawish endgames
-  if (score > 0) degradation = SetDegradationFactor(p, WHITE);
-  if (score < 0) degradation = SetDegradationFactor(p, BLACK);
-
-  score *= degradation;
-  score /= 64;
+  score = PullToDraw(p, score); // decrease score in drawish endgames
 
   // add random value in weakening mode
   if (Data.elo < MAX_ELO && Data.useWeakening) {
@@ -289,13 +284,7 @@ int sEvaluator::ReturnFast(sPosition *p)
   egScore += (p->pstEg[WHITE] - p->pstEg[BLACK]);
   
   score += Interpolate();
-
-  // decrease score for drawish endgames
-  if (score > 0) degradation = SetDegradationFactor(p, WHITE);
-  if (score < 0) degradation = SetDegradationFactor(p, BLACK);
-
-  score *= degradation;
-  score /= 64;
+  score = PullToDraw(p, score); // decrease score in drawish endgames
 
   // add random value in weakening mode
   if (Data.elo < MAX_ELO && Data.useWeakening) {

@@ -22,6 +22,15 @@
 #include "../bitboard/bitboard.h"
 #include "eval.h"
 
+int sEvaluator::PullToDraw(sPosition *p, int score)
+{
+  if (score > 0) degradation = SetDegradationFactor(p, WHITE);
+  if (score < 0) degradation = SetDegradationFactor(p, BLACK);
+
+  score *= degradation;
+  return score / 64;
+}
+
 // Functions responsible for scaling down the evaluation score
 // in case of drawish endgames.
 
