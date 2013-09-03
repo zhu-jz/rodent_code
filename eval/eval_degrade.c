@@ -24,6 +24,7 @@
 
 int sEvaluator::PullToDraw(sPosition *p, int score)
 {
+  int degradation = 64; 
   if (score > 0) degradation = SetDegradationFactor(p, WHITE);
   if (score < 0) degradation = SetDegradationFactor(p, BLACK);
 

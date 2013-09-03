@@ -48,7 +48,6 @@ private:
   int attNumber[2];        // no. of pieces participating in the attack
   int mgFact,  egFact;     // material-driven scaling factors
   int mgScore, egScore;    // partial midgame and endgame scores (to be scaled)
-  int degradation;         // for scaling down the score in endgames that are hard to win
 
   sPawnHashEntry PawnTT[PAWN_HASH_SIZE]; // pawn transposition table
 

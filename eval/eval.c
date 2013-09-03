@@ -37,7 +37,6 @@ void sEvaluator::InitStatic(void)
      mgScore            = 0;   egScore            = 0;  // clear midgame/endgame score component
      pawnScoreMg[WHITE] = 0;   pawnScoreMg[BLACK] = 0;  // clear midgame pawn scores
      pawnScoreEg[WHITE] = 0;   pawnScoreEg[BLACK] = 0;  // clear endgame pawn scores	 
-     degradation        = 64;                           // no scaling for drawish endgames
 }
 
 void sEvaluator::InitDynamic(sPosition *p) 
