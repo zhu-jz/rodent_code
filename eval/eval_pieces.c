@@ -39,7 +39,7 @@
   //                           P   N   B   R   Q   K   -
   const int outpostBase [7] = {0,  4,  4,  0,  0,  0,  0};
   const int canCheckWith[7] = {0,  0,  1,  4, 10,  0,  0};
-
+ 
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
   int sq;

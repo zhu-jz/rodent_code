@@ -179,8 +179,7 @@ int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side)
 
 int sEvaluator::EvalFileStorm(U64 bbOppPawns, int side)
 {
-	if (!bbOppPawns) return -10;
-	return 0; // TEMPORARY, I HOPE; unfortunately both -5 -10 -15 and current set are worse than not using it
+	if (!bbOppPawns) return -15;
 	if (bbOppPawns & rank4[side]) return -3;
 	if (bbOppPawns & rank5[side]) return -5;
 	if (bbOppPawns & rank6[side]) return -7;
