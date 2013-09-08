@@ -205,7 +205,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
   TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply);
   
   // safeguard against hitting max ply limit
-  if (ply >= MAX_PLY - 1) return Eval.Return(p, alpha, beta);
+  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
   if (nodeType == PV_NODE && !move && depth >= 4*ONE_PLY && !flagInCheck ) {
@@ -348,7 +348,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      return score;
   
   // SAFEGUARD AGAINST HITTING MAX PLY LIMIT
-  if (ply >= MAX_PLY - 1) return Eval.Return(p, alpha, beta);
+  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
 
   // DETERMINE IF WE CAN APPLY PRUNING
   int flagCanPrune = (nodeType != PV_NODE) && (beta < MAX_EVAL) && !flagInCheck;
@@ -384,7 +384,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   && !wasNull
   && p->pieceMat[p->side] > Data.matValue[N]) 
   {
-    if ( beta <= Eval.Return(p, alpha, beta) ) {
+    if ( beta <= Eval.ReturnFull(p, alpha, beta) ) {
 
       Manipulator.DoNull(p, undoData);
 	  newDepth = SetNullDepth(depth);                             // ALL_NODE

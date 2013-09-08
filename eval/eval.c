@@ -186,8 +186,7 @@ int sEvaluator::EvalFileStorm(U64 bbOppPawns, int side)
     return 0;
 }
 
-// full evaluation function
-int sEvaluator::Return(sPosition *p, int alpha, int beta)
+int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 {
   int score = GetMaterialScore(p) + CheckmateHelper(p);
   p->side == WHITE ? score+=5 : score-=5;

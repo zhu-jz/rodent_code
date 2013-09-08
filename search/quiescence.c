@@ -49,9 +49,9 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
   *pv = 0;
 
   // safeguard against hitting max ply limit
-  if (ply >= MAX_PLY - 1) return Eval.Return(p, alpha, beta);
+  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
 
-  best = Eval.Return(p, alpha, beta);
+  best = Eval.ReturnFull(p, alpha, beta);
 
   if (best >= beta) { 
   // CAUSES DIFFERENT NODE COUNTS BETWEEN DEBUG AND RELEASE COMPILE 
@@ -136,10 +136,10 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
   *pv = 0;
 
   // safeguard against hitting max ply limit
-  if (ply >= MAX_PLY - 1) return Eval.Return(p, alpha, beta);
+  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
 
   if (flagInCheck) best = -INF;
-  else             best = Eval.Return(p, alpha, beta);
+  else             best = Eval.ReturnFull(p, alpha, beta);
 
   if (best >= beta) { 
   // CAUSES DIFFERENT NODE COUNTS BETWEEN DEBUG AND RELEASE COMPILE 

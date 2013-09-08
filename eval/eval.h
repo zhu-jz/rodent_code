@@ -86,7 +86,7 @@ public:
   void ScaleValue(int * value, int factor);
   void DebugPst(sPosition *p);
   int ReturnFast(sPosition *p);
-  int Return(sPosition *p, int alpha, int beta);
+  int ReturnFull(sPosition *p, int alpha, int beta);
 };
 
 extern struct sEvaluator Eval;
