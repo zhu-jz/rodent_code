@@ -86,14 +86,14 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
 	bbSpace &= ~rank2[side];
 	bbSpace &= ~rank3[side];
 	bbSpace &= ~bbPawnControl[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
-	AddMiscTwo(side, PopCnt(bbSpace), 0);
+	AddMisc(side, PopCnt(bbSpace), 0);
 	int pc, sq, val;
 
     while (bbHanging) {
        sq  = FirstOne(bbHanging);
 	   pc  = TpOnSq(p, sq);
 	   val = Data.matValue[pc] / 32;
-	   AddMiscTwo(side, 5+val, 10+val);
+	   AddMisc(side, 5+val, 10+val);
 	   bbHanging &= bbHanging - 1;
 	}
 }

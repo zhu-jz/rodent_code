@@ -53,9 +53,9 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	bbControl &= ~p->bbCl[side];      // exclude squares occupied by own pieces
 
     // knight attacked / defended by pawn
-	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMiscOne(side, MINOR_ATTACKED_BY_P);
+	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMisc(side, MINOR_ATTACKED_BY_P, MINOR_ATTACKED_BY_P);
 	else 
-    if ( SqBb(sq) & bbPawnControl[side] )  AddMiscOne(side, MINOR_DEFENDED_BY_P);
+    if ( SqBb(sq) & bbPawnControl[side] )  AddMisc(side, MINOR_DEFENDED_BY_P, MINOR_DEFENDED_BY_P);
 
 	ScoreOutpost(p, side, N, sq);
 
@@ -81,9 +81,9 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	bbAllAttacks[side] |= bbControl;                 // update attack data
 
 	// bishop attacked / defended by pawn
-	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMiscOne(side, MINOR_ATTACKED_BY_P);
+	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMisc(side, MINOR_ATTACKED_BY_P, MINOR_ATTACKED_BY_P);
 	else 
-    if ( SqBb(sq) & bbPawnControl[side] )  AddMiscOne(side, MINOR_DEFENDED_BY_P);
+    if ( SqBb(sq) & bbPawnControl[side] )  AddMisc(side, MINOR_DEFENDED_BY_P, MINOR_DEFENDED_BY_P);
 
 	ScoreOutpost(p, side, B, sq);
 
@@ -107,7 +107,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 
 	// penalize bishop blocked by own pawns
 	if ( bbBadBishopMasks[side][sq] & bbPc(p, side, P) )
-       AddMiscOne(side, Data.badBishopPenalty[side][sq]);
+       AddMisc(side, Data.badBishopPenalty[side][sq], Data.badBishopPenalty[side][sq]);
   }
 }
 
@@ -129,17 +129,17 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
 	// evaluate rook on an open file
 	U64 bbFrontSpan = GetFrontSpan(SqBb(sq), side );
-	if (bbFrontSpan & bbPc(p, Opp(side), Q) ) AddMiscTwo(side, 5, 5); // rook and queen in the same file
+	if (bbFrontSpan & bbPc(p, Opp(side), Q) ) AddMisc(side, 5, 5); // rook and queen in the same file
 
 	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {
 	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) 
 	   {
-		  AddMiscTwo(side, Data.rookOpenMg, Data.rookOpenEg);
+		  AddMisc(side, Data.rookOpenMg, Data.rookOpenEg);
 		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += Data.rookOpenAttack;
 	   }
 	  else
 	  {
-		  AddMiscTwo(side, Data.rookSemiOpenMg, Data.rookSemiOpenEg);
+		  AddMisc(side, Data.rookSemiOpenMg, Data.rookSemiOpenEg);
 		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += Data.rookSemiOpenAttack;
 	  }
 	}
@@ -148,7 +148,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	if (SqBb(sq) & bbSeventh[side] ) {
        if ( bbPc(p, Opp(side), P) & bbSeventh[side]
 	   || bbPc(p, Opp(side), K) & bbEighth[side]  
-	   )  AddMiscTwo(side, Data.rookSeventhMg, Data.rookSeventhEg);
+	   )  AddMisc(side, Data.rookSeventhMg, Data.rookSeventhEg);
 	}
 
     // check threats (including false positives due to queen/rook transparency)
@@ -232,8 +232,8 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 
 	if (bbStop &~bbOccupied) {           // this pawn is mobile
 	   if (Data.pstMg[side][P][sq] > 0)  // and placed on a good square
-		   AddMiscTwo(side, Data.pstMg[side][P][sq] / 5, Data.pstEg[side][P][sq] / 5);
-	   else AddMiscTwo(side, 2, 1);
+		   AddMisc(side, Data.pstMg[side][P][sq] / 5, Data.pstEg[side][P][sq] / 5);
+	   else AddMisc(side, 2, 1);
 	}
 	   
 	bbObstacles = bbPassedMask[side][sq] & bbPc(p, Opp(side), P);
@@ -244,13 +244,13 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 		passUnitEg = Data.pawnProperty[PASSED][EG][side][sq] / 5;
 
 		// blocked and unblocked passers
-		if (bbStop &~bbOccupied) AddMiscTwo(side,  passUnitMg,  passUnitEg);
-		else                     AddMiscTwo(side, -passUnitMg, -passUnitEg);
+		if (bbStop &~bbOccupied) AddMisc(side,  passUnitMg,  passUnitEg);
+		else                     AddMisc(side, -passUnitMg, -passUnitEg);
 
 		// control of stop square
 		if (bbStop &~ bbAllAttacks[Opp(side)] ) {
-           AddMiscTwo(side,  passUnitMg,  passUnitEg);
-           if (bbStop & bbAllAttacks[side] ) AddMiscTwo(side,  passUnitMg,  passUnitEg);
+           AddMisc(side,  passUnitMg,  passUnitEg);
+           if (bbStop & bbAllAttacks[side] ) AddMisc(side,  passUnitMg,  passUnitEg);
 		}
 	}
   }
@@ -268,13 +268,8 @@ void sEvaluator::AddMobility( int pc, int side, int cnt)
 	egMobility[side] += Data.mobBonusEg [pc] [cnt];
 }
 
-void sEvaluator::AddMiscOne(int side, int val)
-{
-	mgMisc[side] += val;
-	egMisc[side] += val;
-}
 
-void sEvaluator::AddMiscTwo(int side, int mg, int eg)
+void sEvaluator::AddMisc(int side, int mg, int eg)
 {
 	mgMisc[side] += mg;
 	egMisc[side] += eg;
@@ -284,10 +279,10 @@ void sEvaluator::ScoreOutpost(sPosition *p, int side, int piece, int sq)
 {
 	// constant bonus if piece occupies hole of enemy pawn structure
 	if ( SqBb(sq) & ~bbPawnCanControl[Opp(side)] ) {
-		AddMiscOne(side, outpostBase[piece] );
+		AddMisc(side, outpostBase[piece], outpostBase[piece] );
 
 	   // additional pst bonus if defended by a pawn
 	   if ( SqBb(sq) & bbPawnControl[side] ) 
-		   AddMiscOne(side, Data.outpost[side][piece][sq] );
+		   AddMisc(side, Data.outpost[side][piece][sq], Data.outpost[side][piece][sq] );
 	}
 }

@@ -53,8 +53,7 @@ private:
 
   int GetMaterialScore(sPosition *p);
   void AddMobility(int pc, int side, int cnt);
-  void AddMiscOne(int side, int val);
-  void AddMiscTwo(int side, int mg, int eg);
+  void AddMisc(int side, int mg, int eg);
   void AddPieceAttack(int side, int val);
   void AddPawnProperty(int pawnProperty, int side, int sq);
   int CheckmateHelper(sPosition *p);
