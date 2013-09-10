@@ -129,6 +129,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
 	// evaluate rook on an open file
 	U64 bbFrontSpan = GetFrontSpan(SqBb(sq), side );
+	if (bbFrontSpan & bbPc(p, Opp(side), Q) ) AddMiscTwo(side, 5, 5); // rook and queen in the same file
 
 	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {
 	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) 
