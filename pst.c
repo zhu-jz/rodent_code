@@ -23,6 +23,7 @@
 
 const int neutral[8]  = {-3, -1, 1, 3, 3, 1, -1, -3};
 const int knightEg[8] = {-4, -2, 0, 1, 1, 0, -2, -4};
+const int kingEg[8] =   {-36, -24, 0, 12, 12, 0, -24, -36};
 const int pawnAdv[8]  = { 0,  1, 1, 3, 5, 8, 12,  0};
 
 const int pstKnightMg[64] = 
@@ -268,7 +269,6 @@ void sData::InitPstValues(void)
 
 int sData::GetPawnMgPst(int sq)
 {
-	if ( sq == C2 || sq == F2 ) return 0;
 	if ( sq == D2 || sq == E2 ) return 5;
 	if ( sq == D4 || sq == E4 ) return 25;
 	if ( sq == D6 || sq == E6 ) return 5;
