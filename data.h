@@ -104,8 +104,11 @@ public:
  int GetPawnMgPst(int sq);
  int GetPawnEgPst(int sq);
  int GetKnightEgPst(int sq);
+ int GetBishopEgPst(int sq);
  int GetRookEgPst(int sq);
  int GetQueenMgPst(int sq);
+ int GetPhalanxPstMg(int sq);
+ int GetPhalanxPstEg(int sq);
  int GetPasserPstMg(int sq);
  int GetPasserPstEg(int sq);
 };

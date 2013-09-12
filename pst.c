@@ -50,18 +50,6 @@ const int pstBishopMg[64] =
     -5,  -5,  -5,  -5,  -5,  -5,  -5,  -5
 };
 
-const int pstBishopEg[64] = 
-{
-    -5,  -5, - 5,  -5,  -5,  -5,  -5,  -5,
-    -5,   0,   0,   0,   0,   0,   0,  -5,
-    -5,   0,   5,   5,   5,   5,   0,  -5,
-    -5,   0,   5,  10,  10,   5,   0,  -5,
-    -5,   0,   5,  10,  10,   5,   0,  -5,
-    -5,   0,   5,   5,   5,   5,   0,  -5,
-    -5,   0,   0,   0,   0,   0,   0,  -5,
-    -5,  -5,  -5,  -5,  -5,  -5,  -5,  -5
-};
-
 const int pstRookMg[64] = 
 {  
   	 0,   0,   2,   4,   4,   2,   0,   0,
@@ -108,30 +96,6 @@ const int pstKingEg[64] =
    -36, -12,   0,  12,  12,   0, -12, -36,
    -48, -24, -12,   0,   0, -12, -24, -48,
    -72, -48, -36, -24, -24, -36, -48, -72
-};
-
-const int pstPhalanxMg[64] = 
-{ 
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,  10,  15,  10,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0
-};
-
-const int pstPhalanxEg[64] = // on modifying this table please uncomment a line in eval_pawns.c
-{ 
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-	 0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0
 };
 
 const int pstIsolatedMg[64] = 
@@ -244,12 +208,13 @@ void sData::InitPstValues(void)
 
 	  pstEg[side][P][REL_SQ(sq,side)] = GetPawnEgPst(sq);
 	  pstEg[side][N][REL_SQ(sq,side)] = GetKnightEgPst(sq);
-	  pstEg[side][B][REL_SQ(sq,side)] = pstBishopEg[sq];
+	  pstEg[side][B][REL_SQ(sq,side)] = GetBishopEgPst(sq);
 	  pstEg[side][R][REL_SQ(sq,side)] = GetRookEgPst(sq);
 	  pstEg[side][Q][REL_SQ(sq,side)] = pstQueenEg[sq];
 	  pstEg[side][K][REL_SQ(sq,side)] = pstKingEg[sq];
 
-	  pawnProperty[PHALANX]  [MG] [side] [REL_SQ(sq,side)]  = pstPhalanxMg[sq];
+	  pawnProperty[PHALANX]  [MG] [side] [REL_SQ(sq,side)]  = GetPhalanxPstMg(sq);
+	  pawnProperty[PHALANX]  [EG] [side] [REL_SQ(sq,side)]  = GetPhalanxPstEg(sq);
 	  pawnProperty[PASSED]   [MG] [side] [REL_SQ(sq,side)]  = GetPasserPstMg(sq);
 	  pawnProperty[PASSED]   [EG] [side] [REL_SQ(sq,side)]  = GetPasserPstEg(sq);
 	  pawnProperty[CANDIDATE][MG] [side] [REL_SQ(sq,side)]  = GetPasserPstMg(sq) / 3;
@@ -287,6 +252,14 @@ int sData::GetKnightEgPst(int sq)
     return 5 * ( knightEg[Rank(sq)] + knightEg[File(sq)] );
 }
 
+int sData::GetBishopEgPst(int sq)
+{
+    if ( Rank(sq) == RANK_1 || Rank(sq) == RANK_8 || File(sq) == FILE_A || File(sq) == FILE_H) return -5;
+	if ( Rank(sq) == RANK_2 || Rank(sq) == RANK_7 || File(sq) == FILE_B || File(sq) == FILE_G) return  0;
+	if ( Rank(sq) == RANK_3 || Rank(sq) == RANK_6 || File(sq) == FILE_C || File(sq) == FILE_F) return  5;
+	return 10;
+}
+
 int sData::GetRookEgPst(int sq)
 {
     return 0;
@@ -306,4 +279,16 @@ int sData::GetPasserPstMg(int sq)
 int sData::GetPasserPstEg(int sq)
 {
     return pawnAdv[Rank(sq)] * 13;
+}
+
+int sData::GetPhalanxPstMg(int sq)
+{
+    if (sq == D4) return 15;             // D4/E4 pawns
+	if (sq == C4 || sq == E4) return 10; // C4/D4 or E4/F4 pawns
+	return 0;
+}
+
+int sData::GetPhalanxPstEg(int sq)
+{
+    return 0; // on modifying please uncomment a line in eval_pawns.c
 }
