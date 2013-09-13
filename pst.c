@@ -21,9 +21,11 @@
 #include "data.h"
 #include "bitboard/bitboard.h"
 
+const int passerMg    = 10;
+const int passerEg    = 13;
 const int neutral[8]  = {-3, -1, 1, 3, 3, 1, -1, -3};
+const int biased[8]   = {-3, -1, 0, 1, 1, 0, -1, -3};
 const int knightEg[8] = {-4, -2, 0, 1, 1, 0, -2, -4};
-const int kingEg[8] =   {-36, -24, 0, 12, 12, 0, -24, -36};
 const int pawnAdv[8]  = { 0,  1, 1, 3, 5, 8, 12,  0};
 
 const int pstKnightMg[64] = 
@@ -84,18 +86,6 @@ const int pstKingMg[64] =
    -20, -10, -30, -50, -50, -30, -10, -20,
    -30, -20, -40, -60, -60, -40, -20, -30,
    -40, -30, -50, -70, -70, -50, -30, -40
-};
-
-const int pstKingEg[64] = 
-{ 
-   -72, -48, -36, -24, -24, -36, -48, -72,
-   -48, -24, -12,   0,   0, -12, -24, -48,
-   -36, -12,   0,  12,  12,   0, -12, -36,
-   -24,   0,  12,  24,  24,  12,   0, -24,
-   -24,   0,  12,  24,  24,  12,   0, -24,
-   -36, -12,   0,  12,  12,   0, -12, -36,
-   -48, -24, -12,   0,   0, -12, -24, -48,
-   -72, -48, -36, -24, -24, -36, -48, -72
 };
 
 const int pstIsolatedMg[64] = 
@@ -211,14 +201,14 @@ void sData::InitPstValues(void)
 	  pstEg[side][B][REL_SQ(sq,side)] = GetBishopEgPst(sq);
 	  pstEg[side][R][REL_SQ(sq,side)] = GetRookEgPst(sq);
 	  pstEg[side][Q][REL_SQ(sq,side)] = pstQueenEg[sq];
-	  pstEg[side][K][REL_SQ(sq,side)] = pstKingEg[sq];
+	  pstEg[side][K][REL_SQ(sq,side)] = 12 * ( biased[Rank(sq)] + biased[File(sq)] );
 
 	  pawnProperty[PHALANX]  [MG] [side] [REL_SQ(sq,side)]  = GetPhalanxPstMg(sq);
-	  pawnProperty[PHALANX]  [EG] [side] [REL_SQ(sq,side)]  = GetPhalanxPstEg(sq);
-	  pawnProperty[PASSED]   [MG] [side] [REL_SQ(sq,side)]  = GetPasserPstMg(sq);
-	  pawnProperty[PASSED]   [EG] [side] [REL_SQ(sq,side)]  = GetPasserPstEg(sq);
-	  pawnProperty[CANDIDATE][MG] [side] [REL_SQ(sq,side)]  = GetPasserPstMg(sq) / 3;
-	  pawnProperty[CANDIDATE][EG] [side] [REL_SQ(sq,side)]  = GetPasserPstEg(sq) / 3;
+	  pawnProperty[PHALANX]  [EG] [side] [REL_SQ(sq,side)]  = 0; // on modifying please uncomment relevant line in eval_pawns.c
+	  pawnProperty[PASSED]   [MG] [side] [REL_SQ(sq,side)]  = passerMg * pawnAdv[Rank(sq)];
+	  pawnProperty[PASSED]   [EG] [side] [REL_SQ(sq,side)]  = passerEg * pawnAdv[Rank(sq)];
+	  pawnProperty[CANDIDATE][MG] [side] [REL_SQ(sq,side)]  = ( passerMg * pawnAdv[Rank(sq)] ) / 3;
+	  pawnProperty[CANDIDATE][EG] [side] [REL_SQ(sq,side)]  = ( passerEg * pawnAdv[Rank(sq)] ) / 3;
 	  pawnProperty[ISOLATED] [MG] [side] [REL_SQ(sq,side)] = pstIsolatedMg[sq];
 	  pawnProperty[ISOLATED] [EG] [side] [REL_SQ(sq,side)] = pstIsolatedEg[sq];
 	  pawnProperty[BACKWARD] [MG] [side] [REL_SQ(sq,side)] = pstBackwardMg[sq];
@@ -271,24 +261,9 @@ int sData::GetQueenMgPst(int sq)
 	else                     return 0;
 }
 
-int sData::GetPasserPstMg(int sq)
-{
-    return pawnAdv[Rank(sq)] * 10;
-}
-
-int sData::GetPasserPstEg(int sq)
-{
-    return pawnAdv[Rank(sq)] * 13;
-}
-
 int sData::GetPhalanxPstMg(int sq)
 {
     if (sq == D4) return 15;             // D4/E4 pawns
 	if (sq == C4 || sq == E4) return 10; // C4/D4 or E4/F4 pawns
 	return 0;
-}
-
-int sData::GetPhalanxPstEg(int sq)
-{
-    return 0; // on modifying please uncomment a line in eval_pawns.c
 }

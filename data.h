@@ -108,9 +108,6 @@ public:
  int GetRookEgPst(int sq);
  int GetQueenMgPst(int sq);
  int GetPhalanxPstMg(int sq);
- int GetPhalanxPstEg(int sq);
- int GetPasserPstMg(int sq);
- int GetPasserPstEg(int sq);
 };
 
 extern struct sData Data;
