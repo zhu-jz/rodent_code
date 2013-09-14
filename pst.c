@@ -20,6 +20,7 @@
 #include "rodent.h"
 #include "data.h"
 #include "bitboard/bitboard.h"
+#include <stdio.h>
 
 const int passerMg    = 10;
 const int passerEg    = 13;
@@ -196,10 +197,10 @@ void sData::InitPstValues(void)
 	  pstMg[side][Q][REL_SQ(sq,side)] = GetQueenMgPst(sq);
 	  pstMg[side][K][REL_SQ(sq,side)] = pstKingMg[sq];
 
-	  pstEg[side][P][REL_SQ(sq,side)] = GetPawnEgPst(sq);
-	  pstEg[side][N][REL_SQ(sq,side)] = GetKnightEgPst(sq);
+	  pstEg[side][P][REL_SQ(sq,side)] = 10;
+	  pstEg[side][N][REL_SQ(sq,side)] = 5 * ( knightEg[Rank(sq)] + knightEg[File(sq)] );
 	  pstEg[side][B][REL_SQ(sq,side)] = GetBishopEgPst(sq);
-	  pstEg[side][R][REL_SQ(sq,side)] = GetRookEgPst(sq);
+	  pstEg[side][R][REL_SQ(sq,side)] = 0;
 	  pstEg[side][Q][REL_SQ(sq,side)] = pstQueenEg[sq];
 	  pstEg[side][K][REL_SQ(sq,side)] = 12 * ( biased[Rank(sq)] + biased[File(sq)] );
 
@@ -232,27 +233,12 @@ int sData::GetPawnMgPst(int sq)
     return neutral[File(sq)] * 5;
 }
 
-int sData::GetPawnEgPst(int sq)
-{
-    return 10;
-}
-
-int sData::GetKnightEgPst(int sq)
-{
-    return 5 * ( knightEg[Rank(sq)] + knightEg[File(sq)] );
-}
-
 int sData::GetBishopEgPst(int sq)
 {
     if ( Rank(sq) == RANK_1 || Rank(sq) == RANK_8 || File(sq) == FILE_A || File(sq) == FILE_H) return -5;
 	if ( Rank(sq) == RANK_2 || Rank(sq) == RANK_7 || File(sq) == FILE_B || File(sq) == FILE_G) return  0;
 	if ( Rank(sq) == RANK_3 || Rank(sq) == RANK_6 || File(sq) == FILE_C || File(sq) == FILE_F) return  5;
 	return 10;
-}
-
-int sData::GetRookEgPst(int sq)
-{
-    return 0;
 }
 
 int sData::GetQueenMgPst(int sq)
