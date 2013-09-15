@@ -1,6 +1,6 @@
 Rodent, a UCI chess playing engine derived from Sungorus 1.4
 Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-Copyright (C) 2011-2012 Pawel Koziol
+Copyright (C) 2011-2013 Pawel Koziol
 http://www.pkoziol.cal24.pl/rodent/rodent.htm
 https://github.com/nescitus/rodent_code
 
@@ -27,13 +27,11 @@ fell in love with it, started adding chess knowledge and advanced
 search algorithms. Hopefully code quality didn't deteriorate too
 much because of that attempt at learning by emulation.
 
-The second most important source is excellent document called
-"Toga LOG user manual" by josephd, which is accessible from
-http://members.aon.at/josefd/Toga%20LOG.html . It describes 
+The second most important source is "Toga LOG user manual" by josephd, 
+(http://members.aon.at/josefd/Toga%20LOG.html). It describes 
 evaluation function of Fruit/Toga in a natural language. First
-draft of Rodent evaluation function relied heavily on this
-document. Currently at least king safety code is different, 
-but for example weak pawn evaluation remains basically the same.
+draft of Rodent's evaluation function relied heavily on this
+document, and many evaluation weights are derived directly from it.
 
 Open source programming makes most sense as a collaborative effort.
 Rodent would be clearly weaker without the following contributions:
@@ -50,8 +48,7 @@ making use of advanced 64-bit instructions and first bit intrinsics
 an important time management bug in version 0.12, 
 affecting repeated time controls.
 
-*Jim Ablett*, *Dann Corbit* and *Denis Mendoza* supplied me 
-with 64-bit compiles.
+*Jim Ablett*, *Dann Corbit* and *Denis Mendoza* supplied 64-bit compiles.
 
 III. Project goals:
 
@@ -110,16 +107,11 @@ The only non-standard solution is what I call "sliding Late Move Reduction".
 Since Rodent from the very beginning uses fractional plies, it made sense
 to check whether smoothly scaling reduction can help. And it certainly did.
 
-It works as follows. Instead of a fixed one ply reduction, Rodent uses
-something like:
-
-QUARTER_PLY * ( (moves_tried / 5)+3 )
-
-where moves_tried counts moves accepted by search as legal. Thus the first 
-reduction occurs much later under normal scheme, but as the search proceeds, 
-the effect of accumulated quarter ply reductions compensates for it, without 
-hurting the playing strength. This kind of reduction has a chance of being 
-much less detrimental to the tactical ability of the engine. After all, 
+It works as follows. Instead of a fixed one ply reduction, Rodent increases
+reduction depth by 1/4 ply every few moves. The first reduction occurs a bit 
+later than under normal scheme, but as the search proceeds, accumulated 
+quarter ply reductions compensate for it. This kind of reduction has a chance 
+of being less detrimental to the tactical ability of the engine. After all, 
 it is geared towards reducing more deeply when the engine encounters a series 
 of moves that have low probability of changing the node value (move ordering, 
 especially using history heuristic, is a measure of that probability).
@@ -227,9 +219,7 @@ basic infrastructure is already in place. It consists of three parts:
 
 1. Weaker levels play slower. On starting a new iteration or changing a move
    Rodent "freezes" for a moment, depending on its Elo command.
-   
 2. Weaker levels add random value to evaluation score.
-
 3. Weaker levels are more likely to blunder, because they forget 
    about calculating consequences of certain moves.
 
