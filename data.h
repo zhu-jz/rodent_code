@@ -29,7 +29,6 @@ public:
  int matValue[7];
  int deltaValue[7];
  int phaseValue[7];
- int attMultiplier[7];
  int distance[64][64];
  int pstMg[2][6][64];
  int pstEg[2][6][64];
@@ -90,7 +89,7 @@ public:
 
  // functions
  void InitMaterialValues(void);
- void InitSinglePiece(int pc, int mat, int del, int phase, int att );
+ void InitSinglePiece(int pc, int mat, int del, int phase);
  void InitPstValues(void);
  void InitMobBonus(void);
  void InitAttackBonus(void);

@@ -103,12 +103,11 @@ void sData::SetBadBishopMask(int bishSq, int pawnSq)
 	 bbBadBishopMasks[BLACK][ REL_SQ(bishSq,BLACK) ] ^= RelSqBb(pawnSq, BLACK);
 }
 
-void sData::InitSinglePiece(int pc, int mat, int del, int phase, int att) 
+void sData::InitSinglePiece(int pc, int mat, int del, int phase) 
 {
      matValue[pc]      = mat;   
 	 deltaValue[pc]    = del;
-	 phaseValue[pc]    = phase;     
-	 attMultiplier[pc] = att;      
+	 phaseValue[pc]    = phase;         
 }
 
 void sData::InitMobBonus(void) 
@@ -159,7 +158,7 @@ void sData::InitSearchData(void)
 
      aspiration       = 30;
 	 useNull          = 1;
-	 minimalNullDepth = ONE_PLY;
+	 minimalNullDepth = 2 * ONE_PLY; // TRY 3 * ONE_PLY
 	 minimalLmrDepth  = 2 * ONE_PLY;
 	 moveIsLate       = 6;
 	 lmrStep          = 3; 
@@ -190,12 +189,12 @@ void sData::InitDistanceBonus(void)
 void sData::InitMaterialValues(void) 
 {
 	//             name,  val, del, pha, att
-	 InitSinglePiece( P,  0,   150,  0,   0 );  // pawn material is evaluated in eval.c
-	 InitSinglePiece( N,  325, 475,  1,   2 );
-	 InitSinglePiece( B,  335, 485,  1,   2 );
-	 InitSinglePiece( R,  500, 650,  2,   4 );  // 510 is worse
-	 InitSinglePiece( Q,  975, 1125, 4,   7 );
-	 InitSinglePiece(NO_TP, 0, 150,  0,   0 );
+	 InitSinglePiece( P,  0,   150,  0);  // pawn material is evaluated in eval.c
+	 InitSinglePiece( N,  325, 475,  1);
+	 InitSinglePiece( B,  335, 485,  1);
+	 InitSinglePiece( R,  500, 650,  2);  // 510 is worse
+	 InitSinglePiece( Q,  975, 1125, 4);
+	 InitSinglePiece(NO_TP, 0, 150,  0);
 };
 
 void sData::InitEvalVars(void) 
