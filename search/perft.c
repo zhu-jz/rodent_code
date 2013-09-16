@@ -129,8 +129,7 @@ void sSearcher::Divide(sPosition *p, int ply, int depth)
 	   }
 
        if (depth == 1) nOfMoves++;
-	   else  
-	   {   
+	   else  {   
 		   int fraction = Perft(p, ply+1, depth-1);
 		   nOfMoves += fraction;
 		   PrintMove(move);

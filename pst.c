@@ -29,6 +29,12 @@ const int biased[8]   = {-3, -1, 0, 1, 1, 0, -1, -3};
 const int knightEg[8] = {-4, -2, 0, 1, 1, 0, -2, -4};
 const int pawnAdv[8]  = { 0,  1, 1, 3, 5, 8, 12,  0};
 
+// weak pawn penalties are file based
+const int pawnBackwardMg[8] = { -7,  -8,  -9, -10, -10,  -9,  -8,  -7 };
+const int pawnBackwardEg[8] = { -8,  -9, -10, -12, -12, -10,  -9,  -8 };
+const int pawnIsolatedMg[8] = { -8,  -9, -10, -12, -12, -10,  -9,  -8 };
+const int pawnIsolatedEg[8] = {-16, -18, -20, -22, -22, -20, -18, -16 };
+
 const int pstKnightMg[64] = 
 {
    -50, -40, -30, -25, -25, -30, -40, -50,
@@ -87,54 +93,6 @@ const int pstKingMg[64] =
    -20, -10, -30, -50, -50, -30, -10, -20,
    -30, -20, -40, -60, -60, -40, -20, -30,
    -40, -30, -50, -70, -70, -50, -30, -40
-};
-
-const int pstIsolatedMg[64] = 
-{
-     0,   0,   0,   0,   0,   0,   0,   0,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-     0,   0,   0,   0,   0,   0,   0,   0
-};
-
-const int pstIsolatedEg[64] = 
-{
-     0,   0,   0,   0,   0,   0,   0,   0,
-   -16, -18, -20, -22, -22, -20, -18, -16,
-   -16, -18, -20, -22, -22, -20, -18, -16,
-   -16, -18, -20, -22, -22, -20, -18, -16,
-   -16, -18, -20, -22, -22, -20, -18, -16,
-   -16, -18, -20, -22, -22, -20, -18, -16,
-   -16, -18, -20, -22, -22, -20, -18, -16,
-     0,   0,   0,   0,   0,   0,   0,   0
-};
-
-const int pstBackwardMg[64] = 
-{
-     0,   0,   0,   0,   0,   0,   0,   0,
-    -7,  -8,  -9, -10, -10,  -9,  -8,  -7,
-    -7,  -8,  -9, -10, -10,  -9,  -8,  -7,
-    -7,  -8,  -9, -10, -10,  -9,  -8,  -7,
-    -7,  -8,  -9, -10, -10,  -9,  -8,  -7,
-    -7,  -8,  -9, -10, -10,  -9,  -8,  -7,
-    -7,  -8,  -9, -10, -10,  -9,  -8,  -7,
-	 0,   0,   0,   0,   0,   0,   0,   0
-};
-
-const int pstBackwardEg[64] = 
-{
-     0,   0,   0,   0,   0,   0,   0,   0,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-    -8,  -9, -10, -12, -12, -10,  -9,  -8,
-     0,   0,   0,   0,   0,   0,   0,   0
 };
 
 const int pstKnightOutpost[64] = 
@@ -204,16 +162,16 @@ void sData::InitPstValues(void)
 	  pstEg[side][Q][REL_SQ(sq,side)] = pstQueenEg[sq];
 	  pstEg[side][K][REL_SQ(sq,side)] = 12 * ( biased[Rank(sq)] + biased[File(sq)] );
 
-	  pawnProperty[PHALANX]  [MG] [side] [REL_SQ(sq,side)]  = GetPhalanxPstMg(sq);
-	  pawnProperty[PHALANX]  [EG] [side] [REL_SQ(sq,side)]  = 0; // on modifying please uncomment relevant line in eval_pawns.c
-	  pawnProperty[PASSED]   [MG] [side] [REL_SQ(sq,side)]  = passerMg * pawnAdv[Rank(sq)];
-	  pawnProperty[PASSED]   [EG] [side] [REL_SQ(sq,side)]  = passerEg * pawnAdv[Rank(sq)];
-	  pawnProperty[CANDIDATE][MG] [side] [REL_SQ(sq,side)]  = ( passerMg * pawnAdv[Rank(sq)] ) / 3;
-	  pawnProperty[CANDIDATE][EG] [side] [REL_SQ(sq,side)]  = ( passerEg * pawnAdv[Rank(sq)] ) / 3;
-	  pawnProperty[ISOLATED] [MG] [side] [REL_SQ(sq,side)] = pstIsolatedMg[sq];
-	  pawnProperty[ISOLATED] [EG] [side] [REL_SQ(sq,side)] = pstIsolatedEg[sq];
-	  pawnProperty[BACKWARD] [MG] [side] [REL_SQ(sq,side)] = pstBackwardMg[sq];
-	  pawnProperty[BACKWARD] [EG] [side] [REL_SQ(sq,side)] = pstBackwardEg[sq];
+	  pawnProperty[PHALANX]  [MG] [side] [REL_SQ(sq,side)] = GetPhalanxPstMg(sq);
+	  pawnProperty[PHALANX]  [EG] [side] [REL_SQ(sq,side)] = 0; // on modifying please uncomment relevant line in eval_pawns.c
+	  pawnProperty[PASSED]   [MG] [side] [REL_SQ(sq,side)] = passerMg * pawnAdv[Rank(sq)];
+	  pawnProperty[PASSED]   [EG] [side] [REL_SQ(sq,side)] = passerEg * pawnAdv[Rank(sq)];
+	  pawnProperty[CANDIDATE][MG] [side] [REL_SQ(sq,side)] = ( passerMg * pawnAdv[Rank(sq)] ) / 3;
+	  pawnProperty[CANDIDATE][EG] [side] [REL_SQ(sq,side)] = ( passerEg * pawnAdv[Rank(sq)] ) / 3;
+	  pawnProperty[ISOLATED] [MG] [side] [REL_SQ(sq,side)] = pawnIsolatedMg[File(sq)];
+	  pawnProperty[ISOLATED] [EG] [side] [REL_SQ(sq,side)] = pawnIsolatedEg[File(sq)];
+	  pawnProperty[BACKWARD] [MG] [side] [REL_SQ(sq,side)] = pawnBackwardMg[File(sq)];
+	  pawnProperty[BACKWARD] [EG] [side] [REL_SQ(sq,side)] = pawnBackwardEg[File(sq)];
 
 	  outpost[side][N][REL_SQ(sq,side)] = pstKnightOutpost[sq];
 	  outpost[side][B][REL_SQ(sq,side)] = pstBishopOutpost[sq];
