@@ -99,7 +99,7 @@ public:
  void InitEvalVars(void);
  void InitBadBishop(void);
  void InitAsymmetric(int side);
- void SetBadBishopMask(int bishSq, int pawnSq);
+ void SetBadBishopMask(int bishSq, int pawnSq, int val);
  int GetPawnMgPst(int sq);
  int GetBishopEgPst(int sq);
  int GetQueenMgPst(int sq);

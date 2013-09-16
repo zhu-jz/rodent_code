@@ -131,18 +131,6 @@ const int pstRookOutpost[64] =
      0,   0,   0,   0,   0,   0,   0,   0
 };
 
-const int pstBadBishop[64] =  
-{
-	 0,   0, -20,   0,   0, -20,   0,   0, 
-   -10,  -5,  -5,  -5,  -5,  -5,  -5, -10,
-    -5, -10,  -5,  -5,  -5,  -5, -10,  -5,
-     0,   0,  -3,   0,   0,  -3,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0,
-     0,   0,   0,   0,   0,   0,   0,   0
-};
-
 void sData::InitPstValues(void)
 {
   for (int sq = 0; sq < 64; sq++) {  
@@ -176,7 +164,6 @@ void sData::InitPstValues(void)
 	  outpost[side][N][REL_SQ(sq,side)] = pstKnightOutpost[sq];
 	  outpost[side][B][REL_SQ(sq,side)] = pstBishopOutpost[sq];
 	  outpost[side][R][REL_SQ(sq,side)]   = pstRookOutpost[sq];
-	  badBishopPenalty[side] [REL_SQ(sq,side)] = pstBadBishop[sq];
     }
   }
 }

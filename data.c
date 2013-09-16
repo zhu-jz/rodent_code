@@ -72,35 +72,38 @@ void sData::InitBadBishop(void)
 	 for (int side = 0; side < 2; side++) {
 	    for (int i = 0; i < 64; i++) {  
 			 bbBadBishopMasks [side][i] = 0ULL;
+			 badBishopPenalty[side][i] = 0;
 		 }
 	 }
 
-	 SetBadBishopMask(F1, E2);
-	 SetBadBishopMask(C1, D2);
-	 SetBadBishopMask(A2, B3); SetBadBishopMask(A2, C4);
-	 SetBadBishopMask(B2, C3);
-	 SetBadBishopMask(C2, D3); SetBadBishopMask(C2, E4);
-	 SetBadBishopMask(D2, E3);
-	 SetBadBishopMask(E2, D3);
-	 SetBadBishopMask(F2, E3); SetBadBishopMask(F2, D4);
-	 SetBadBishopMask(G2, F3);
-	 SetBadBishopMask(H2, G3); SetBadBishopMask(H2, F4);
-	 SetBadBishopMask(A3, B4); SetBadBishopMask(A3, C5);
-	 SetBadBishopMask(B3, C4); SetBadBishopMask(B3, D5);
-	 SetBadBishopMask(C3, D4);
-	 SetBadBishopMask(D3, E4);
-	 SetBadBishopMask(E3, D4);
-	 SetBadBishopMask(F3, E4);
-	 SetBadBishopMask(G3, F4); SetBadBishopMask(G3, E5);
-	 SetBadBishopMask(H3, G4); SetBadBishopMask(H3, F5);
-	 SetBadBishopMask(C4, D5);
-	 SetBadBishopMask(F4, E5);
+	 SetBadBishopMask(F1, E2, -20);
+	 SetBadBishopMask(C1, D2, -20);
+	 SetBadBishopMask(A2, B3, -10); SetBadBishopMask(A2, C4, -10);
+	 SetBadBishopMask(B2, C3, -5);
+	 SetBadBishopMask(C2, D3, -5);  SetBadBishopMask(C2, E4, -5);
+	 SetBadBishopMask(D2, E3, -5);
+	 SetBadBishopMask(E2, D3, -5);
+	 SetBadBishopMask(F2, E3, -5);  SetBadBishopMask(F2, D4, -5);
+	 SetBadBishopMask(G2, F3, -5);
+	 SetBadBishopMask(H2, G3, -10); SetBadBishopMask(H2, F4, -10);
+	 SetBadBishopMask(A3, B4, -5);  SetBadBishopMask(A3, C5, -5);
+	 SetBadBishopMask(B3, C4, -10); SetBadBishopMask(B3, D5, -10);
+	 SetBadBishopMask(C3, D4, -5);
+	 SetBadBishopMask(D3, E4, -5);
+	 SetBadBishopMask(E3, D4, -5);
+	 SetBadBishopMask(F3, E4, -5);
+	 SetBadBishopMask(G3, F4, -10); SetBadBishopMask(G3, E5, -10);
+	 SetBadBishopMask(H3, G4, -5);  SetBadBishopMask(H3, F5, -5);
+	 SetBadBishopMask(C4, D5, -3);
+	 SetBadBishopMask(F4, E5, -3);
 }
 
-void sData::SetBadBishopMask(int bishSq, int pawnSq)
+void sData::SetBadBishopMask(int bishSq, int pawnSq, int val)
 {
      bbBadBishopMasks[WHITE][bishSq] ^= SqBb(pawnSq);
 	 bbBadBishopMasks[BLACK][ REL_SQ(bishSq,BLACK) ] ^= RelSqBb(pawnSq, BLACK);
+	 badBishopPenalty[WHITE][bishSq] = val;
+	 badBishopPenalty[BLACK][REL_SQ(bishSq,BLACK)] = val;
 }
 
 void sData::InitSinglePiece(int pc, int mat, int del, int phase) 
