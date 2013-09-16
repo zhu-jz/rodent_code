@@ -33,7 +33,7 @@ const int pawnAdv[8]  = { 0,  1, 1, 3, 5, 8, 12,  0};
 const int pawnBackwardMg[8] = { -7,  -8,  -9, -10, -10,  -9,  -8,  -7 };
 const int pawnBackwardEg[8] = { -8,  -9, -10, -12, -12, -10,  -9,  -8 };
 const int pawnIsolatedMg[8] = { -8,  -9, -10, -12, -12, -10,  -9,  -8 };
-const int pawnIsolatedEg[8] = {-16, -18, -20, -22, -22, -20, -18, -16 };
+const int pawnIsolatedEg[8] = {-16, -18, -20, -24, -24, -20, -18, -16 };
 
 const int pstKnightMg[64] = 
 {
@@ -187,7 +187,6 @@ int sData::GetPawnMgPst(int sq)
 	if ( sq == D4 || sq == E4 ) return 25;
 	if ( sq == D6 || sq == E6 ) return 5;
 	if ( sq == D7 || sq == E7 ) return 5;
-
     return neutral[File(sq)] * 5;
 }
 
