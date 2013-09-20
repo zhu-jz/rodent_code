@@ -63,14 +63,15 @@ private:
 	int SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int *pv);
 	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv);
 	int SetFutilityMargin(int depth);
-	int SetLmrDepth(int move, int movesTried);
 	int SetNullDepth(int depth);
 	
 	int RecognizeDraw(sPosition *p);
 	int nodes;
-	int rootDepth;
+	int rootDepth; 
+	int reductionSize[MAX_PLY * ONE_PLY][MAX_MOVES];
 	sFlatMoveList rootList;
 public:
+	void Init(void);
 	int bestMove;
 	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int isRoot, int *pv);
 	int QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int beta, int isRoot, int *pv); 

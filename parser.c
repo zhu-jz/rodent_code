@@ -176,10 +176,6 @@ void sParser::SetOption(char *ptr)
 	Data.ownAttack = atoi(value);
   } else if (strcmp(name, "OppAttack") == 0) {
 	Data.oppAttack = atoi(value);
-  } else if (strcmp(name, "LMRbase") == 0) {
-	Data.moveIsLate = atoi(value);
-  } else if (strcmp(name, "LMRstep") == 0) {
-	Data.lmrStep = atoi(value);
   } else if (strcmp(name, "LMRHistLimit") == 0) {
 	Data.lmrHistLimit = atoi(value);
   } else  if (strcmp(name, "FutilityDepth") == 0) {
@@ -230,8 +226,6 @@ void sParser::PrintUciOptions()
 	printf("option name OppMobility type spin default %d min 0 max 300\n", Data.oppMobility);
 	printf("option name OwnAttack type spin default %d min 0 max 300\n", Data.ownAttack);
 	printf("option name OppAttack type spin default %d min 0 max 300\n", Data.oppAttack);
-	printf("option name LMRbase type spin default %d min 1 max 100\n", Data.moveIsLate);
-	printf("option name LMRstep type spin default %d min 0 max 100\n", Data.lmrStep);
 	printf("option name LMRHistLimit type spin default %d min 0 max 100\n", Data.lmrHistLimit);
 	printf("option name FutilityDepth type spin default %d min 0 max 8\n", Data.futilityDepth);
 	printf("option name FutilityBase type spin default %d min 0 max 1000\n", Data.futilityBase);

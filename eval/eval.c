@@ -168,7 +168,7 @@ int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side)
 {
 	// values taken from Fruit
 	if ( !bbOwnPawns ) return -36;
-	if ( bbOwnPawns & rank2[side] ) return    0;
+	if ( bbOwnPawns & rank2[side] ) return    2;  // scoeres about the same as original 0
 	if ( bbOwnPawns & rank3[side] ) return  -11;
 	if ( bbOwnPawns & rank4[side] ) return  -20;
 	if ( bbOwnPawns & rank5[side] ) return  -27;

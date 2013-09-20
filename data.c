@@ -163,8 +163,6 @@ void sData::InitSearchData(void)
 	 useNull          = 1;
 	 minimalNullDepth = 2 * ONE_PLY; // TRY 3 * ONE_PLY
 	 minimalLmrDepth  = 2 * ONE_PLY;
-	 moveIsLate       = 6;
-	 lmrStep          = 3; 
 	 lmrHistLimit     = 60;      // 70 is better in very fast games (10s per game)
 	 futilityBase     = 100;
 	 futilityStep     = 20;

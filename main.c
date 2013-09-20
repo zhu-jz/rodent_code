@@ -55,6 +55,7 @@ int main()
   History.OnNewGame();
   Learner.Init("lrn.dat");
   Book.Init(&p);
+  Searcher.Init();
   Parser.UciLoop();
   Learner.Save("lrn.dat");
   return 0;

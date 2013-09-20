@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "../rodent.h"
 #include "../data.h"
 #include "../bitboard/bitboard.h"
@@ -27,9 +28,17 @@
 #include "../hist.h"
 #include "../parser.h"
 #include "../learn.h"
-#include "../book.h"
+#include "../book.h"e
 #include "search.h"
 #include "../eval/eval.h"
+
+void sSearcher::Init(void)
+{
+	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
+		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
+           reductionSize[depth][moves] = 4*(0.33 + log((double) (depth/4)) * log((double) (moves)) / 2.25);
+		}
+}
 
 void sSearcher::Think(sPosition *p, int *pv)
 {
@@ -496,13 +505,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 // LATE MOVE REDUCTION
 	 if  ( flagCanReduce
      &&  Data.minimalLmrDepth           // we have some depth left
-	 &&  movesTried > Data.moveIsLate   // it is sufficiently down the move list
+	 &&  movesTried > 3                 // we're sufficiently down the move list
      &&  !InCheck(p)                    // we're not giving check
 	 &&  History.MoveIsBad(move)        // current move has bad history score
 	 ) {
 		 // big reduction of quiet moves (hash and killer moves excluded)
 		 if ( IsMoveOrdinary(flagMoveType) ) {                 
-		    depthChange -= ( SetLmrDepth(move,movesTried) );
+		    depthChange -= reductionSize[depth][movesTried];
 		    History.OnMoveReduced(move);
  	        flagIsReduced = 1;
 		 }
@@ -581,19 +590,6 @@ int sSearcher::SetNullDepth(int depth)
 int sSearcher::SetFutilityMargin(int depth) 
 {
 	return Data.futilityBase + depth * Data.futilityStep;
-}
-
-int sSearcher::SetLmrDepth(int move, int movesTried) 
-{
-    int depthChange = ONE_PLY + QUARTER_PLY;
-
-	// reductions for even later moves get fractionally bigger
-	depthChange += QUARTER_PLY * (movesTried > Data.moveIsLate + Data.lmrStep);
-	depthChange += QUARTER_PLY * (movesTried > Data.moveIsLate + 2*Data.lmrStep);
-	depthChange += QUARTER_PLY * (movesTried > Data.moveIsLate + 3*Data.lmrStep);
-	depthChange += QUARTER_PLY * (movesTried > Data.moveIsLate + 4*Data.lmrStep);
-
-    return depthChange;
 }
 
 int sSearcher::IsRepetition(sPosition *p)

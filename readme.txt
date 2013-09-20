@@ -85,14 +85,14 @@ IV. The most important changes (comparing with Sungorus 1.4) include:
 - position learning
 - weaker levels of play
 
-V. SEARCH (featuring "sliding LMR" proof of concept)
+V. SEARCH
 
 - fail soft alpha beta with principal variation search (from Sungorus)
 - transposition table (from Sungorus)
 - null move with variable reduction depth (modified)
   and with threat detection in order to sort evasion higher (modified)
 - futility pruning (added)
-- "sliding" late move reduction (added)
+- late move reduction from Stockfish / Toga II 3.0 (added)
 - late move pruning (added)
 - eval pruning (a.k.a. static null move)
 - internal iterative deepening in pv nodes
@@ -102,33 +102,6 @@ from Sungorus. It has been enhanced in several standard ways - by adding
 futility pruning, internal iterative deepening in pv nodes, check extension,
 Stockfish-like null move pruning and using capture threats uncovered by 
 null move for better move sorting.
-
-The only non-standard solution is what I call "sliding Late Move Reduction".
-Since Rodent from the very beginning uses fractional plies, it made sense
-to check whether smoothly scaling reduction can help. And it certainly did.
-
-It works as follows. Instead of a fixed one ply reduction, Rodent increases
-reduction depth by 1/4 ply every few moves. The first reduction occurs a bit 
-later than under normal scheme, but as the search proceeds, accumulated 
-quarter ply reductions compensate for it. This kind of reduction has a chance 
-of being less detrimental to the tactical ability of the engine. After all, 
-it is geared towards reducing more deeply when the engine encounters a series 
-of moves that have low probability of changing the node value (move ordering, 
-especially using history heuristic, is a measure of that probability).
-
-Imagine a tactical shot requiring two quiet moves, the rest being forcing 
-and therefore exempt from reduction. Both are sorted around move 20. Under 
-normal scheme both would get reduced, the new one reduces just one. Instead, 
-it trims the lines where many moves are sorted down the list. Finding really 
-deep combintations, full of quiet moves, is equally difficult under both 
-schemes. However, probability of such a combination is  
-
-P(one_move_cuts) * P(next_move_cuts) ... * P(last_required_move_cuts) 
-
-IIRC (I've never been much into maths, much less into the English math 
-terminology) the right word for this kind of function is "exponential". 
-If we manage to keep the growth of a reduction factor just a bit slower, 
-we'll have a beautifully scalable reduction algorithm.
 
 VI. EVALUATION
 
@@ -148,18 +121,15 @@ VI. EVALUATION
 
 Creating version 0.13 I looked for more aggressive King safety function,
 using Rebel-like additive table approach. I also wanted my function to 
-ne initialized at startup using some relatively simple mathematical formula.
+be initialized at startup using some relatively simple mathematical formula.
 After some experiments with logistic function, I settled for an addition
-of logarithmic and linear function. I'd like to express my gratitude
-to Agnieszka Ziomek for discussing these mathematical matters with a noob
-like me.
+of logarithmic and linear function.
 
 Mobility evaluation is sometimes inexact due to the concept of "transparent 
 pieces". For example, own queen is considered transparent for the bishop. 
 This might cause occasional error in evaluating whether a bishop can check 
 enemy king, or force the engine to rely on search in order to avoid certain
-blockages. However, tests has shown that this solution is better than more
-exact mobility calculation.
+blockages. However, this solution passed the tests.
 
 VII. OPENING BOOK
 

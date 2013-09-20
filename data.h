@@ -62,8 +62,6 @@ public:
  int useNull;          // shall we use null move?
  int minimalNullDepth;
  int minimalLmrDepth;
- int moveIsLate;       // how many moves must be tried before considering next one "late"?
- int lmrStep;          // how many moves beyond moveIsLate we decide to increase reduction by 1/4 ply?
  int lmrHistLimit;     // what value of history counter prevents lmr?
  int futilityBase;     // initial value of futility margin
  int futilityStep;     // margin is incremented by this value for every 1/4 ply
