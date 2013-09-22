@@ -28,7 +28,7 @@
 #include "../hist.h"
 #include "../parser.h"
 #include "../learn.h"
-#include "../book.h"e
+#include "../book.h"
 #include "search.h"
 #include "../eval/eval.h"
 
@@ -510,17 +510,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 &&  History.MoveIsBad(move)        // current move has bad history score
 	 ) {
 		 // big reduction of quiet moves (hash and killer moves excluded)
-		 if ( IsMoveOrdinary(flagMoveType) ) {                 
+		 if ( IsMoveOrdinary(flagMoveType) || flagMoveType == FLAG_BAD_CAPTURE) {                 
 		    depthChange -= reductionSize[depth][movesTried];
 		    History.OnMoveReduced(move);
  	        flagIsReduced = 1;
 		 }
-		
-		 // marginal reduction of bad captures (somehow history restriction from main loop helps here)
-		 if (flagMoveType == FLAG_BAD_CAPTURE) {
-            depthChange -= HALF_PLY;
- 	        flagIsReduced = 1;
-	     }
 	 } // end of late move reduction code
 
 	 newDepth = depth - ONE_PLY + depthChange; // determine new depth
