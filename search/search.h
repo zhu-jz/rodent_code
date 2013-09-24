@@ -60,7 +60,7 @@ private:
 	int IsMoveOrdinary(int flagMoveType);
 	int AvoidReduction(int move, int flagMoveType);
 	int Perft(sPosition *p, int ply, int depth);
-	int SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int *pv);
+	int SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv);
 	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv);
 	int SetFutilityMargin(int depth);
 	int SetNullDepth(int depth);

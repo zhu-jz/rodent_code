@@ -36,7 +36,7 @@ void sSearcher::Init(void)
 {
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
-           reductionSize[depth][moves] = 4*(0.33 + log((double) (depth/4)) * log((double) (moves)) / 2.25);
+           reductionSize[depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // Stockfish formula
 		}
 }
 
@@ -97,7 +97,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 	else                          { alpha = val-delta; beta = val+delta; }
     
 	// first use aspiration window around the value from the last completed depth
-	curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, pv);
+	curVal = SearchRoot(p, alpha, beta, rootDepth, pv);
 	bestMove = pv[0];
 	if (flagAbortSearch) break;
 
@@ -110,13 +110,13 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 		if (curVal >= beta)  beta  = val +3*delta;
 		if (curVal <= alpha) alpha = val -3*delta;
 
-		curVal = SearchRoot(p, 0, alpha, beta, rootDepth, PV_NODE, pv);
+		curVal = SearchRoot(p, alpha, beta, rootDepth, pv);
 		bestMove = pv[0];
         if (flagAbortSearch) break;
 
 		// the second window
 		if (curVal >= beta || curVal <= alpha) 
-            curVal = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, pv);
+            curVal = SearchRoot(p, -INF, INF, rootDepth, pv);
 		    bestMove = pv[0];
         if (flagAbortSearch) break;
 	}
@@ -155,7 +155,7 @@ int sSearcher::VerifyValue(sPosition *p, int depth, int move)
   if (move != 0) Manipulator.DoMove(p, move, undoData);    
 
   for (rootDepth = ONE_PLY; rootDepth <= depth * ONE_PLY; rootDepth+=ONE_PLY) {
-      val = SearchRoot(p, 0, -INF, INF, rootDepth, PV_NODE, pv);
+      val = SearchRoot(p, -INF, INF, rootDepth, pv);
 	  bestMove = pv[0];
   }
 
@@ -168,7 +168,7 @@ int sSearcher::VerifyValue(sPosition *p, int depth, int move)
   return val;
 }
 
-int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int *pv)
+int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 {
   int best,                     // best value found at this node
 	  score,                    // score returned by a search started in this node
@@ -176,7 +176,6 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 	  depthChange,              // extension/reduction value
 	  newDepth,                 // depth of a new search started in this node
 	  newPv[MAX_PLY];           // new main line
-  sSelector Selector;           // an object responsible for maintaining move list and picking moves 
     UNDO  undoData[1];          // data required to undo a move
 
   // NODE INITIALIZATION
@@ -185,7 +184,7 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 
   // at root we keep track whether a move has been found; if not, we let the engine
   // search for a bit longer, as this might indicate a fail-high/fail-low
-  if (!ply && nodeType == PV_NODE) Timer.SetData(FLAG_NO_FIRST_MOVE, 1);
+  Timer.SetData(FLAG_NO_FIRST_MOVE, 1);
 
   // CHECK EXTENSION (no QS entry later as SearchRoot is called with depth >= 1 ply)
   if (flagInCheck) depth += ONE_PLY;
@@ -195,40 +194,35 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
   
   // EARLY EXIT / DRAW CONDITIONS
   if ( flagAbortSearch )                         return 0;
-  if ( IsRepetition(p) && ply )                  return 0;
+  if ( IsRepetition(p) && 0 )                    return 0;
   if ( DrawBy50Moves(p) )                        return 0;
-  if ( !flagInCheck && ply && RecognizeDraw(p) ) return 0;
+  if ( !flagInCheck && 0   && RecognizeDraw(p) ) return 0;
   
-  if (ply) *pv = 0;
+  if (0) *pv = 0;
   move = 0;
 
   // MATE DISTANCE PRUNING
-   alpha = Max(-MATE+ply, alpha);
-   beta  = Min( MATE-ply, beta);
+   alpha = Max(-MATE, alpha);
+   beta  = Min( MATE, beta);
    if (alpha >= beta)
        return alpha;
 
   // TRANSPOSITION TABLE READ
   // at root we only get a move for sorting purposes
 
-  TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply);
-  
-  // safeguard against hitting max ply limit
-  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
+  TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, 0);
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
-  if (nodeType == PV_NODE && !move && depth >= 4*ONE_PLY && !flagInCheck ) {
-	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, newPv);
+  if (!move && depth >= 4*ONE_PLY && !flagInCheck ) {
+	  Search(p, 0, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, newPv);
 	  TransTable.RetrieveMove(p->hashKey, &move);
   }
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
   rootList.ClearUsed(bestMove);
-  Selector.InitMoveList(p, move, ply);
 
-  // LOOP THROUGH THE MOVE LIST 
-  // (note that rootList supplies legal moves only)
+  // LOOP THROUGH ROOT MOVE LIST (which supplies legal moves only)
   while( move = rootList.GetNextMove() ) {
   
 	 // MAKE A MOVE
@@ -246,17 +240,17 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 
 	 // PRINCIPAL VARIATION SEARCH
 	 if (best == -INF )
-       score =   -Search(p, ply+1, -beta,    -alpha, newDepth, NEW_NODE(nodeType), NO_NULL, move, newPv);
+       score =   -Search(p, 1, -beta,    -alpha, newDepth, NEW_NODE(PV_NODE), NO_NULL, move, newPv);
      else {
-       score =   -Search(p, ply+1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, newPv);
+       score =   -Search(p, 1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, newPv);
        if (!flagAbortSearch && score > alpha && score < beta)
-         score = -Search(p, ply+1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, newPv);
+         score = -Search(p, 1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, newPv);
      }
 
      Manipulator.UndoMove(p, move, undoData);
 	 rootList.ScoreLastMove(move, nodesPerBranch);
 
-	 if (!ply && nodeType == PV_NODE) Timer.SetData(FLAG_NO_FIRST_MOVE, 0);
+	 Timer.SetData(FLAG_NO_FIRST_MOVE, 0);
 
 	 if (flagAbortSearch) return 0; // timeout, "stop" command or mispredicted ponder move
 
@@ -265,8 +259,8 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 		 if (movesTried > 1 && depth > 2*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
 		 IncStat(FAIL_HIGH);
 		 if (movesTried == 1) IncStat(FAIL_FIRST);
-         History.OnGoodMove(p, move, depth / ONE_PLY, ply);
-         TransTable.Store(p->hashKey, move, score, LOWER, depth, ply);
+         History.OnGoodMove(p, move, depth / ONE_PLY, 0);
+         TransTable.Store(p->hashKey, move, score, LOWER, depth, 0);
          return score;
      }
 
@@ -276,21 +270,21 @@ int sSearcher::SearchRoot(sPosition *p, int ply, int alpha, int beta, int depth,
 		 if (movesTried > 1 && depth > 2*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
          if (score > alpha) {
             alpha = score;
-            if (nodeType == PV_NODE) BuildPv(pv, newPv, move);
+            BuildPv(pv, newPv, move);
 		    DisplayPv(score, pv);
          }
       }
    }
   
    // RETURN CORRECT CHECKMATE/STALEMATE SCORE
-   if (best == -INF) return flagInCheck ? -MATE + ply : 0;
+   if (best == -INF) return flagInCheck ? -MATE : 0;
 
    // SAVE SEARCH RESULT IN TRANSPOSITION TABLE
    if (*pv) {
- 	 History.OnGoodMove(p, *pv, depth / ONE_PLY, ply);
-     TransTable.Store(p->hashKey, *pv, best, EXACT, depth, ply);
+ 	 History.OnGoodMove(p, *pv, depth / ONE_PLY, 0);
+     TransTable.Store(p->hashKey, *pv, best, EXACT, depth, 0);
    } else
-     TransTable.Store(p->hashKey, 0, best, UPPER, depth, ply);
+     TransTable.Store(p->hashKey, 0, best, UPPER, depth, 0);
 
    return best;
 }
