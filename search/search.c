@@ -503,8 +503,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      &&  !InCheck(p)                    // we're not giving check
 	 &&  History.MoveIsBad(move)        // current move has bad history score
 	 ) {
-		 // big reduction of quiet moves (hash and killer moves excluded)
-		 if ( IsMoveOrdinary(flagMoveType) || flagMoveType == FLAG_BAD_CAPTURE) {                 
+		 if ( IsMoveOrdinary(flagMoveType) /*|| flagMoveType == FLAG_BAD_CAPTURE*/) {
 		    depthChange -= reductionSize[depth][movesTried];
 		    History.OnMoveReduced(move);
  	        flagIsReduced = 1;
