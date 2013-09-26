@@ -421,15 +421,15 @@ void sParser::PrintEngineHeader()
 void sParser::PrintBoard(sPosition *p)
 {
   printf("--------------------------------------------\n");
-  for (int i = 0; i < 64; i++) {
-	  if      (p->bbTp[P] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("P "); else printf("p "); }
-	  else if (p->bbTp[N] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("N "); else printf("n "); }
-	  else if (p->bbTp[B] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("B "); else printf("b "); }
-	  else if (p->bbTp[R] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("R "); else printf("r "); }
-	  else if (p->bbTp[Q] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("Q "); else printf("q "); }
-	  else if (p->bbTp[K] & RelSqBb(i,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(i,BLACK) ) printf("K "); else printf("k "); }
+  for (int sq = 0; sq < 64; sq++) {
+	  if      (p->bbTp[P] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("P "); else printf("p "); }
+	  else if (p->bbTp[N] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("N "); else printf("n "); }
+	  else if (p->bbTp[B] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("B "); else printf("b "); }
+	  else if (p->bbTp[R] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("R "); else printf("r "); }
+	  else if (p->bbTp[Q] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("Q "); else printf("q "); }
+	  else if (p->bbTp[K] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("K "); else printf("k "); }
 	  else printf(". ");
-	  if ( (i+1) % 8 == 0) printf(" %d\n", 9 - ((i+1) / 8) );
+	  if ( (sq+1) % 8 == 0) printf(" %d\n", 9 - ((sq+1) / 8) );
   }
   printf("\na b c d e f g h\n");
   printf("Incremental  hash: %llu pawn: %llu \n", p->hashKey, p->pawnKey);

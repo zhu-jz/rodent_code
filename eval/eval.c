@@ -32,6 +32,8 @@ const U64 rank6[2] = {bbRANK_6, bbRANK_3};
 const U64 rank7[2] = {bbRANK_7, bbRANK_2};
 const U64 rank8[2] = {bbRANK_8, bbRANK_1};
 
+const int attMult[15] = {0, 0, 4, 10, 14, 26, 42, 52, 64, 70, 76, 82, 86, 92, 100};
+
 void sEvaluator::InitStatic(void) 
 {
      mgScore            = 0;   egScore            = 0;  // clear midgame/endgame score component
@@ -43,6 +45,8 @@ void sEvaluator::InitDynamic(sPosition *p)
 {
      attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
 	 attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear attack scores
+	 attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
+	 attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear attack scores
 	 mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
 	 egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
 	 mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
@@ -159,16 +163,16 @@ void sEvaluator::ScoreK(sPosition *p, int side)
 
   mgScore += result * sideMult[side];                 // add shield score to midgame score
 
-  if (attCount[side] > 255) attCount[side] = 255;     // normalize attack data for table size
-  if (attNumber[side] < 2)  attCount[side] = 0;       // avoid evaluating attack by single piece
-  attScore[side] = Data.attackBonus[attCount[side]];  // read attack score from the table
+  if (attWood[side] > 14) attWood[side] = 14;     // normalize attack data for table size
+  if (attNumber[side] > 1)  attWood[side] += 1;       // avoid evaluating attack by single piece
+  attScore[side] = (attCount[side] * attMult[attWood[side]]) / 100;  // read attack score from the table
 }
 
 int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side)
 {
 	// values taken from Fruit
 	if ( !bbOwnPawns ) return -36;
-	if ( bbOwnPawns & rank2[side] ) return    2;  // scoeres about the same as original 0
+	if ( bbOwnPawns & rank2[side] ) return    2;  // scores about the same as original 0
 	if ( bbOwnPawns & rank3[side] ) return  -11;
 	if ( bbOwnPawns & rank4[side] ) return  -20;
 	if ( bbOwnPawns & rank5[side] ) return  -27;

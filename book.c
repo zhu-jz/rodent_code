@@ -247,8 +247,8 @@ int sBook::PrintMissingMoves(sPosition *p) {
   return isProblem;
 }
 
-void sBook::AddMoveToGuideBook(U64 hashKey, int move, int val) {
-
+void sBook::AddMoveToGuideBook(U64 hashKey, int move, int val) 
+{
     // if move is already in the book, just change its frequency 
 	for (int i = 0; i < nOfGuideRecords; i++ ) {
          if ( guideBook[i].hash == hashKey 
@@ -265,8 +265,8 @@ void sBook::AddMoveToGuideBook(U64 hashKey, int move, int val) {
 	 nOfGuideRecords++;
 }
 
-void sBook::AddMoveToMainBook(U64 hashKey, int move, int val) {
-
+void sBook::AddMoveToMainBook(U64 hashKey, int move, int val) 
+{
     // if move is already in the book, just change its frequency 
 	for (int i = 0; i < nOfRecords; i++ ) 
 	{
@@ -389,10 +389,8 @@ int sBook::ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedCol
     FILE *bookFile; 
 	char line[256];
 
-    // exit if book file doesn't exist
-	if ( (bookFile = fopen(fileName, "r")) == NULL ) return 0;
-
-    nOfGuideRecords = 0; // clear any preexisting guide book
+	if ( (bookFile = fopen(fileName, "r")) == NULL ) return 0;  // exit if book file doesn't exist
+    nOfGuideRecords = 0;                                        // clear any preexisting guide book
 
     // process book file line by line 
 	while ( fgets(line, 250, bookFile) ) {

@@ -55,7 +55,6 @@ public:
  int rookSeventhEg;
  int pawnIsolatedOnOpen;
  int pawnBackwardOnOpen;
- int attackBonus[256];
 
  // search data
  int aspiration;       // size of aspiration window
@@ -90,7 +89,6 @@ public:
  void InitSinglePiece(int pc, int mat, int del, int phase);
  void InitPstValues(void);
  void InitMobBonus(void);
- void InitAttackBonus(void);
  void InitCastleMask(void);
  void InitSearchData(void);
  void InitDistanceBonus(void);

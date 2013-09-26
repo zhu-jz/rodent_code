@@ -44,7 +44,6 @@ void Init(void)
   Data.InitMaterialValues();
   Data.InitPstValues();
   Data.InitMobBonus();
-  Data.InitAttackBonus();
   Data.InitCastleMask();
   Data.InitSearchData();
   Data.InitDistanceBonus();

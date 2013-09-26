@@ -29,7 +29,7 @@ void sEvaluator::EvalPawns(sPosition *p)
   int pawnHash = p->pawnKey % PAWN_HASH_SIZE;
 
   // try reading score from pawn hashtable
-  if ( PawnTT[pawnHash].pawnKey == p->pawnKey ) {
+  if ( PawnTT[pawnHash].pawnKey == p->pawnKey) {
 	  mgScore += PawnTT[pawnHash].mgPawns;
 	  egScore += PawnTT[pawnHash].egPawns;
   }

@@ -46,6 +46,7 @@ private:
   U64 bbAllAttacks[2];     // squares attacked by a side
   int attCount[2];         // attack counter based on square control
   int attNumber[2];        // no. of pieces participating in the attack
+  int attWood[2];
   int mgFact,  egFact;     // material-driven scaling factors
   int mgScore, egScore;    // partial midgame and endgame scores (to be scaled)
 
@@ -54,7 +55,7 @@ private:
   int GetMaterialScore(sPosition *p);
   void AddMobility(int pc, int side, int cnt);
   void AddMisc(int side, int mg, int eg);
-  void AddPieceAttack(int side, int val);
+  void AddPieceAttack(int side, int pc, int cnt);
   void AddPawnProperty(int pawnProperty, int side, int sq);
   int CheckmateHelper(sPosition *p);
   void InitStatic(void);            

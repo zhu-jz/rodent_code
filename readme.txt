@@ -61,8 +61,7 @@ III. Project goals:
    a search function that can be read at one sitting (thank You,
    Pablo Vazquez, it would not be possible without Your work!)
    
-2. Providing a simple framework for testing new ideas and showcasing
-   them (I'm planning a short paper on a "sliding LMR" concept) 
+2. Providing a simple framework for testing and showcasing new ideas
    
 3. Providing an engine that is fun to play against, with adjustable
    strength and different personalities.
@@ -110,20 +109,14 @@ VI. EVALUATION
 - Fruit-like weak pawns eval
 - passed pawns eval
 - outposts (B, N, even R), further bonus if defended by a pawn
-- logaritmic, and therefore dynamic King safety evaluation
+- logaritmically scaled King safety 
   (with bigger bonus for the first attack by a piece) 
 - possibility to give check and safe queen contact checks
 - hanging pieces
 - minor pieces attacked/defended by a pawn (overlaps with hanging pieces)
 - bad bishops (using bitmask of obstructing pawns)
-- (half)open files for rooks with additional bonus if they target enemy king
+- (half)open files for rooks with additional tmibonus if they target enemy king
 - rook on 7th rank cutting off enemy king or attacking pawns
-
-Creating version 0.13 I looked for more aggressive King safety function,
-using Rebel-like additive table approach. I also wanted my function to 
-be initialized at startup using some relatively simple mathematical formula.
-After some experiments with logistic function, I settled for an addition
-of logarithmic and linear function.
 
 Mobility evaluation is sometimes inexact due to the concept of "transparent 
 pieces". For example, own queen is considered transparent for the bishop. 

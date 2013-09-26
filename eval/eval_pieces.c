@@ -27,11 +27,6 @@
 #include "eval.h"
 #include <stdio.h>
 
-  const int att_N[12] = { 0,  4,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15}; // increasing hurts
-  const int att_B[12] = { 0,  4,  6,  7,  8,  9,  10,  11,  12,  13,  14,  15}; // increasing hurts
-  const int att_R[12] = { 0,  8, 12, 16, 19, 22,  24,  26,  28,  30,  31,  32};   
-  const int att_Q[12] = { 0, 10, 16, 22, 27, 33,  39,  46,  50,  52,  54,  56};  
-
   #define QUEEN_CONTACT_CHECK   30
   #define MINOR_ATTACKED_BY_P  -10
   #define MINOR_DEFENDED_BY_P    2
@@ -39,6 +34,8 @@
   //                           P   N   B   R   Q   K   -
   const int outpostBase [7] = {0,  4,  4,  0,  0,  0,  0};
   const int canCheckWith[7] = {0,  0,  1,  4, 10,  0,  0};
+        const int attPc [7] = {0,  1,  1,  2,  4,  0,  0};
+        const int woodPc[7] = {0,  1,  1,  2,  4,  0,  0};
  
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
@@ -61,7 +58,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 
 	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];    // king attacks
 	if (bbAttZone && p->pcCount[side][Q] ) 
-       AddPieceAttack(side, att_N[PopCntSparse(bbAttZone)] ); 
+       AddPieceAttack(side, N, PopCntSparse(bbAttZone) ); 
 
 	bbControl &= ~bbPawnControl[Opp(side)];      // exclude squares controlled by enemy pawns
 	AddMobility(N, side, PopCnt15(bbControl) );  // evaluate mobility
@@ -99,7 +96,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
        bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone 
 	   && p->pcCount[side][Q] ) // no attack eval without queens on board
-		  AddPieceAttack( side, att_B[PopCntSparse(bbAttZone)] ); 
+		  AddPieceAttack( side, B, PopCntSparse(bbAttZone) ); 
    }
 
 	bbControl &= ~bbPawnControl[Opp(side)];      // exclude squares controlled by enemy pawns
@@ -127,10 +124,10 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
 	ScoreOutpost(p, side, R, sq);
 
-	// evaluate rook on an open file
 	U64 bbFrontSpan = GetFrontSpan(SqBb(sq), side );
-	if (bbFrontSpan & bbPc(p, Opp(side), Q) ) AddMisc(side, 5, 5); // rook and queen in the same file
+	if (bbFrontSpan & bbPc(p, Opp(side), Q) ) AddMisc(side, 5, 5); // rook and enemy queen in the same file
 
+	// evaluate rook on an open file
 	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {
 	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) 
 	   {
@@ -161,7 +158,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
        bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone && p->pcCount[side][Q]) 
-		  AddPieceAttack(side, att_R[ PopCntSparse(bbAttZone) ] );
+		  AddPieceAttack(side, R, 2*PopCntSparse(bbAttZone) );
 	}
 	
 	AddMobility(R, side, PopCnt15(bbControl) );
@@ -176,11 +173,20 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
   U64 bbOccupied     = OccBb(p); // real occupancy, since we'll look for contact checks
   U64 bbTransparent  = bbPc(p, side, R) | bbPc(p, side, B);
   U64 bbCanCheckFrom = kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)];
+    const U64 bbSeventh[2] = { bbRANK_7, bbRANK_2};
+  const U64 bbEighth [2] = { bbRANK_8, bbRANK_1};
 
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);                      // set piece location and clear it from bbPieces 
 	bbControl = GenCache.GetQueenMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                  // update attack data
+
+	// evaluate queen on 7th rank if it attacks pawns or cuts off enemy king
+	/*if (SqBb(sq) & bbSeventh[side] ) {
+       if ( bbPc(p, Opp(side), P) & bbSeventh[side]
+	   || bbPc(p, Opp(side), K) & bbEighth[side]  
+	   )  AddMisc(side, Data.rookSeventhMg, Data.rookSeventhEg);
+	}*/
 
 	if (bbControl & bbCanCheckFrom ) {
 
@@ -211,7 +217,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	   // count attacks
 	   bbAttZone = bbAttacks & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone) 
-		   AddPieceAttack(side, att_Q[PopCntSparse(bbAttZone)] );	   
+		   AddPieceAttack(side, Q, 4*PopCntSparse(bbAttZone) );	   
 	}
 	
 	AddMobility(Q, side, PopCnt(bbControl) );
@@ -256,10 +262,11 @@ void sEvaluator::ScoreP(sPosition *p, int side)
   }
 }
 
-void sEvaluator::AddPieceAttack(int side, int val)
+void sEvaluator::AddPieceAttack(int side, int pc, int cnt)
 {
     attNumber[side] += 1;
-	attCount [side] += val;
+	attCount [side] += cnt;
+	attWood  [side] += woodPc[pc];
 }
 
 void sEvaluator::AddMobility( int pc, int side, int cnt)

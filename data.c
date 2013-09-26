@@ -123,22 +123,6 @@ void sData::InitMobBonus(void)
 	 }
 }
 
-void sData::InitAttackBonus(void) 
-{
-    int startCurve = 10; // 7 is worse
-	int logMult    = 20; // 20 is OK, raising doesn't seem to help
-
-	 for (int i=0; i < 256; i++)
-     attackBonus[i] = i / 3;
-
-	 for (int i=0; i < 256; i++) {
-		attackBonus[i+startCurve] = logMult * log((double) i) + i / 2;
-		attackBonus[startCurve] = startCurve / 2;
-		attackBonus[startCurve+1] = startCurve / 2+2;
-	    //printf("%2d %d\n", i, attackBonus[i] );
-  }
-}
-
 void sData::InitCastleMask(void) 
 {
   for (int sq = 0; sq < 64; sq++) castleMask[sq] = 15;
