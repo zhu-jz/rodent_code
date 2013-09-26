@@ -69,32 +69,32 @@ void InitKindergartenBitboards()
 
 void InitPawnAttacks()
 {
-  for (int i = 0; i < 64; i++) {
-      bbPawnAttacks[WHITE][i] = GetWPControl(SqBb(i) );
-	  bbPawnAttacks[BLACK][i] = GetBPControl(SqBb(i) );
+  for (int sq = 0; sq < 64; sq++) {
+      bbPawnAttacks[WHITE][sq] = GetWPControl(SqBb(sq) );
+	  bbPawnAttacks[BLACK][sq] = GetBPControl(SqBb(sq) );
   }
 }
 
 void InitKnightAttacks() 
 {
-  for (int i = 0; i < 64; i++) 
-    bbKnightAttacks[i] = ShiftNE( ShiftNorth(SqBb(i) ) )
-		               | ShiftNW( ShiftNorth(SqBb(i) ) )
-					   | ShiftNE( ShiftEast (SqBb(i) ) )
-					   | ShiftSE( ShiftEast (SqBb(i) ) )
-					   | ShiftSW( ShiftSouth(SqBb(i) ) )
-					   | ShiftSE( ShiftSouth(SqBb(i) ) )
-					   | ShiftNW( ShiftWest (SqBb(i) ) )
-					   | ShiftSW( ShiftWest (SqBb(i) ) );
+  for (int sq = 0; sq < 64; sq++) 
+    bbKnightAttacks[sq] = ShiftNE( ShiftNorth(SqBb(sq) ) )
+		                | ShiftNW( ShiftNorth(SqBb(sq) ) )
+					    | ShiftNE( ShiftEast (SqBb(sq) ) )
+					    | ShiftSE( ShiftEast (SqBb(sq) ) )
+					    | ShiftSW( ShiftSouth(SqBb(sq) ) )
+					    | ShiftSE( ShiftSouth(SqBb(sq) ) )
+					    | ShiftNW( ShiftWest (SqBb(sq) ) )
+					    | ShiftSW( ShiftWest (SqBb(sq) ) );
 }
 
 void InitKingAttacks() 
 {
-  for (int i = 0; i < 64; i++) {
-    bbKingAttacks[i] = FillKing( SqBb(i) ) ^ SqBb(i);
+  for (int sq = 0; sq < 64; sq++) {
+    bbKingAttacks[sq] = FillKing( SqBb(sq) ) ^ SqBb(sq);
   
     // set bitboard of squares constituting king zone (used in king safety eval)
-    bbKingZone[WHITE][i] = bbKingAttacks[i] | bbKingAttacks[i] << 8; 
-    bbKingZone[BLACK][i] = bbKingAttacks[i] | bbKingAttacks[i] >> 8; 
+    bbKingZone[WHITE][sq] = bbKingAttacks[sq] | bbKingAttacks[sq] << 8; 
+    bbKingZone[BLACK][sq] = bbKingAttacks[sq] | bbKingAttacks[sq] >> 8; 
   }
 }

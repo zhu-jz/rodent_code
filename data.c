@@ -62,17 +62,13 @@ static const int r_mob_eg[28] = { -20-4, -16-2, -12,  8,  4,  0,  4,  8, 12, 16,
 static const int q_mob_mg[28] = {  -6-4,  -4-2,  -2,  0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,  5 };
 static const int q_mob_eg[28] = { -12-4,  -8-2,  -4, -2,  0,  1,  2,  3,  4,  5,  6,  6,  7,  7,  8,  8,  8,  9,  9,  9, 10, 10, 10 };
 
-//static const int q_mob_mg[28] = { -10-4,  -9-2,  -8,  -7,  -6, -5,  -4, -3, -2, -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 10, 10 };
-//static const int q_mob_eg[28] = { -20-4, -18-2, -16, -14, -12, -10, -8, -6, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 16, 18, 20, 20, 20 };
-
-
 void sData::InitBadBishop(void)
 {
 	 // first clear bad bishop masks
 	 for (int side = 0; side < 2; side++) {
-	    for (int i = 0; i < 64; i++) {  
-			 bbBadBishopMasks [side][i] = 0ULL;
-			 badBishopPenalty[side][i] = 0;
+	    for (int sq = 0; sq < 64; sq++) {  
+			 bbBadBishopMasks [side][sq] = 0ULL;
+			 badBishopPenalty[side][sq] = 0;
 		 }
 	 }
 
@@ -156,9 +152,6 @@ void sData::InitCastleMask(void)
 
 void sData::InitSearchData(void) 
 {
-     // History of moveIsLate:lmrStep tuning:
-	 // 10:5 best, 8:4 best, 8:5 fails, 6:4 best, 5:4 fails, 6:3 best)
-
      aspiration       = 30;
 	 useNull          = 1;
 	 minimalNullDepth = 2 * ONE_PLY; // TRY 3 * ONE_PLY

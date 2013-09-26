@@ -22,13 +22,13 @@
 
 void InitPassedMask() 
 {
-  for (int i = 0; i < 64; i++) {
-	bbPassedMask[WHITE][i] = FillNorthExcl(SqBb(i));
-	bbPassedMask[WHITE][i] |= ShiftWest(bbPassedMask[WHITE][i]);
-	bbPassedMask[WHITE][i] |= ShiftEast(bbPassedMask[WHITE][i]);
-	bbPassedMask[BLACK][i] = FillSouthExcl(SqBb(i));
-	bbPassedMask[BLACK][i] |= ShiftWest(bbPassedMask[BLACK][i]);
-	bbPassedMask[BLACK][i] |= ShiftEast(bbPassedMask[BLACK][i]);
+  for (int sq = 0; sq < 64; sq++) {
+	bbPassedMask[WHITE][sq] = FillNorthExcl(SqBb(sq));
+	bbPassedMask[WHITE][sq] |= ShiftWest(bbPassedMask[WHITE][sq]);
+	bbPassedMask[WHITE][sq] |= ShiftEast(bbPassedMask[WHITE][sq]);
+	bbPassedMask[BLACK][sq] = FillSouthExcl(SqBb(sq));
+	bbPassedMask[BLACK][sq] |= ShiftWest(bbPassedMask[BLACK][sq]);
+	bbPassedMask[BLACK][sq] |= ShiftEast(bbPassedMask[BLACK][sq]);
   }
 }
 
@@ -61,11 +61,11 @@ void InitPossibleAttacks()
 
 void InitPawnSupport() 
 {
-  for (int i = 0; i < 64; i++) {
-      bbPawnSupport[WHITE][i] = ShiftWest(SqBb(i)) | ShiftEast(SqBb(i));
-	  bbPawnSupport[WHITE][i] |= FillNorth(bbPawnSupport [WHITE][i] );
+  for (int sq = 0; sq < 64; sq++) {
+      bbPawnSupport[WHITE][sq] = ShiftWest(SqBb(sq)) | ShiftEast(SqBb(sq));
+	  bbPawnSupport[WHITE][sq] |= FillNorth(bbPawnSupport [WHITE][sq] );
 
-	  bbPawnSupport[BLACK][i] = ShiftWest(SqBb(i)) | ShiftEast(SqBb(i));
-	  bbPawnSupport[BLACK][i] |= FillSouth(bbPawnSupport [BLACK][i] );
+	  bbPawnSupport[BLACK][sq] = ShiftWest(SqBb(sq)) | ShiftEast(SqBb(sq));
+	  bbPawnSupport[BLACK][sq] |= FillSouth(bbPawnSupport [BLACK][sq] );
   }
 }

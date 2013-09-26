@@ -23,10 +23,10 @@
 
 void PrintBb( U64 bbTest) 
 {
-  for (int i = 0; i < 64; i++) {
-	  if (bbTest & RelSqBb(i,BLACK) ) printf("+ ");
-	  else                            printf(". ");
-	  if ( (i+1) % 8 == 0) printf(" %d\n", 9 - ((i+1) / 8) );
+  for (int sq = 0; sq < 64; sq++) {
+	  if (bbTest & RelSqBb(sq,BLACK) ) printf("+ ");
+	  else                             printf(". ");
+	  if ( (sq+1) % 8 == 0) printf(" %d\n", 9 - ((sq+1) / 8) );
   }
   printf("\na b c d e f g h\n");
 }
