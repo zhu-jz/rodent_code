@@ -17,8 +17,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <math.h>
 #include "data.h"
 #include "bitboard/bitboard.h"
 #include "rodent.h"
