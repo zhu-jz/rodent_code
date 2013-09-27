@@ -51,7 +51,7 @@ private:
   int mgScore, egScore;    // partial midgame and endgame scores (to be scaled)
 
   sPawnHashEntry PawnTT[PAWN_HASH_SIZE]; // pawn transposition table
-
+  
   int GetMaterialScore(sPosition *p);
   void AddMobility(int pc, int side, int cnt);
   void AddMisc(int side, int mg, int eg);
@@ -72,8 +72,10 @@ private:
   void ScoreR(sPosition *p, int side);
   void ScoreQ(sPosition *p, int side);
   void ScoreP(sPosition *p, int side);
-  void ScoreK(sPosition *p, int side);
+  void ScoreKingShield(sPosition *p, int side);
+  void ScoreKingAttacks(int side);
   void ScoreOutpost(sPosition *p, int side, int piece, int sq);
+  void ScoreMinorPawnRelation(sPosition *p, int side, int sq);
   void ScoreHanging(sPosition *p, int side);
   int  EvalFileShelter(U64 bbOwnPawns, int side);
   int  EvalFileStorm(U64 bbOppPawns, int side);

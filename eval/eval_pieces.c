@@ -28,14 +28,12 @@
 #include <stdio.h>
 
   #define QUEEN_CONTACT_CHECK   30
-  #define MINOR_ATTACKED_BY_P  -10
-  #define MINOR_DEFENDED_BY_P    2
 
   //                           P   N   B   R   Q   K   -
   const int outpostBase [7] = {0,  4,  4,  0,  0,  0,  0};
-  const int canCheckWith[7] = {0,  0,  1,  4, 10,  0,  0};
-        const int attPc [7] = {0,  1,  1,  2,  4,  0,  0};
-        const int woodPc[7] = {0,  1,  1,  2,  4,  0,  0};
+  const int canCheckWith[7] = {0,  0,  1,  4, 10,  0,  0};  // attack bonus for possibility of giving check
+     const int attPerPc [7] = {0,  1,  1,  2,  4,  0,  0};  // bonus for attacking a square near enemy king
+     const int woodPerPc[7] = {0,  1,  1,  2,  4,  0,  0};  // contribution of attack to a scaling factor
  
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
@@ -49,11 +47,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	bbAllAttacks[side] |= bbControl;  // update attack data
 	bbControl &= ~p->bbCl[side];      // exclude squares occupied by own pieces
 
-    // knight attacked / defended by pawn
-	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMisc(side, MINOR_ATTACKED_BY_P, MINOR_ATTACKED_BY_P);
-	else 
-    if ( SqBb(sq) & bbPawnControl[side] )  AddMisc(side, MINOR_DEFENDED_BY_P, MINOR_DEFENDED_BY_P);
-
+	ScoreMinorPawnRelation(p, side, sq); // knight attacked / defended by pawn
 	ScoreOutpost(p, side, N, sq);
 
 	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];    // king attacks
@@ -77,11 +71,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	bbControl = GenCache.GetBishMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                 // update attack data
 
-	// bishop attacked / defended by pawn
-	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMisc(side, MINOR_ATTACKED_BY_P, MINOR_ATTACKED_BY_P);
-	else 
-    if ( SqBb(sq) & bbPawnControl[side] )  AddMisc(side, MINOR_DEFENDED_BY_P, MINOR_DEFENDED_BY_P);
-
+	ScoreMinorPawnRelation(p, side, sq); // bishop attacked / defended by pawn
 	ScoreOutpost(p, side, B, sq);
 
     // check threats (with false positive due to queen transparency)
@@ -114,8 +104,6 @@ void sEvaluator::ScoreR(sPosition *p, int side)
   U64 bbControl, bbAttZone;
   U64 bbPieces   = bbPc(p, side, R);
   U64 bbOccupied = OccBb(p) ^ bbPc(p, side, Q) ^ bbPc(p, side, R);
-  const U64 bbSeventh[2] = { bbRANK_7, bbRANK_2};
-  const U64 bbEighth [2] = { bbRANK_8, bbRANK_1};
 
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);                     // set piece location and clear it from bbPieces
@@ -142,9 +130,9 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	}
 
 	// evaluate rook on 7th rank if it attacks pawns or cuts off enemy king
-	if (SqBb(sq) & bbSeventh[side] ) {
-       if ( bbPc(p, Opp(side), P) & bbSeventh[side]
-	   || bbPc(p, Opp(side), K) & bbEighth[side]  
+	if (SqBb(sq) & relRank[side][RANK_7] ) {
+       if ( bbPc(p, Opp(side), P) & relRank[side][RANK_7]
+	   || bbPc(p, Opp(side), K) & relRank[side][RANK_8]
 	   )  AddMisc(side, Data.rookSeventhMg, Data.rookSeventhEg);
 	}
 
@@ -158,7 +146,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
        bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone && p->pcCount[side][Q]) 
-		  AddPieceAttack(side, R, 2*PopCntSparse(bbAttZone) );
+		  AddPieceAttack(side, R, PopCntSparse(bbAttZone) );
 	}
 	
 	AddMobility(R, side, PopCnt15(bbControl) );
@@ -173,8 +161,6 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
   U64 bbOccupied     = OccBb(p); // real occupancy, since we'll look for contact checks
   U64 bbTransparent  = bbPc(p, side, R) | bbPc(p, side, B);
   U64 bbCanCheckFrom = kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)];
-    const U64 bbSeventh[2] = { bbRANK_7, bbRANK_2};
-  const U64 bbEighth [2] = { bbRANK_8, bbRANK_1};
 
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);                      // set piece location and clear it from bbPieces 
@@ -182,9 +168,9 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	bbAllAttacks[side] |= bbControl;                  // update attack data
 
 	// evaluate queen on 7th rank if it attacks pawns or cuts off enemy king
-	/*if (SqBb(sq) & bbSeventh[side] ) {
-       if ( bbPc(p, Opp(side), P) & bbSeventh[side]
-	   || bbPc(p, Opp(side), K) & bbEighth[side]  
+	/*if (SqBb(sq) & relRank[side][RANK_7] ) {
+       if ( bbPc(p, Opp(side), P) & relRank[side][RANK_7]
+	   || bbPc(p, Opp(side), K) & relRank[side][RANK_8]
 	   )  AddMisc(side, Data.rookSeventhMg, Data.rookSeventhEg);
 	}*/
 
@@ -217,7 +203,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	   // count attacks
 	   bbAttZone = bbAttacks & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone) 
-		   AddPieceAttack(side, Q, 4*PopCntSparse(bbAttZone) );	   
+		   AddPieceAttack(side, Q, PopCntSparse(bbAttZone) );	   
 	}
 	
 	AddMobility(Q, side, PopCnt(bbControl) );
@@ -265,8 +251,8 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 void sEvaluator::AddPieceAttack(int side, int pc, int cnt)
 {
     attNumber[side] += 1;
-	attCount [side] += cnt;
-	attWood  [side] += woodPc[pc];
+	attCount [side] += attPerPc[pc] * cnt;
+	attWood  [side] += woodPerPc[pc];
 }
 
 void sEvaluator::AddMobility( int pc, int side, int cnt)
@@ -292,4 +278,11 @@ void sEvaluator::ScoreOutpost(sPosition *p, int side, int piece, int sq)
 	   if ( SqBb(sq) & bbPawnControl[side] ) 
 		   AddMisc(side, Data.outpost[side][piece][sq], Data.outpost[side][piece][sq] );
 	}
+}
+
+void sEvaluator::ScoreMinorPawnRelation(sPosition *p, int side, int sq)
+{
+	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMisc(side, -10, -10);
+	else 
+    if ( SqBb(sq) & bbPawnControl[side] )  AddMisc(side, 2, 2);
 }

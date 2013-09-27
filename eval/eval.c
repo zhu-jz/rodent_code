@@ -23,14 +23,8 @@
 #include "../rodent.h"
 #include "eval.h"
 
-const U64 rank1[2] = {bbRANK_1, bbRANK_8};
-const U64 rank2[2] = {bbRANK_2, bbRANK_7};
-const U64 rank3[2] = {bbRANK_3, bbRANK_6};
-const U64 rank4[2] = {bbRANK_4, bbRANK_5};
-const U64 rank5[2] = {bbRANK_5, bbRANK_4};
-const U64 rank6[2] = {bbRANK_6, bbRANK_3};
-const U64 rank7[2] = {bbRANK_7, bbRANK_2};
-const U64 rank8[2] = {bbRANK_8, bbRANK_1};
+extern const U64 relRank [2] [8] = { {bbRANK_1, bbRANK_2, bbRANK_3, bbRANK_4, bbRANK_5, bbRANK_6, bbRANK_7, bbRANK_8 }, 
+                                     {bbRANK_8, bbRANK_7, bbRANK_6, bbRANK_5, bbRANK_4, bbRANK_3, bbRANK_2, bbRANK_1 } };
 
 const int attMult[15] = {0, 0, 4, 10, 14, 26, 42, 52, 64, 70, 76, 82, 86, 92, 100};
 
@@ -44,9 +38,9 @@ void sEvaluator::InitStatic(void)
 void sEvaluator::InitDynamic(sPosition *p) 
 {
      attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
-	 attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear attack scores
+	 attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
 	 attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
-	 attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear attack scores
+	 attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
 	 mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
 	 egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
 	 mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
@@ -86,9 +80,9 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
 	bbHanging &= ~bbPc(p, Opp(side), P);  // currently we don't evaluate threats against pawns
 
 	U64 bbSpace = UnoccBb(p) & bbAllAttacks[side];
-	bbSpace &= ~rank1[side];              // controlling home ground is not space advantage
-	bbSpace &= ~rank2[side];
-	bbSpace &= ~rank3[side];
+	bbSpace &= ~relRank[side][RANK_1];    // controlling home ground is not space advantage
+	bbSpace &= ~relRank[side][RANK_2];
+	bbSpace &= ~relRank[side][RANK_3];
 	bbSpace &= ~bbPawnControl[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
 	AddMisc(side, PopCnt(bbSpace), 0);
 	int pc, sq, val;
@@ -115,7 +109,7 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
 	 return score;
  }
 
-void sEvaluator::ScoreK(sPosition *p, int side)
+void sEvaluator::ScoreKingShield(sPosition *p, int side)
 {
   const U64 bbQSCastle[2] = { SqBb(A1) | SqBb(B1) | SqBb(C1) | SqBb(A2) | SqBb(B2) | SqBb(C2), 
 	                          SqBb(A8) | SqBb(B8) | SqBb(C8) | SqBb(A7) | SqBb(B7) | SqBb(C7) };
@@ -161,32 +155,36 @@ void sEvaluator::ScoreK(sPosition *p, int side)
 	 result += EvalFileStorm  ( bbNextFile & bbPc(p, Opp(side), P), side );
   }
 
-  mgScore += result * sideMult[side];                 // add shield score to midgame score
-
-  if (attWood[side] > 14) attWood[side] = 14;     // normalize attack data for table size
-  if (attNumber[side] > 1)  attWood[side] += 1;       // avoid evaluating attack by single piece
-  attScore[side] = (attCount[side] * attMult[attWood[side]]) / 100;  // read attack score from the table
+  mgScore += result * sideMult[side]; // add shield score to midgame score
 }
 
-int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side)
+void sEvaluator::ScoreKingAttacks(int side) 
+{
+	if (attWood[side] > 14) attWood[side] = 14;         
+    if (attNumber[side] > 1)  attWood[side] += 1;       
+    attScore[side] = (attCount[side] * attMult[attWood[side]]) / 100;
+	ScaleValue(&attScore[side]  , Data.attSidePercentage[side]);
+}
+
+int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side) 
 {
 	// values taken from Fruit
 	if ( !bbOwnPawns ) return -36;
-	if ( bbOwnPawns & rank2[side] ) return    2;  // scores about the same as original 0
-	if ( bbOwnPawns & rank3[side] ) return  -11;
-	if ( bbOwnPawns & rank4[side] ) return  -20;
-	if ( bbOwnPawns & rank5[side] ) return  -27;
-	if ( bbOwnPawns & rank6[side] ) return  -32;
-	if ( bbOwnPawns & rank7[side] ) return  -35;
+	if ( bbOwnPawns & relRank[side][RANK_2] ) return    2;  // scores about the same as original 0
+	if ( bbOwnPawns & relRank[side][RANK_3] ) return  -11;
+	if ( bbOwnPawns & relRank[side][RANK_4] ) return  -20;
+	if ( bbOwnPawns & relRank[side][RANK_5] ) return  -27;
+	if ( bbOwnPawns & relRank[side][RANK_6] ) return  -32;
+	if ( bbOwnPawns & relRank[side][RANK_7] ) return  -35;
 	return 0;
 }
 
 int sEvaluator::EvalFileStorm(U64 bbOppPawns, int side)
 {
 	if (!bbOppPawns) return -15;
-	if (bbOppPawns & rank4[side]) return -3;
-	if (bbOppPawns & rank5[side]) return -5;
-	if (bbOppPawns & rank6[side]) return -7;
+	if (bbOppPawns & relRank[side][RANK_4] ) return -3;
+	if (bbOppPawns & relRank[side][RANK_5] ) return -5;
+	if (bbOppPawns & relRank[side][RANK_6] ) return -7;
     return 0;
 }
 
@@ -222,22 +220,22 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  ScoreR(p, BLACK);
       ScoreQ(p, WHITE);
       ScoreQ(p, BLACK);
-	  ScoreK(p, WHITE);
-	  ScoreK(p, BLACK);
+	  ScoreKingShield(p, WHITE);
+	  ScoreKingShield(p, BLACK);
+	  ScoreKingAttacks(WHITE);
+	  ScoreKingAttacks(BLACK);
 	  ScoreHanging(p, WHITE);
 	  ScoreHanging(p, BLACK);
 
-	  // correction of passed pawns eval based on their interactions with pieces
+	  // ADDITIONAL PAWN EVAL
 	  ScoreP(p, WHITE);
 	  ScoreP(p, BLACK);
       
-	  // ASYMMETRIC MOBILITY AND ATTACK SCALING
+	  // ASYMMETRIC MOBILITY SCALING
 	  ScaleValue(&mgMobility[WHITE], Data.mobSidePercentage[WHITE]);
 	  ScaleValue(&mgMobility[BLACK], Data.mobSidePercentage[BLACK]);
   	  ScaleValue(&egMobility[WHITE], Data.mobSidePercentage[WHITE]);
 	  ScaleValue(&egMobility[BLACK], Data.mobSidePercentage[BLACK]);
-	  ScaleValue(&attScore[WHITE]  , Data.attSidePercentage[WHITE]);
-	  ScaleValue(&attScore[BLACK]  , Data.attSidePercentage[BLACK]);
 
 	  // MERGING SCORE
 	  mgScore += ( mgMobility[WHITE] - mgMobility[BLACK] );

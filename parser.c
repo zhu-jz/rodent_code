@@ -413,8 +413,8 @@ void sParser::ReadIniFile(char *fileName)
 
 void sParser::PrintEngineHeader() 
 {
-    printf("id name Rodent 1.0");
-	printf("%d\n", BUILD);
+    printf("id name Rodent 1.1");
+	printf(" (build %d)\n", BUILD);
     printf("id author Pawel Koziol (based on Sungorus by Pablo Vazquez)\n");
 }
 

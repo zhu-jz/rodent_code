@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 20
-#define BENCH_8 1361577
+#define BUILD 1
+#define BENCH_8 1162465
 // #define FAST_TUNING 100000 // node limit for ultra-past tests
 
 #undef CDECL
@@ -272,3 +272,4 @@ extern U64 zobEp[8];
 extern int pondering;
 extern char ponder_str[6];
 extern int flagProtocol;
+extern const U64 relRank [2] [8];
