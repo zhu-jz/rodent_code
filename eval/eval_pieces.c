@@ -168,11 +168,11 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	bbAllAttacks[side] |= bbControl;                  // update attack data
 
 	// evaluate queen on 7th rank if it attacks pawns or cuts off enemy king
-	/*if (SqBb(sq) & relRank[side][RANK_7] ) {
+	if (SqBb(sq) & relRank[side][RANK_7] ) {
        if ( bbPc(p, Opp(side), P) & relRank[side][RANK_7]
 	   || bbPc(p, Opp(side), K) & relRank[side][RANK_8]
-	   )  AddMisc(side, Data.rookSeventhMg, Data.rookSeventhEg);
-	}*/
+	   )  AddMisc(side, 10, 5); // correct would be 5/10, but it is for the next test
+	}
 
 	if (bbControl & bbCanCheckFrom ) {
 
