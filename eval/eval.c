@@ -146,14 +146,14 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
   int result = 0;
   if (bbFile & bbCentralFile) result += (EvalFileShelter( bbFile & bbPc(p, side, P), side ) / 2);
   else                        result +=  EvalFileShelter( bbFile & bbPc(p, side, P), side );
-  result += EvalFileStorm  ( bbFile & bbPc(p, Opp(side), P), side );
-  return result;
+
+  return result + EvalFileStorm  ( bbFile & bbPc(p, Opp(side), P), side );
 }
 
 void sEvaluator::ScoreKingAttacks(int side) 
 {
-	if (attWood[side] > 14) attWood[side] = 14;         
-    if (attNumber[side] > 1)  attWood[side] += 1;       
+	if (attWood[side]   > 14) attWood[side] = 14;         
+    if (attNumber[side] > 1 ) attWood[side] += 1;       
     attScore[side] = (attCount[side] * attMult[attWood[side]]) / 100;
 	ScaleValue(&attScore[side]  , Data.attSidePercentage[side]);
 }

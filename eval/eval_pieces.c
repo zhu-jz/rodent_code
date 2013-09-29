@@ -272,7 +272,8 @@ void sEvaluator::ScoreOutpost(sPosition *p, int side, int piece, int sq)
 
 void sEvaluator::ScoreMinorPawnRelation(sPosition *p, int side, int sq)
 {
-	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMisc(side, -10, -10);
-	else 
-    if ( SqBb(sq) & bbPawnControl[side] )  AddMisc(side, 2, 2);
+	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMisc(side, -10, -10); // attacked by pawn
+	else {
+       if ( SqBb(sq) & bbPawnControl[side] )  AddMisc(side, 2, 2);       // defended by pawn
+	}
 }
