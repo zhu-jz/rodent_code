@@ -42,20 +42,19 @@ void sEvaluator::ScoreN(sPosition *p, int side)
   U64 bbPieces = bbPc(p, side, N);
 
   while (bbPieces) {
-    sq = PopFirstBit(&bbPieces);      // set piece location and clear it from bbPieces
-	bbControl = bbKnightAttacks[sq];  // set control bitboard
-	bbAllAttacks[side] |= bbControl;  // update attack data
-	bbControl &= ~p->bbCl[side];      // exclude squares occupied by own pieces
+    sq = PopFirstBit(&bbPieces);                     // set piece location and clear it from bbPieces
+	bbControl = bbKnightAttacks[sq];                 // set control bitboard
+	bbAllAttacks[side] |= bbControl;                 // update attack data
+	bbControl &= ~p->bbCl[side];                     // exclude squares occupied by own pieces
+	ScoreMinorPawnRelation(p, side, sq);             // knight attacked / defended by pawn
+	ScoreOutpost(p, side, N, sq);                    // outposts
 
-	ScoreMinorPawnRelation(p, side, sq); // knight attacked / defended by pawn
-	ScoreOutpost(p, side, N, sq);
+	// king attacks (if our queen is present)
+	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
+	if (bbAttZone && p->pcCount[side][Q] ) AddPieceAttack(side, N, PopCntSparse(bbAttZone) ); 
 
-	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];    // king attacks
-	if (bbAttZone && p->pcCount[side][Q] ) 
-       AddPieceAttack(side, N, PopCntSparse(bbAttZone) ); 
-
-	bbControl &= ~bbPawnControl[Opp(side)];      // exclude squares controlled by enemy pawns
-	AddMobility(N, side, PopCnt15(bbControl) );  // evaluate mobility
+	bbControl &= ~bbPawnControl[Opp(side)];          // exclude squares controlled by enemy pawns
+	AddMobility(N, side, PopCnt15(bbControl) );      // evaluate mobility
   }
 }
 
@@ -70,27 +69,22 @@ void sEvaluator::ScoreB(sPosition *p, int side)
     sq = PopFirstBit(&bbPieces);                     // set piece location and clear it from bbPieces
 	bbControl = GenCache.GetBishMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                 // update attack data
-
-	ScoreMinorPawnRelation(p, side, sq); // bishop attacked / defended by pawn
-	ScoreOutpost(p, side, B, sq);
+	ScoreMinorPawnRelation(p, side, sq);             // bishop attacked / defended by pawn
+	ScoreOutpost(p, side, B, sq);                    // outposts
 
     // check threats (with false positive due to queen transparency)
 	if (bbControl & ( kingDiagChecks[Opp(side)] ) )
 		attCount[side] += canCheckWith[B]; 
 
-    // If we can attack zone around enemy king from the current square, 
-	// test this possibility on the actual board.
+    // king attack (if our queen is present)
 	if (bbBCanAttack[sq] [KingSq(p, side ^ 1) ] 
 	&& (bbControl & bbKingZone[side][p->kingSquare[Opp(side)]] ) ) {
-
        bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
-	   if (bbAttZone 
-	   && p->pcCount[side][Q] ) // no attack eval without queens on board
-		  AddPieceAttack( side, B, PopCntSparse(bbAttZone) ); 
+	   if (bbAttZone && p->pcCount[side][Q] ) AddPieceAttack( side, B, PopCntSparse(bbAttZone) ); 
    }
 
-	bbControl &= ~bbPawnControl[Opp(side)];      // exclude squares controlled by enemy pawns
-	AddMobility(B, side, PopCnt15(bbControl) );  // evaluate mobility
+	bbControl &= ~bbPawnControl[Opp(side)];          // exclude squares controlled by enemy pawns
+	AddMobility(B, side, PopCnt15(bbControl) );      // evaluate mobility
 
 	// penalize bishop blocked by own pawns
 	if ( bbBadBishopMasks[side][sq] & bbPc(p, side, P) )
@@ -109,8 +103,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
     sq = PopFirstBit(&bbPieces);                     // set piece location and clear it from bbPieces
 	bbControl = GenCache.GetRookMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                 // update attack data
-
-	ScoreOutpost(p, side, R, sq);
+	ScoreOutpost(p, side, R, sq);                    // rook outpost
 
 	U64 bbFrontSpan = GetFrontSpan(SqBb(sq), side );
 	if (bbFrontSpan & bbPc(p, Opp(side), Q) ) AddMisc(side, 5, 5); // rook and enemy queen in the same file
@@ -140,13 +133,11 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	if (bbControl & kingStraightChecks[Opp(side)] )
 		attCount[side] += canCheckWith[R];
 
-	// if we can attack enemy king from current square, test this possibility
+	// king attack (if our queen is present)
 	if ( bbRCanAttack[sq] [KingSq(p, side ^ 1) ]  
 	&& ( bbControl & bbKingZone[side][p->kingSquare[Opp(side)]] ) ) {
-
        bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
-	   if (bbAttZone && p->pcCount[side][Q]) 
-		  AddPieceAttack(side, R, PopCntSparse(bbAttZone) );
+	   if (bbAttZone && p->pcCount[side][Q])  AddPieceAttack(side, R, PopCntSparse(bbAttZone) );
 	}
 	
 	AddMobility(R, side, PopCnt15(bbControl) );
