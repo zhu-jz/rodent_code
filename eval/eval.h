@@ -77,6 +77,7 @@ private:
   void ScoreOutpost(sPosition *p, int side, int piece, int sq);
   void ScoreMinorPawnRelation(sPosition *p, int side, int sq);
   void ScoreHanging(sPosition *p, int side);
+  int  EvalKingFile(sPosition * p, int side, U64 bbFile);
   int  EvalFileShelter(U64 bbOwnPawns, int side);
   int  EvalFileStorm(U64 bbOppPawns, int side);
   int  EvalTrappedKnight(sPosition *p);

@@ -129,33 +129,25 @@ void sEvaluator::ScoreKingShield(sPosition *p, int side)
   if (SqBb(sq) & bbKSCastle[side]) sq = kCastle[side];
   if (SqBb(sq) & bbQSCastle[side]) sq = qCastle[side];
 
-  // TODO: shrink this code writing an EvalKingsFile function
   bbKingFile = FillNorth(SqBb(sq) ) | FillSouth(SqBb(sq));
-  if (bbKingFile & bbCentralFile)
-     result += (EvalFileShelter( bbKingFile & bbPc(p, side, P), side ) / 2);
-  else
-     result += EvalFileShelter( bbKingFile & bbPc(p, side, P), side );
-  result += EvalFileStorm  ( bbKingFile & bbPc(p, Opp(side), P), side );
+  result += EvalKingFile(p, side, bbKingFile);
    
   bbNextFile = ShiftEast(bbKingFile);
-  if (bbNextFile) {
-     if (bbNextFile & bbCentralFile)
-        result += (EvalFileShelter( bbNextFile & bbPc(p, side, P), side ) / 2);
-	 else
-		result += EvalFileShelter( bbNextFile & bbPc(p, side, P), side );
-	 result += EvalFileStorm  ( bbNextFile & bbPc(p, Opp(side), P), side );
-  }
+  if (bbNextFile) result += EvalKingFile(p, side, bbNextFile);
   
   bbNextFile = ShiftWest(bbKingFile);
-  if (bbNextFile) {
-     if (bbNextFile & bbCentralFile)
-        result += (EvalFileShelter( bbNextFile & bbPc(p, side, P), side ) / 2);
-	 else
-		result += EvalFileShelter( bbNextFile & bbPc(p, side, P), side );
-	 result += EvalFileStorm  ( bbNextFile & bbPc(p, Opp(side), P), side );
-  }
+  if (bbNextFile) result += EvalKingFile(p, side, bbNextFile);
 
   mgScore += result * sideMult[side]; // add shield score to midgame score
+}
+
+int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
+{
+  int result = 0;
+  if (bbFile & bbCentralFile) result += (EvalFileShelter( bbFile & bbPc(p, side, P), side ) / 2);
+  else                        result +=  EvalFileShelter( bbFile & bbPc(p, side, P), side );
+  result += EvalFileStorm  ( bbFile & bbPc(p, Opp(side), P), side );
+  return result;
 }
 
 void sEvaluator::ScoreKingAttacks(int side) 

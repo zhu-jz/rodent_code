@@ -261,7 +261,6 @@ void sEvaluator::AddMobility( int pc, int side, int cnt)
 	egMobility[side] += Data.mobBonusEg [pc] [cnt];
 }
 
-
 void sEvaluator::AddMisc(int side, int mg, int eg)
 {
 	mgMisc[side] += mg;
