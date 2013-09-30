@@ -100,7 +100,7 @@ int PopNextBit(int side, U64 * bb)
    return sq;
 }
 
-
+#ifdef USE_FIRST_ONE_ASM
 
 int FirstOneAsm(U64 bb)
 {
@@ -118,3 +118,5 @@ f_ret:
 }
 #endif
 }
+
+#endif
