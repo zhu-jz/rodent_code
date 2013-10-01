@@ -51,14 +51,14 @@ int pondering;
 char ponder_str[6];
 
 // mobility values
-static const int n_mob_mg[28] = { -16-4, -12-2,  -8,  0,  4,  8,  12, 16, 16};
-static const int n_mob_eg[28] = { -16-4, -12-2,  -8,  0,  4,  8,  12, 16, 16};
-static const int b_mob_mg[28] = { -16-4, -12-2,  -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
-static const int b_mob_eg[28] = { -16-4, -12-2,  -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
-static const int r_mob_mg[28] = { -10-4,  -8-2,  -6,  4,  2,  0,  2,  4,  6,  8, 10, 10, 11, 12, 13,                                };
-static const int r_mob_eg[28] = { -20-4, -16-2, -12,  8,  4,  0,  4,  8, 12, 16, 20, 20, 22, 24, 26,                                };
-static const int q_mob_mg[28] = {  -6-4,  -4-2,  -2,  0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,  5 };
-static const int q_mob_eg[28] = { -12-4,  -8-2,  -4, -2,  0,  1,  2,  3,  4,  5,  6,  6,  7,  7,  8,  8,  8,  9,  9,  9, 10, 10, 10 };
+static const int n_mob_mg[28] = { -160-40, -120-20,  -80,  00,  40,  80,  120, 160, 160};
+static const int n_mob_eg[28] = { -160-40, -120-20,  -80,  00,  40,  80,  120, 160, 160};
+static const int b_mob_mg[28] = { -160-40, -120-20,  -80, -40, -20,  00,  20,  40,  60,  80, 100, 120, 140, 140, 160                                 };
+static const int b_mob_eg[28] = { -160-40, -120-20,  -80, -40, -20,  00,  20,  40,  60,  80, 100, 120, 140, 140, 160                                 };
+static const int r_mob_mg[28] = { -100-40,  -80-20,  -60,  40,  20,  00,  20,  40,  60,  80, 100, 100, 110, 120, 130,                                };
+static const int r_mob_eg[28] = { -200-40, -160-20, -120,  80,  40,  00,  40,  80, 120, 160, 200, 200, 220, 240, 260,                                };
+static const int q_mob_mg[28] = {  -60-40,  -40-20,  -20,  00,  00,  10,  10,  10,  20,  20,  20,  30,  30,  30,  30,  40,  40,  40,  40,  50,  50,  50,  50 };
+static const int q_mob_eg[28] = { -120-40,  -80-20,  -40, -20,  00,  10,  20,  30,  40,  50,  60,  60,  70,  70,  80,  80,  80,  90,  90,  90, 100, 100, 100 };
 
 void sData::InitBadBishop(void)
 {
@@ -186,8 +186,6 @@ void sData::InitEvalVars(void)
      rookOpenEg      = 10;
 	 rookSemiOpenMg  = 5;
 	 rookSemiOpenEg  = 5;
-	 rookOpenAttack  = 10;
-	 rookSemiOpenAttack = 5;
 	 rookSeventhMg   = 20;
 	 rookSeventhEg   = 20;
 	 pawnIsolatedOnOpen = -15;

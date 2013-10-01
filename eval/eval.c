@@ -304,7 +304,7 @@ int sEvaluator::Normalize(int val, int limit)
 void sEvaluator::ScaleValue(int * value, int factor) 
 {
      *value *= factor;
-	 *value /= 100;
+	 *value /= 1000;
 }
 
 void sEvaluator::DebugPst(sPosition *p) 

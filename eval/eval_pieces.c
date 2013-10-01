@@ -27,13 +27,15 @@
 #include "eval.h"
 #include <stdio.h>
 
-  #define QUEEN_CONTACT_CHECK   30
+#define QUEEN_CONTACT_CHECK   300  // milipawns
+#define ROOK_OPEN_ATTACK	  100  // milipawns
+#define ROOK_SEMI_OPEN_ATTACK  50  // milipawns
 
   //                           P   N   B   R   Q   K   -
   const int outpostBase [7] = {0,  4,  4,  0,  0,  0,  0};
-  const int canCheckWith[7] = {0,  0,  1,  4, 10,  0,  0};  // attack bonus for possibility of giving check
-     const int attPerPc [7] = {0,  1,  1,  2,  4,  0,  0};  // bonus for attacking a square near enemy king
-     const int woodPerPc[7] = {0,  1,  1,  2,  4,  0,  0};  // contribution of attack to a scaling factor
+  const int canCheckWith[7] = {0,  0,  10,  40, 100,  0,  0};  // attack bonus for possibility of giving check
+     const int attPerPc [7] = {0, 10,  10,  20,  40,  0,  0};  // bonus for attacking a square near enemy king (milipawns)
+     const int woodPerPc[7] = {0,  1,  1,  2,  4,  0,  0};     // contribution of attack to a scaling factor
  
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
@@ -113,12 +115,12 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) 
 	   {
 		  AddMisc(side, Data.rookOpenMg, Data.rookOpenEg);
-		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += Data.rookOpenAttack;
+		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += ROOK_OPEN_ATTACK;
 	   }
 	  else
 	  {
 		  AddMisc(side, Data.rookSemiOpenMg, Data.rookSemiOpenEg);
-		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += Data.rookSemiOpenAttack;
+		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += ROOK_SEMI_OPEN_ATTACK;
 	  }
 	}
 

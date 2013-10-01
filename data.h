@@ -49,8 +49,6 @@ public:
  int rookOpenEg;
  int rookSemiOpenMg;
  int rookSemiOpenEg;
- int rookOpenAttack;
- int rookSemiOpenAttack;
  int rookSeventhMg;
  int rookSeventhEg;
  int pawnIsolatedOnOpen;
