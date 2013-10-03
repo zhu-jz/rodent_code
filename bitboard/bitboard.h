@@ -33,7 +33,7 @@
     typedef unsigned long long U64;
 #else
     #include <stdint.h>
-    typedef uint64_t U64;enc
+    typedef uint64_t U64;
 #endif
 
 #define bbEmpty			(U64)0ULL
@@ -77,6 +77,7 @@
 #define RelSqBb(sq,cl)  ( SqBb(REL_SQ(sq,cl) ) )
 
 extern const U64 bbRank [8];
+extern const U64 bbFile [8];
 extern const U64 bbRelRank [2] [8];
 
 // Compiler and architecture dependent versions of FirstOne() function, 
