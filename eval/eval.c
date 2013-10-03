@@ -23,9 +23,6 @@
 #include "../rodent.h"
 #include "eval.h"
 
-extern const U64 relRank [2] [8] = { {bbRANK_1, bbRANK_2, bbRANK_3, bbRANK_4, bbRANK_5, bbRANK_6, bbRANK_7, bbRANK_8 }, 
-                                     {bbRANK_8, bbRANK_7, bbRANK_6, bbRANK_5, bbRANK_4, bbRANK_3, bbRANK_2, bbRANK_1 } };
-
 const int attMult[15] = {0, 0, 4, 10, 14, 26, 42, 52, 64, 70, 76, 82, 86, 92, 100};
 
 void sEvaluator::InitStatic(void) 
@@ -80,9 +77,9 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
 	bbHanging &= ~bbPc(p, Opp(side), P);  // currently we don't evaluate threats against pawns
 
 	U64 bbSpace = UnoccBb(p) & bbAllAttacks[side];
-	bbSpace &= ~relRank[side][RANK_1];    // controlling home ground is not space advantage
-	bbSpace &= ~relRank[side][RANK_2];
-	bbSpace &= ~relRank[side][RANK_3];
+	bbSpace &= ~bbRelRank[side][RANK_1];    // controlling home ground is not space advantage
+	bbSpace &= ~bbRelRank[side][RANK_2];
+	bbSpace &= ~bbRelRank[side][RANK_3];
 	bbSpace &= ~bbPawnControl[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
 	AddMisc(side, PopCnt(bbSpace), 0);
 	int pc, sq, val;
@@ -162,21 +159,21 @@ int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side)
 {
 	// values taken from Fruit
 	if ( !bbOwnPawns ) return -36;
-	if ( bbOwnPawns & relRank[side][RANK_2] ) return    2;  // scores about the same as original 0
-	if ( bbOwnPawns & relRank[side][RANK_3] ) return  -11;
-	if ( bbOwnPawns & relRank[side][RANK_4] ) return  -20;
-	if ( bbOwnPawns & relRank[side][RANK_5] ) return  -27;
-	if ( bbOwnPawns & relRank[side][RANK_6] ) return  -32;
-	if ( bbOwnPawns & relRank[side][RANK_7] ) return  -35;
+	if ( bbOwnPawns & bbRelRank[side][RANK_2] ) return    2;  // scores about the same as original 0
+	if ( bbOwnPawns & bbRelRank[side][RANK_3] ) return  -11;
+	if ( bbOwnPawns & bbRelRank[side][RANK_4] ) return  -20;
+	if ( bbOwnPawns & bbRelRank[side][RANK_5] ) return  -27;
+	if ( bbOwnPawns & bbRelRank[side][RANK_6] ) return  -32;
+	if ( bbOwnPawns & bbRelRank[side][RANK_7] ) return  -35;
 	return 0;
 }
 
 int sEvaluator::EvalFileStorm(U64 bbOppPawns, int side)
 {
 	if (!bbOppPawns) return -15;
-	if (bbOppPawns & relRank[side][RANK_4] ) return -3;
-	if (bbOppPawns & relRank[side][RANK_5] ) return -5;
-	if (bbOppPawns & relRank[side][RANK_6] ) return -7;
+	if (bbOppPawns & bbRelRank[side][RANK_4] ) return -3;
+	if (bbOppPawns & bbRelRank[side][RANK_5] ) return -5;
+	if (bbOppPawns & bbRelRank[side][RANK_6] ) return -7;
     return 0;
 }
 

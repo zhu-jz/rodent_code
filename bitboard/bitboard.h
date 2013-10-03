@@ -25,16 +25,15 @@
 
 #pragma once
 
-//#define USE_MM_POPCNT
-//#define USE_FIRST_ONE_INTRINSICS
-#define USE_FIRST_ONE_ASM
-
+#define USE_MM_POPCNT
+#define USE_FIRST_ONE_INTRINSICS
+//#define USE_FIRST_ONE_ASM
 // portable definition of an unsigned 64-bit integer
 #if defined(_WIN32) || defined(_WIN64)
     typedef unsigned long long U64;
 #else
     #include <stdint.h>
-    typedef uint64_t U64;
+    typedef uint64_t U64;enc
 #endif
 
 #define bbEmpty			(U64)0ULL
@@ -76,6 +75,9 @@
 
 #define REL_SQ(sq,cl)   ( sq ^ (cl * 56) )
 #define RelSqBb(sq,cl)  ( SqBb(REL_SQ(sq,cl) ) )
+
+extern const U64 bbRank [8];
+extern const U64 bbRelRank [2] [8];
 
 // Compiler and architecture dependent versions of FirstOne() function, 
 // triggered by defines at the top of this file.

@@ -21,6 +21,10 @@
 #include "../rodent.h"
 #include "bitboard.h"
 
+extern const U64 bbRank    [8]     = { bbRANK_1, bbRANK_2, bbRANK_3, bbRANK_4, bbRANK_5, bbRANK_6, bbRANK_7, bbRANK_8 };
+extern const U64 bbRelRank [2] [8] = { {bbRANK_1, bbRANK_2, bbRANK_3, bbRANK_4, bbRANK_5, bbRANK_6, bbRANK_7, bbRANK_8 }, 
+                                       {bbRANK_8, bbRANK_7, bbRANK_6, bbRANK_5, bbRANK_4, bbRANK_3, bbRANK_2, bbRANK_1 } };
+
 void PrintBb( U64 bbTest) 
 {
   for (int sq = 0; sq < 64; sq++) {

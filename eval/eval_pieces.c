@@ -32,10 +32,10 @@
 #define ROOK_SEMI_OPEN_ATTACK  50  // milipawns
 
   //                           P   N   B   R   Q   K   -
-  const int outpostBase [7] = {0,  4,  4,  0,  0,  0,  0};
-  const int canCheckWith[7] = {0,  0,  10,  40, 100,  0,  0};  // attack bonus for possibility of giving check
-     const int attPerPc [7] = {0, 10,  10,  20,  40,  0,  0};  // bonus for attacking a square near enemy king (milipawns)
-     const int woodPerPc[7] = {0,  1,  1,  2,  4,  0,  0};     // contribution of attack to a scaling factor
+  const int outpostBase [7] = {0,  4,   4,   0,   0,  0,  0};
+  const int canCheckWith[7] = {0,  0,  10,  40, 100,  0,  0};  // attack bonus for possibility of giving check  (milipawns)
+     const int attPerPc [7] = {0, 10,  10,  20,  40,  0,  0};  // bonus for attacking a square near enemy king  (milipawns)
+     const int woodPerPc[7] = {0,  1,   1,   2,   4,  0,  0};  // contribution of attack to a scaling factor
  
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
@@ -75,7 +75,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	ScoreOutpost(p, side, B, sq);                    // outposts
 
     // check threats (with false positive due to queen transparency)
-	if (bbControl & ( kingDiagChecks[Opp(side)] ) )
+	if (bbControl & kingDiagChecks[Opp(side)] )
 		attCount[side] += canCheckWith[B]; 
 
     // king attack (if our queen is present)
@@ -125,9 +125,9 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	}
 
 	// evaluate rook on 7th rank if it attacks pawns or cuts off enemy king
-	if (SqBb(sq) & relRank[side][RANK_7] ) {
-       if ( bbPc(p, Opp(side), P) & relRank[side][RANK_7]
-	   || bbPc(p, Opp(side), K) & relRank[side][RANK_8]
+	if (SqBb(sq) & bbRelRank[side][RANK_7] ) {
+       if ( bbPc(p, Opp(side), P) & bbRelRank[side][RANK_7]
+	   || bbPc(p, Opp(side), K) & bbRelRank[side][RANK_8]
 	   )  AddMisc(side, Data.rookSeventhMg, Data.rookSeventhEg);
 	}
 
@@ -161,9 +161,9 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	bbAllAttacks[side] |= bbControl;                  // update attack data
 
 	// evaluate queen on 7th rank if it attacks pawns or cuts off enemy king
-	if (SqBb(sq) & relRank[side][RANK_7] ) {
-       if ( bbPc(p, Opp(side), P) & relRank[side][RANK_7]
-	   || bbPc(p, Opp(side), K) & relRank[side][RANK_8]
+	if (SqBb(sq) & bbRelRank[side][RANK_7] ) {
+       if ( bbPc(p, Opp(side), P) & bbRelRank[side][RANK_7]
+	   || bbPc(p, Opp(side), K) & bbRelRank[side][RANK_8]
 	   )  AddMisc(side, 10, 5); // correct would be 5/10, but it is for the next test
 	}
 
