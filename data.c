@@ -175,6 +175,7 @@ void sData::InitMaterialValues(void)
 
 void sData::InitEvalVars(void) 
 {
+	 safetyStyle     = KS_RODENT;
 	 ownMobility     = 110;
 	 oppMobility     = 110;
 	 ownAttack       = 100; 

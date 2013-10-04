@@ -187,7 +187,7 @@ int sData::GetBishopEgPst(int sq)
 
 int sData::GetQueenMgPst(int sq)
 {
-    if ( Rank(sq) == RANK_1) return -5;
+	if ( Rank(sq) == RANK_1) return -5;
 	else                     return 0;
 }
 

@@ -27,16 +27,19 @@
 #include "eval.h"
 #include <stdio.h>
 
-#define QUEEN_CONTACT_CHECK   300  // milipawns
-#define ROOK_OPEN_ATTACK	  100  // milipawns
-#define ROOK_SEMI_OPEN_ATTACK  50  // milipawns
 
-  //                           P   N   B   R   Q   K   -
-  const int outpostBase [7] = {0,  4,   4,   0,   0,  0,  0};
-  const int canCheckWith[7] = {0,  0,  10,  40, 100,  0,  0};  // attack bonus for possibility of giving check  (milipawns)
-     const int attPerPc [7] = {0, 10,  10,  20,  40,  0,  0};  // bonus for attacking a square near enemy king  (milipawns)
-     const int woodPerPc[7] = {0,  1,   1,   2,   4,  0,  0};  // contribution of attack to a scaling factor
- 
+  //                                    data for Rodent curve               data for Stockfish curve 
+  //                                    P    N    B    R    Q    K          P   N   B   R   Q   K
+  const int attPerPc     [2]  [7] = { { 0,  10,  10,  20,  40,   0,  0} , { 0,  2,  2,  3,  5,  0,  0} }; 
+  const int canCheckWith [2]  [7] = { { 0,   0,  10,  40,  100,  0,  0} , { 0,  1,  1,  2,  3,  0,  0} };  
+  const int woodPerPc         [7] =   { 0,   1,   1,   2,   4,   0,  0};
+
+  const int outpostBase       [7] =   { 0,   4,   4,   0,   0,   0,  0};
+
+  const int rookOpenAttack    [2] = { 100, 0 };
+  const int rookSemiOpenAttack[2] = {  50, 0 };
+  const int queenContactCheck [2] = { 300, 6 };
+
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
   int sq;
@@ -50,6 +53,10 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	bbControl &= ~p->bbCl[side];                     // exclude squares occupied by own pieces
 	ScoreMinorPawnRelation(p, side, sq);             // knight attacked / defended by pawn
 	ScoreOutpost(p, side, N, sq);                    // outposts
+
+    // check threats (with false positive due to queen transparency)
+	if (bbControl & kingKnightChecks[Opp(side)] )
+		attCount[side] += canCheckWith[Data.safetyStyle][N]; 
 
 	// king attacks (if our queen is present)
 	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
@@ -76,7 +83,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 
     // check threats (with false positive due to queen transparency)
 	if (bbControl & kingDiagChecks[Opp(side)] )
-		attCount[side] += canCheckWith[B]; 
+		attCount[side] += canCheckWith[Data.safetyStyle][B]; 
 
     // king attack (if our queen is present)
 	if (bbBCanAttack[sq] [KingSq(p, side ^ 1) ] 
@@ -115,12 +122,12 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) 
 	   {
 		  AddMisc(side, Data.rookOpenMg, Data.rookOpenEg);
-		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += ROOK_OPEN_ATTACK;
+		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += rookOpenAttack[Data.safetyStyle];
 	   }
 	  else
 	  {
 		  AddMisc(side, Data.rookSemiOpenMg, Data.rookSemiOpenEg);
-		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += ROOK_SEMI_OPEN_ATTACK;
+		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += rookSemiOpenAttack[Data.safetyStyle];
 	  }
 	}
 
@@ -133,7 +140,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
     // check threats (including false positives due to queen/rook transparency)
 	if (bbControl & kingStraightChecks[Opp(side)] )
-		attCount[side] += canCheckWith[R];
+		attCount[side] += canCheckWith[Data.safetyStyle][R];
 
 	// king attack (if our queen is present)
 	if ( bbRCanAttack[sq] [KingSq(p, side ^ 1) ]  
@@ -170,7 +177,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	if (bbControl & bbCanCheckFrom ) {
 
 		// queen check threats (unlike with other pieces, we *count the number* of possible checks here)
-		attCount[side] += PopCntSparse( bbControl & bbCanCheckFrom ) * canCheckWith[Q];
+		attCount[side] += PopCntSparse( bbControl & bbCanCheckFrom ) * canCheckWith[Data.safetyStyle][Q];
 
         // safe contact checks
 	    bbContact = bbControl & bbKingAttacks[ p->kingSquare[Opp(side)] ];
@@ -178,7 +185,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
            contactSq = PopFirstBit(&bbContact);
 
 	       if ( Swap(p, sq, contactSq) >= 0 ) {
-              attCount[side] += QUEEN_CONTACT_CHECK; 
+			  attCount[side] += queenContactCheck[Data.safetyStyle]; 
 		      break;
 	       }
 	    }
@@ -244,7 +251,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 void sEvaluator::AddPieceAttack(int side, int pc, int cnt)
 {
     attNumber[side] += 1;
-	attCount [side] += attPerPc[pc] * cnt;
+	attCount [side] += attPerPc[Data.safetyStyle][pc] * cnt;
 	attWood  [side] += woodPerPc[pc];
 }
 

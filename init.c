@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "bitboard/bitboard.h"
 #include "data.h"
 #include "rodent.h"
@@ -30,6 +31,13 @@ U64 bbPawnSupport[2][64];
 
 void Init(void)
 {
+
+  	for (int t=0, i=1; i < 100; ++i)
+    {
+        t = Min(1280, Min(int(0.4 * i * i), t + 30));
+		Data.kingDanger[i] = (t * 100) / 256;
+	}
+
   InitKindergartenBitboards();
   InitPawnAttacks();
   InitKnightAttacks();

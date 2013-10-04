@@ -71,7 +71,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 
   rootList.Init(p);
   int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
-  if (rootList.nOfMoves == 1) localDepth = 4 * ONE_PLY;
+  if (rootList.nOfMoves == 1) localDepth = 4 * ONE_PLY; // single reply
 
   Timer.SetIterationTiming();            // define additional rules for starting next iteration
   Data.InitAsymmetric(p->side);          // set asymmetric eval parameters, dependent on the side to move
@@ -415,6 +415,19 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	  }
     }
   } // end of null move code 
+
+   // RAZORING based on Toga II 4.0 - NARROW FAIL, 49,4%, TRY AGAIN WITH BETTER QS
+   /*if (nodeType != PV_NODE 
+   && !flagInCheck 
+   && !move
+   && depth <= 3*ONE_PLY){
+        int threshold = beta - 300 - (depth-ONE_PLY)*10;
+        if (Eval.ReturnFull(p, alpha, beta) < threshold)
+		{
+		   score = Quiesce(p, ply, 0, alpha, beta, 0, pv); 
+           if (score < threshold) return score;
+        }
+   }*/
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
   if (nodeType == PV_NODE && !move && depth >= 4*ONE_PLY && !flagInCheck ) {

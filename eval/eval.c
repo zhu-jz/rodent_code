@@ -55,6 +55,8 @@ void sEvaluator::InitDynamic(sPosition *p)
 	 kingStraightChecks[BLACK] = RAttacks(bbOccupied, KingSq(p, BLACK) );  
 	 kingDiagChecks[WHITE]     = BAttacks(bbOccupied, KingSq(p, WHITE) );  
 	 kingDiagChecks[BLACK]     = BAttacks(bbOccupied, KingSq(p, BLACK) );  
+	 kingKnightChecks[WHITE]   = bbKnightAttacks[KingSq(p, WHITE)];
+	 kingKnightChecks[BLACK]   = bbKnightAttacks[KingSq(p, BLACK)];
 }
 
 void sEvaluator::SetScaleFactor(sPosition *p) 
@@ -149,9 +151,17 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 
 void sEvaluator::ScoreKingAttacks(int side) 
 {
-	if (attWood[side]   > 14) attWood[side] = 14;         
-    if (attNumber[side] > 1 ) attWood[side] += 1;       
-    attScore[side] = (attCount[side] * attMult[attWood[side]]) / 100;
+	if (Data.safetyStyle == KS_RODENT)    {
+	   if (attWood[side] > 14) attWood[side] = 14;
+       if (attNumber[side] > 1 ) attWood[side] += 1;
+       attScore[side] = (attCount[side] * attMult[attWood[side]]) / 100;
+	}
+
+	if (Data.safetyStyle == KS_STOCKFISH) {
+	   if(attCount[side] > 99) attCount[side] = 99;
+	   if(attNumber[side] < 2) attCount[side] = 0;
+	   attScore[side] = Data.kingDanger[attCount[side]] * 10;
+	}
 	ScaleValue(&attScore[side]  , Data.attSidePercentage[side]);
 }
 

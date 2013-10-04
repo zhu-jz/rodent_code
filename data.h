@@ -20,6 +20,7 @@
 #pragma once
 
 enum ePanelStyle   { PANEL_NORMAL, PANEL_POWER };
+enum eSafetyStyle  { KS_RODENT, KS_STOCKFISH };
 enum ePawnProperty { PASSED, CANDIDATE, PHALANX, ISOLATED, BACKWARD, PAWN_PROPERTIES };
 
 struct sData {
@@ -53,6 +54,9 @@ public:
  int rookSeventhEg;
  int pawnIsolatedOnOpen;
  int pawnBackwardOnOpen;
+ int kingDanger[100];
+ int safetyStyle;
+
 
  // search data
  int aspiration;       // size of aspiration window
