@@ -38,6 +38,8 @@
   const int rookOpenAttack    [2] = { 100, 0 };
   const int rookSemiOpenAttack[2] = {  50, 0 };
   const int queenContactCheck [2] = { 300, 6 };
+  const int rookSeventhMg   = 20;
+  const int rookSeventhEg   = 20; // 40 is worse
 
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
@@ -134,7 +136,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	if (SqBb(sq) & bbRelRank[side][RANK_7] ) {
        if ( bbPc(p, Opp(side), P) & bbRelRank[side][RANK_7]
 	   || bbPc(p, Opp(side), K) & bbRelRank[side][RANK_8]
-	   )  AddMisc(side, Data.rookSeventhMg, Data.rookSeventhEg);
+	   )  AddMisc(side, rookSeventhMg, rookSeventhEg);
 	}
 
     // check threats (including false positives due to queen/rook transparency)

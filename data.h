@@ -50,8 +50,6 @@ public:
  int rookOpenEg;
  int rookSemiOpenMg;
  int rookSemiOpenEg;
- int rookSeventhMg;
- int rookSeventhEg;
  int pawnIsolatedOnOpen;
  int pawnBackwardOnOpen;
  int kingDanger[100];

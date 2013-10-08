@@ -175,7 +175,7 @@ void sData::InitMaterialValues(void)
 
 void sData::InitEvalVars(void) 
 {
-	 safetyStyle     = KS_RODENT;
+	 safetyStyle     = KS_STOCKFISH;
 	 ownMobility     = 110;
 	 oppMobility     = 110;
 	 ownAttack       = 100; 
@@ -187,8 +187,6 @@ void sData::InitEvalVars(void)
      rookOpenEg      = 10;
 	 rookSemiOpenMg  = 5;
 	 rookSemiOpenEg  = 5;
-	 rookSeventhMg   = 20;
-	 rookSeventhEg   = 20;
 	 pawnIsolatedOnOpen = -15;
 	 pawnBackwardOnOpen = -15;
 }
