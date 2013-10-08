@@ -23,7 +23,7 @@
 #include "../rodent.h"
 #include "eval.h"
 
-const int attMult[15] = {0, 0, 4, 10, 14, 26, 42, 52, 64, 70, 76, 82, 86, 92, 100};
+const int attMult[15]     = {0, 0, 4, 10, 14, 26, 42, 52, 64, 70, 76, 82, 86, 92, 100};
 
 void sEvaluator::InitStatic(void) 
 {
@@ -156,9 +156,8 @@ void sEvaluator::ScoreKingAttacks(int side)
        if (attNumber[side] > 1 ) attWood[side] += 1;
        attScore[side] = (attCount[side] * attMult[attWood[side]]) / 100;
 	}
-
 	if (Data.safetyStyle == KS_STOCKFISH) {
-	   if(attCount[side] > 99) attCount[side] = 99;
+ 	   if(attCount[side] > 99) attCount[side] = 99;
 	   if(attNumber[side] < 2) attCount[side] = 0;
 	   attScore[side] = Data.kingDanger[attCount[side]] * 10;
 	}

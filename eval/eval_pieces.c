@@ -27,11 +27,10 @@
 #include "eval.h"
 #include <stdio.h>
 
-
-  //                                    data for Rodent curve               data for Stockfish curve 
+  //                                    for Rodent curve                    for Stockfish-like curve
   //                                    P    N    B    R    Q    K          P   N   B   R   Q   K
-  const int attPerPc     [2]  [7] = { { 0,  10,  10,  20,  40,   0,  0} , { 0,  2,  2,  3,  5,  0,  0} }; 
-  const int canCheckWith [2]  [7] = { { 0,   0,  10,  40,  100,  0,  0} , { 0,  1,  1,  2,  3,  0,  0} };  
+  const int attPerPc     [2]  [7] = { { 0,  10,  10,  20,  40,   0,  0} , { 0,  2,  2,  3,  5,  0,  0} };
+  const int canCheckWith [2]  [7] = { { 0,   0,  10,  40,  100,  0,  0} , { 0,  1,  1,  2,  3,  0,  0} }; 
   const int woodPerPc         [7] =   { 0,   1,   1,   2,   4,   0,  0};
 
   const int outpostBase       [7] =   { 0,   4,   4,   0,   0,   0,  0};
@@ -54,16 +53,16 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	ScoreMinorPawnRelation(p, side, sq);             // knight attacked / defended by pawn
 	ScoreOutpost(p, side, N, sq);                    // outposts
 
-    // check threats (with false positive due to queen transparency)
-	if (bbControl & kingKnightChecks[Opp(side)] )
-		attCount[side] += canCheckWith[Data.safetyStyle][N]; 
-
 	// king attacks (if our queen is present)
 	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	if (bbAttZone && p->pcCount[side][Q] ) AddPieceAttack(side, N, PopCntSparse(bbAttZone) ); 
 
 	bbControl &= ~bbPawnControl[Opp(side)];          // exclude squares controlled by enemy pawns
 	AddMobility(N, side, PopCnt15(bbControl) );      // evaluate mobility
+
+    // check threats (excluding checks from squares controlled by enemy pawns)
+	if (bbControl & kingKnightChecks[Opp(side)] )
+		attCount[side] += canCheckWith[Data.safetyStyle][N]; 
   }
 }
 
@@ -71,8 +70,8 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 {
   int sq;
   U64 bbControl, bbAttZone;
-  U64 bbPieces      = bbPc(p, side, B);
-  U64 bbOccupied    = OccBb(p) ^ bbPc(p, side, Q);   // accept mobility through own queen
+  U64 bbPieces    = bbPc(p, side, B);
+  U64 bbOccupied  = OccBb(p) ^ bbPc(p, side, Q);     // accept mobility through own queen
 
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);                     // set piece location and clear it from bbPieces
