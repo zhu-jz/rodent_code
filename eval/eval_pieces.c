@@ -27,25 +27,24 @@
 #include "eval.h"
 #include <stdio.h>
 
-  // eval variables not exposed to the user
-  const int rookSeventhMg  = 20;
-  const int rookSeventhEg  = 20; // 40 is worse
-  const int rookOpenMg     = 10;
-  const int rookOpenEg     = 10;
-  const int rookSemiOpenMg = 5;
-  const int rookSemiOpenEg = 5;
-  const int outpostBase[7] = { 0,   4,   4,   0,   0,   0,  0};
+  // eval data not exposed to the user
+  const int outpostBase       [7] = { 0,   4,   4,   0,   0,   0,  0};
+  const int rookOpenAttack    [2] = { 100, 0 };
+  const int rookSemiOpenAttack[2] = {  50, 0 };
+  const int queenContactCheck [2] = { 300, 6 };
+  const int rookSeventhMg   = 20;
+  const int rookSeventhEg   = 20; // BEST 20, 40 is worse
+  const int rookOpenMg      = 10;
+  const int rookOpenEg      = 10;
+  const int rookSemiOpenMg  = 5;
+  const int rookSemiOpenEg  = 5;
 
-  // data used for attack evaluation
+  // data for attack evaluation
   //                                    for Rodent curve                    for Stockfish-like curve
   //                                    P    N    B    R    Q    K          P   N   B   R   Q   K
   const int attPerPc     [2]  [7] = { { 0,  10,  10,  20,  40,   0,  0} , { 0,  2,  2,  3,  5,  0,  0} };
   const int canCheckWith [2]  [7] = { { 0,   0,  10,  40,  100,  0,  0} , { 0,  1,  1,  2,  3,  0,  0} }; 
   const int woodPerPc         [7] =   { 0,   1,   1,   2,   4,   0,  0};
-
-  const int rookOpenAttack    [2] = { 100, 0 };
-  const int rookSemiOpenAttack[2] = {  50, 0 };
-  const int queenContactCheck [2] = { 300, 6 };
 
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
@@ -63,7 +62,10 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 
 	// king attacks (if our queen is present)
 	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
-	if (bbAttZone && p->pcCount[side][Q] ) AddPieceAttack(side, N, PopCntSparse(bbAttZone) ); 
+	if (bbAttZone && p->pcCount[side][Q] ) {
+		AddPieceAttack(side, N, PopCntSparse(bbAttZone) ); 
+		bbCoorAttacks[side] ^= bbAttZone;
+	}
 
 	bbControl &= ~bbPawnControl[Opp(side)];          // exclude squares controlled by enemy pawns
 	AddMobility(N, side, PopCnt15(bbControl) );      // evaluate mobility
@@ -92,7 +94,10 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	if (bbBCanAttack[sq] [KingSq(p, side ^ 1) ] 
 	&& (bbControl & bbKingZone[side][p->kingSquare[Opp(side)]] ) ) {
        bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
-	   if (bbAttZone && p->pcCount[side][Q] ) AddPieceAttack( side, B, PopCntSparse(bbAttZone) ); 
+	   if (bbAttZone && p->pcCount[side][Q] ) {
+		   AddPieceAttack( side, B, PopCntSparse(bbAttZone) ); 
+		   bbCoorAttacks[side] ^= bbAttZone;
+	   }
    }
 
 	bbControl &= ~bbPawnControl[Opp(side)];          // exclude squares controlled by enemy pawns
@@ -130,12 +135,10 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	   {
 		  AddMisc(side, rookOpenMg, rookOpenEg);
 		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += rookOpenAttack[Data.safetyStyle];
-	   }
-	  else
-	  {
+	   } else {
 		  AddMisc(side, rookSemiOpenMg, rookSemiOpenEg);
 		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += rookSemiOpenAttack[Data.safetyStyle];
-	  }
+	   }
 	}
 
 	// evaluate rook on 7th rank if it attacks pawns or cuts off enemy king
@@ -153,7 +156,10 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	if ( bbRCanAttack[sq] [KingSq(p, side ^ 1) ]  
 	&& ( bbControl & bbKingZone[side][p->kingSquare[Opp(side)]] ) ) {
        bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
-	   if (bbAttZone && p->pcCount[side][Q])  AddPieceAttack(side, R, PopCntSparse(bbAttZone) );
+	   if (bbAttZone && p->pcCount[side][Q]) {
+		   AddPieceAttack(side, R, PopCntSparse(bbAttZone) );
+		   attCount[side] += PopCntSparse( bbAttZone & bbCoorAttacks[side] ); // rook-minor coordination
+	   }
 	}
 	
 	AddMobility(R, side, PopCnt15(bbControl) );
@@ -209,8 +215,10 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 
 	   // count attacks
 	   bbAttZone = bbAttacks & bbKingZone[side][p->kingSquare[Opp(side)]];
-	   if (bbAttZone) 
+	   if (bbAttZone) {
 		   AddPieceAttack(side, Q, PopCntSparse(bbAttZone) );	   
+		   attCount[side] += PopCntSparse( bbAttZone & bbCoorAttacks[side] ); // coordinated Queen - minor attacks
+	   }
 	}
 	
 	AddMobility(Q, side, PopCnt(bbControl) );
@@ -219,11 +227,10 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 
 void sEvaluator::ScoreP(sPosition *p, int side) 
 {
-  int sq;
+  int sq, passUnitMg, passUnitEg;
   U64 bbPieces = bbPc(p, side, P);
   U64 bbOccupied = OccBb(p);
   U64 bbStop, bbObstacles;
-  int passUnitMg, passUnitEg; 
 
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);
@@ -289,7 +296,5 @@ void sEvaluator::ScoreOutpost(sPosition *p, int side, int piece, int sq)
 void sEvaluator::ScoreMinorPawnRelation(sPosition *p, int side, int sq)
 {
 	if ( SqBb(sq) & bbPawnControl[Opp(side)] )  AddMisc(side, -10, -10); // attacked by pawn
-	else {
-       if ( SqBb(sq) & bbPawnControl[side] )  AddMisc(side, 2, 2);       // defended by pawn
-	}
+	else if ( SqBb(sq) & bbPawnControl[side] )  AddMisc(side, 2, 2);     // defended by pawn
 }
