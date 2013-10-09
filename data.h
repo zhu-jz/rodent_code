@@ -46,10 +46,6 @@ public:
  int oppAttack;
  int bishopPair;
  int badBishopPenalty[2][64];
- int rookOpenMg;
- int rookOpenEg;
- int rookSemiOpenMg;
- int rookSemiOpenEg;
  int pawnIsolatedOnOpen;
  int pawnBackwardOnOpen;
  int kingDanger[100];

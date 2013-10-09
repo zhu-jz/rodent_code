@@ -183,10 +183,6 @@ void sData::InitEvalVars(void)
 	 bishopPair      =  50; 
 	 doubledPawn[MG] = -20;
      doubledPawn[EG] = -10;
-	 rookOpenMg      = 10;
-     rookOpenEg      = 10;
-	 rookSemiOpenMg  = 5;
-	 rookSemiOpenEg  = 5;
 	 pawnIsolatedOnOpen = -15;
 	 pawnBackwardOnOpen = -15;
 }
