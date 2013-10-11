@@ -127,6 +127,7 @@ void sEvaluator::ScoreKingShield(sPosition *p, int side)
   bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
 
   // we use generic score for castled king to avoid changing shield score by, say, Kh1-g1
+  // additionally we give a bonus for returning bishop here
   if (SqBb(sq) & bbKSCastle[side]) sq = kCastle[side];
   if (SqBb(sq) & bbQSCastle[side]) sq = qCastle[side];
 
@@ -250,20 +251,8 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
   }
   else score = temp_score; 
 
-  score = PullToDraw(p, score); // decrease score in drawish endgames
-
-  // add random value in weakening mode
-  if (Data.elo < MAX_ELO && Data.useWeakening) {
-	  int randomFactor = ( MAX_ELO - Data.elo ) / 10;
-	  int randomMod = (randomFactor / 2) - (p->hashKey % randomFactor);
-	  score += randomMod;
-  }
-
-  score = Normalize(score, MAX_EVAL);
-
-  // grain
-  score /= GRAIN_SIZE;
-  score *= GRAIN_SIZE;
+  score = PullToDraw(p, score);    // decrease score in drawish endgames
+  score = FinalizeScore(p, score); // bounds, granulatity and weakening
 
   // return score relative to the side to move
   return p->side == WHITE ? score : -score;
@@ -283,20 +272,8 @@ int sEvaluator::ReturnFast(sPosition *p)
   egScore += (p->pstEg[WHITE] - p->pstEg[BLACK]);
   
   score += Interpolate();
-  score = PullToDraw(p, score); // decrease score in drawish endgames
-
-  // add random value in weakening mode
-  if (Data.elo < MAX_ELO && Data.useWeakening) {
-	  int randomFactor = ( MAX_ELO - Data.elo ) / 15;
-	  int randomMod = (randomFactor / 2) - (p->hashKey % randomFactor);
-	  score += randomMod;
-  }
-
-  score = Normalize(score, MAX_EVAL);
-
-  // grain
-  score /= GRAIN_SIZE;
-  score *= GRAIN_SIZE;
+  score = PullToDraw(p, score);    // decrease score in drawish endgames
+  score = FinalizeScore(p, score); // bounds, granulatity and weakening
 
   // return score relative to the side to move
   return p->side == WHITE ? score : -score;
@@ -307,6 +284,21 @@ int sEvaluator::Normalize(int val, int limit)
 	if (val > limit)       return limit;
 	else if (val < -limit) return -limit;
     return val;
+}
+
+int sEvaluator::FinalizeScore(sPosition * p, int score)
+{
+  // add random value in weakening mode
+  if (Data.elo < MAX_ELO && Data.useWeakening) {
+	  int randomFactor = ( MAX_ELO - Data.elo ) / 10;
+	  int randomMod = (randomFactor / 2) - (p->hashKey % randomFactor);
+	  score += randomMod;
+  }
+
+  // enforce bounds
+  score = Normalize(score, MAX_EVAL);
+
+  return ( score / GRAIN_SIZE) * GRAIN_SIZE;
 }
 
 void sEvaluator::ScaleValue(int * value, int factor) 

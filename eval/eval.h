@@ -85,6 +85,7 @@ private:
   int  EvalTrappedBishop(sPosition *p, int side);
   int  EvalTrappedRook(sPosition *p, int side);
   int  PullToDraw(sPosition *p, int score);
+  int  FinalizeScore(sPosition *p, int score);
 public:
   int Normalize(int val, int limit);
   void ScaleValue(int * value, int factor);
