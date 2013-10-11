@@ -115,6 +115,7 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
   int best, score, move = 0, newPv[MAX_PLY];
   sSelector Selector;
   UNDO undoData[1];
+  int unusedFlag;
 
   nodes++;
   IncStat(Q_NODES);
@@ -149,6 +150,8 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
   }
 
   if (best > alpha) alpha = best;
+
+  //if (!flagInCheck) {
 
   Selector.InitCaptureList(p, move);
 
@@ -191,6 +194,48 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
       }
     }
   }
+
+ // }
+
+
+  /*  if (flagInCheck) {
+
+  Selector.InitMoveList(p, move, 0);
+
+  while ( move = Selector.NextMove(0, &unusedFlag) ) {      // on finding next move
+	  
+    Manipulator.DoMove(p, move, undoData);
+    
+	// don't process illegal moves
+	if (IllegalPosition(p)) { 
+		Manipulator.UndoMove(p, move, undoData); 
+		continue; 
+	}
+    
+	score = -QuiesceSmart(p, ply+1, qDepth+1, -beta, -alpha, 0, newPv);
+
+    Manipulator.UndoMove(p, move, undoData);
+
+    if (flagAbortSearch) return 0; // timeout, "stop" command or mispredicted ponder move
+
+	// BETA CUTOFF
+	if (score >= beta) {
+	   TransTable.Store(p->hashKey, move, score, LOWER, 1, ply);
+	   return score;
+	}
+
+	// SET NEW SCORE
+    if (score > best) {
+      best = score;
+      if (score > alpha) {
+		alpha = score;
+        BuildPv(pv, newPv, move);
+      }
+    }
+  }
+
+  }*/
+
 
   // SAVE SEARCH RESULT IN TRANSPOSITION TABLE
   if (*pv) TransTable.Store(p->hashKey, *pv, best, EXACT, 1, ply);

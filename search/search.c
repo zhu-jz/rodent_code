@@ -37,6 +37,7 @@ void sSearcher::Init(void)
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
            reductionSize[depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // Stockfish formula
+		 pvReductionSize[depth][moves] = 4* (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );       // was / 3.0
 		}
 }
 
@@ -321,9 +322,10 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // CHECK EXTENSION
   if (flagInCheck) depth += ONE_PLY;
-  
+
   // QUIESCENCE SEARCH ENTRY POINT
   if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, 0, pv);
+  //if ( depth < ONE_PLY ) return QuiesceSmart(p, ply, 0, alpha, beta, 0, pv); // with check extension moved up 49,1% out of 2000 games
 
   nodes++;
   nodesPerBranch++;
@@ -510,14 +512,17 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 }
 
 	 // LATE MOVE REDUCTION
-	 if  ( flagCanReduce
+	 if  ( !flagInCheck 
+	 && !depthChange 
+	 && AvoidReduction(move, flagMoveType)
      &&  Data.minimalLmrDepth           // we have some depth left
 	 &&  movesTried > 3                 // we're sufficiently down the move list
      &&  !InCheck(p)                    // we're not giving check
 	 &&  History.MoveIsBad(move)        // current move has bad history score
 	 ) {
-		 if ( IsMoveOrdinary(flagMoveType) /*|| flagMoveType == FLAG_BAD_CAPTURE*/) {
-		    depthChange -= reductionSize[depth][movesTried];
+		 if ( IsMoveOrdinary(flagMoveType) ) {
+            if (nodeType == PV_NODE) depthChange -= pvReductionSize[depth][movesTried];
+		    else                     depthChange -= reductionSize[depth][movesTried];
 		    History.OnMoveReduced(move);
  	        flagIsReduced = 1;
 		 }

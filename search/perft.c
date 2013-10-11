@@ -116,7 +116,6 @@ void sSearcher::Divide(sPosition *p, int ply, int depth)
 	int nOfMoves = 0;
 
 	Timer.SetStartTime();
-
     Selector.InitMoveList(p, move, ply);
 
     while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
@@ -137,7 +136,7 @@ void sSearcher::Divide(sPosition *p, int ply, int depth)
 	   }
 
 	   Manipulator.UndoMove(p, move, undoData);
-  }
+	}
 
 	printf("total: %d\n", nOfMoves);
 	printf("%d \n", Timer.GetElapsedTime() ); 
