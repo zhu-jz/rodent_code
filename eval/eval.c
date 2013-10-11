@@ -49,6 +49,7 @@ void sEvaluator::InitDynamic(sPosition *p)
 	 bbAllAttacks[WHITE]     = bbPawnControl[WHITE];
 	 bbAllAttacks[BLACK]     = bbPawnControl[BLACK];
 	 bbMinorCoorAttacks[WHITE]   = 0ULL;
+	 bbMinorCoorAttacks[BLACK]   = 0ULL;
 	 
 	 // set squares from which king can be checked 
 	 U64 bbOccupied = OccBb(p);
