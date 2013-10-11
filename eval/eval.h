@@ -43,7 +43,7 @@ private:
   U64 kingDiagChecks[2];
   U64 kingStraightChecks[2];
   U64 kingKnightChecks[2];
-  U64 bbCoorAttacks[2];    // bitboard to detect coordinated attacks on enemy king
+  U64 bbMinorCoorAttacks[2];    // bitboard to detect coordinated attacks on enemy king
   U64 bbAllAttacks[2];     // squares attacked by a side
   int attCount[2];         // attack counter based on square control
   int attNumber[2];        // no. of pieces participating in the attack

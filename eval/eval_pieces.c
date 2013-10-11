@@ -64,7 +64,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	if (bbAttZone && p->pcCount[side][Q] ) {
 		AddPieceAttack(side, N, PopCntSparse(bbAttZone) ); 
-		bbCoorAttacks[side] ^= bbAttZone;
+		bbMinorCoorAttacks[side] ^= bbAttZone;
 	}
 
 	bbControl &= ~bbPawnControl[Opp(side)];          // exclude squares controlled by enemy pawns
@@ -96,7 +96,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
        bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone && p->pcCount[side][Q] ) {
 		   AddPieceAttack( side, B, PopCntSparse(bbAttZone) ); 
-		   bbCoorAttacks[side] ^= bbAttZone;
+		   bbMinorCoorAttacks[side] ^= bbAttZone;
 	   }
    }
 
@@ -158,7 +158,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
        bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone && p->pcCount[side][Q]) {
 		   AddPieceAttack(side, R, PopCntSparse(bbAttZone) );
-		   attCount[side] += PopCntSparse( bbAttZone & bbCoorAttacks[side] ); // rook-minor coordination
+		   attCount[side] += PopCntSparse( bbAttZone & bbMinorCoorAttacks[side] ); // rook-minor coordination
 	   }
 	}
 	
@@ -217,7 +217,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	   bbAttZone = bbAttacks & bbKingZone[side][p->kingSquare[Opp(side)]];
 	   if (bbAttZone) {
 		   AddPieceAttack(side, Q, PopCntSparse(bbAttZone) );	   
-		   attCount[side] += PopCntSparse( bbAttZone & bbCoorAttacks[side] ); // coordinated Queen - minor attacks
+		   attCount[side] += PopCntSparse( bbAttZone & bbMinorCoorAttacks[side] ); // coordinated Queen - minor attacks
 	   }
 	}
 	

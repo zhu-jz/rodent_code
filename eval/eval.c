@@ -48,8 +48,7 @@ void sEvaluator::InitDynamic(sPosition *p)
 	 bbPawnCanControl[BLACK] = FillSouth( bbPawnControl[BLACK] );
 	 bbAllAttacks[WHITE]     = bbPawnControl[WHITE];
 	 bbAllAttacks[BLACK]     = bbPawnControl[BLACK];
-	 bbCoorAttacks[WHITE]    = 0ULL;
-	 bbCoorAttacks[BLACK]    = 0ULL;
+	 bbMinorCoorAttacks[WHITE]   = 0ULL;
 	 
 	 // set squares from which king can be checked 
 	 U64 bbOccupied = OccBb(p);
@@ -127,7 +126,6 @@ void sEvaluator::ScoreKingShield(sPosition *p, int side)
   bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
 
   // we use generic score for castled king to avoid changing shield score by, say, Kh1-g1
-  // additionally we give a bonus for returning bishop here
   if (SqBb(sq) & bbKSCastle[side]) sq = kCastle[side];
   if (SqBb(sq) & bbQSCastle[side]) sq = qCastle[side];
 
@@ -295,10 +293,8 @@ int sEvaluator::FinalizeScore(sPosition * p, int score)
 	  score += randomMod;
   }
 
-  // enforce bounds
-  score = Normalize(score, MAX_EVAL);
-
-  return ( score / GRAIN_SIZE) * GRAIN_SIZE;
+  score = Normalize(score, MAX_EVAL);         // enforce bounds
+  return ( score / GRAIN_SIZE) * GRAIN_SIZE;  // enforce grain
 }
 
 void sEvaluator::ScaleValue(int * value, int factor) 
