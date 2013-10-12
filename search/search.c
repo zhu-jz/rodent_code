@@ -365,7 +365,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 int evalMargin = 40 * depth;
 	 if (nodeEval - evalMargin >= beta)
 		return nodeEval - evalMargin;
-  }
+  } // end of eval pruning code
 
   // QUIESCENCE NULL MOVE (idea from CCC post of Vincent Diepeveen)
   if (Data.useNull
@@ -378,7 +378,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 Manipulator.UndoNull(p, undoData);
 
 	 if (score >= beta) return score;
-  }
+  }  // end of quiescence null move code
 
   // NULL MOVE - we allow opponent to move twice in a row; if he cannot beat
   // beta this way, then we assume that there is no need to search any further.
@@ -410,32 +410,31 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
           nullScore = Search(p, ply, alpha, beta, newDepth-ONE_PLY, CUT_NODE, NO_NULL, 0, newPv);
 
       if (nullScore >= beta) {
-         if (!move) // we don't want to overwrite real entries, as they are more useful for move ordering 
-			TransTable.Store(p->hashKey, 0, nullScore, LOWER, depth, ply);
-		
+         // we don't want to overwrite real entries, as they are more useful for move ordering 
+         if (!move) TransTable.Store(p->hashKey, 0, nullScore, LOWER, depth, ply);
 		 return Eval.Normalize(nullScore, MAX_EVAL); // checkmate from null move search isn't reliable
 	  }
     }
   } // end of null move code 
 
-   // RAZORING based on Toga II 4.0 - NARROW FAIL, 49,4%, TRY AGAIN WITH BETTER QS
-   /*if (nodeType != PV_NODE 
+   // RAZORING based on Toga II 4.0
+   if (nodeType != PV_NODE 
    && !flagInCheck 
    && !move
    && depth <= 3*ONE_PLY){
-        int threshold = beta - 300 - (depth-ONE_PLY)*10;
+        int threshold = beta - 300 - (depth-ONE_PLY)*15;
         if (Eval.ReturnFull(p, alpha, beta) < threshold)
 		{
 		   score = Quiesce(p, ply, 0, alpha, beta, 0, pv); 
            if (score < threshold) return score;
         }
-   }*/
+   } // end of razoring code
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
   if (nodeType == PV_NODE && !move && depth >= 4*ONE_PLY && !flagInCheck ) {
 	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, newPv);
 	  TransTable.RetrieveMove(p->hashKey, &move);
-  }
+  } // end of internal iterative deepening code
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
@@ -448,7 +447,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 if (IsMoveOrdinary(flagMoveType) ) {
 
 	     if (++normalMoveCnt == 1) {   
-
             if ( depth < Data.futilityDepth * ONE_PLY  // we are sufficiently close to the leaf
             && flagCanPrune
             && alpha > -MAX_EVAL ) {
@@ -509,7 +507,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 		    { Manipulator.UndoMove(p, move, undoData); continue; }
 		 if ( History.MoveIsBad(move) ) 
 		    { Manipulator.UndoMove(p, move, undoData); continue; }
-	 }
+	 } // end of late move pruning code
 
 	 // LATE MOVE REDUCTION
 	 if  ( !flagInCheck 

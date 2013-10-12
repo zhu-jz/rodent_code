@@ -23,13 +23,11 @@
 #include "../timer.h"
 #include "search.h"
 
-void sSearcher::ClearStats(void)
-{
+void sSearcher::ClearStats(void) {
 	for (int i=0; i < END_OF_STATS; i++) stat[i] = 0;
 }
 
-void sSearcher::IncStat(int slot) 
-{
+void sSearcher::IncStat(int slot) {
 	stat[slot]++;
 }
 
@@ -55,8 +53,7 @@ void sSearcher::DisplayCurrmove(int move, int movesTried)
 	DisplaySpeed();
 }
 
-void sSearcher::DisplayDepth(void) 
-{
+void sSearcher::DisplayDepth(void) {
      printf("info depth %d \n", rootDepth / ONE_PLY);
 }
 
@@ -95,8 +92,7 @@ void sSearcher::DisplayPv(int score, int *pv)
           rootDepth/ONE_PLY, time/1000, (time/100)%10, nodes, nodes / (time+1),  score, pv_str);
 }
 
-void sSearcher::DisplaySavedIterationTime(void) 
-{
+void sSearcher::DisplaySavedIterationTime(void) {
      printf(" info string saving %d ms \n", Timer.GetSavedIterationTime() );
 }
 
