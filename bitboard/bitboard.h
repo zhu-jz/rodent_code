@@ -28,6 +28,7 @@
 #define USE_MM_POPCNT
 #define USE_FIRST_ONE_INTRINSICS
 //#define USE_FIRST_ONE_ASM
+
 // portable definition of an unsigned 64-bit integer
 #if defined(_WIN32) || defined(_WIN64)
     typedef unsigned long long U64;

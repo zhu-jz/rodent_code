@@ -48,7 +48,7 @@ void InitKindergartenBitboards()
       bbLineMask[DIAG_HA][i] = bbDIAG_A8H1 >> (-j * 8);
   }
 
-  // init attacks
+  // init sliding piece attacks
   for (i = 0; i < 4; i++)
     for (j = 0; j < 64; j++)
       for (k = 0; k < 64; k++) {

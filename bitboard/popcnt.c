@@ -23,14 +23,13 @@
 #if defined(GCC_POPCOUNT)
 
 int PopCnt(U64 bb) {
-  
-return __builtin_popcountll(bb);
-
+    return __builtin_popcountll(bb);
 }
+
 int PopCnt15(U64 bb) {
     return __builtin_popcountll(bb);
-
 }
+
 int PopCntSparse(U64 bb) {
    return __builtin_popcountll(bb);
 }
