@@ -77,6 +77,12 @@ void sParser::UciLoop(void)
 	if (strstr(command, "setoption name Verbose value"))
 		Data.verbose = (strstr(command, "value true") != 0);
 
+	// king safety type
+	if (strstr(command, "setoption name SafetyConsiderations value secondary"))
+		Data.safetyStyle = KS_RODENT;
+	if (strstr(command, "setoption name SafetyConsiderations value dominant"))
+		Data.safetyStyle = KS_STOCKFISH;
+
     if (strcmp(token, "uci") == 0) {
       flagProtocol = PROTO_UCI;
       PrintEngineHeader();
@@ -198,14 +204,12 @@ void sParser::SetOption(char *ptr)
 	   ReadPersonality(styleName);
 	   strcpy(Data.currLevel, value);
   } else if (strcmp(name, "Style") == 0) {
-
 	   char styleName[30] = "personalities/";	   
 	   strcat(styleName,value);
 	   strcat(styleName,".txt");
 	   ReadPersonality(styleName);
 	   strcpy(Data.currStyle, value);
   } else if (strcmp(name, "Book") == 0) {
-
 	   char bookName[30] = "books/";	   
 	   strcat(bookName,value);
 	   strcat(bookName,".txt");
@@ -217,6 +221,7 @@ void sParser::SetOption(char *ptr)
 void sParser::PrintUciOptions() 
 {		
 	if (Data.panelStyle == PANEL_POWER) {
+	printf("option name SafetyConsiderations type combo var secondary var dominant default dominant\n");
 	printf("option name Queen type spin default %d min 0 max 1200\n", Data.matValue[Q] );
 	printf("option name Rook type spin default %d min 0 max 1200\n", Data.matValue[R] );
 	printf("option name Bishop type spin default %d min 0 max 1200\n", Data.matValue[B] );
