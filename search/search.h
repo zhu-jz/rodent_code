@@ -68,8 +68,7 @@ private:
 	int RecognizeDraw(sPosition *p);
 	int nodes;
 	int rootDepth; 
-	double reductionSize[MAX_PLY * ONE_PLY][MAX_MOVES];
-	double pvReductionSize[MAX_PLY * ONE_PLY][MAX_MOVES];
+	double reductionSize[3][MAX_PLY * ONE_PLY][MAX_MOVES];
 	sFlatMoveList rootList;
 public:
 	void Init(void);

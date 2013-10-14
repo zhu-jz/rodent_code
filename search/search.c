@@ -35,9 +35,11 @@
 void sSearcher::Init(void)
 {
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
+		// set late move reduction depth using midified Stockfish formula
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
-           reductionSize[depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // Stockfish formula
-		 pvReductionSize[depth][moves] = 4* (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );       // was / 3.0
+           reductionSize[0][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // all node
+		   reductionSize[1][depth][moves] = 4* (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
+		   reductionSize[2][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // cut node
 		}
 }
 
@@ -210,7 +212,6 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 
   // TRANSPOSITION TABLE READ
   // at root we only get a move for sorting purposes
-
   TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, 0);
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
@@ -519,8 +520,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 &&  History.MoveIsBad(move)        // current move has bad history score
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
-            if (nodeType == PV_NODE) depthChange -= pvReductionSize[depth][movesTried];
-		    else                     depthChange -= reductionSize[depth][movesTried];
+		    depthChange -= reductionSize[nodeType+1][depth][movesTried];
 		    History.OnMoveReduced(move);
  	        flagIsReduced = 1;
 		 }
