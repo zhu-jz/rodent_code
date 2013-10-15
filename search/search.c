@@ -35,11 +35,17 @@
 void sSearcher::Init(void)
 {
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
-		// set late move reduction depth using midified Stockfish formula
+		// set late move reduction depth using modified Stockfish formula
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
            reductionSize[0][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // all node
 		   reductionSize[1][depth][moves] = 4* (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
 		   reductionSize[2][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // cut node
+		   for (int node = 0; node <= 2; node++) {
+			   if (reductionSize[node][depth][moves] > 2 * ONE_PLY)
+                  reductionSize[node][depth][moves] += ONE_PLY / 2;
+               else if (reductionSize[node][depth][moves] > 1 * ONE_PLY)
+                  reductionSize[node][depth][moves] += ONE_PLY / 4;
+		   }
 		}
 }
 
