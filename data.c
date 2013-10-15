@@ -136,15 +136,13 @@ void sData::InitSearchData(void)
 {
      aspiration       = 30;
 	 useNull          = 1;
-	 minimalNullDepth = 2 * ONE_PLY; // TRY 3 * ONE_PLY
-	 minimalLmrDepth  = 2 * ONE_PLY;
 	 lmrHistLimit     = 60;      // 70 is better in very fast games (10s per game)
 	 futilityBase     = 100;
 	 futilityStep     = 20;
 	 futilityDepth    = 4;
 	 deltaMargin      = 150;
 	 goodCaptMargin   = 30;      // BxN is OK, RxB isn't
-	 lazyMargin       = 180;
+	 lazyMargin       = 180;     // 360 is marginally worse
 	 verbose          = 0;       // no additional display
 	 elo              = MAX_ELO; // no weakening
 	 isAnalyzing      = 0;
@@ -161,17 +159,6 @@ void sData::InitDistanceBonus(void)
          }
      }
 }
-
-void sData::InitMaterialValues(void) 
-{
-	//             name,  val, del, pha, att
-	 InitSinglePiece( P,  0,   150,  0);  // pawn material is evaluated in eval.c
-	 InitSinglePiece( N,  325, 475,  1);
-	 InitSinglePiece( B,  335, 485,  1);
-	 InitSinglePiece( R,  500, 650,  2);  // 510 is worse
-	 InitSinglePiece( Q,  975, 1125, 4);
-	 InitSinglePiece(NO_TP, 0, 150,  0);
-};
 
 void sData::InitEvalVars(void) 
 {

@@ -55,8 +55,6 @@ public:
  // search data
  int aspiration;       // size of aspiration window
  int useNull;          // shall we use null move?
- int minimalNullDepth;
- int minimalLmrDepth;
  int lmrHistLimit;     // what value of history counter prevents lmr?
  int futilityBase;     // initial value of futility margin
  int futilityStep;     // margin is incremented by this value for every 1/4 ply
@@ -81,7 +79,6 @@ public:
  int elo;
 
  // functions
- void InitMaterialValues(void);
  void InitSinglePiece(int pc, int mat, int del, int phase);
  void InitPstValues(void);
  void InitMobBonus(void);

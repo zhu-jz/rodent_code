@@ -34,17 +34,20 @@
 
 void sSearcher::Init(void)
 {
+	minimalLmrDepth  = 2 * ONE_PLY; // TRY 3 * ONE_PLY
+    minimalNullDepth = 2 * ONE_PLY; // TRY 3 * ONE_PLY
+
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
 		// set late move reduction depth using modified Stockfish formula
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
-           reductionSize[0][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // all node
-		   reductionSize[1][depth][moves] = 4* (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
-		   reductionSize[2][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // cut node
+           lmrSize[0][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // all node
+		   lmrSize[1][depth][moves] = 4* (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
+		   lmrSize[2][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // cut node
 		   for (int node = 0; node <= 2; node++) {
-			   if (reductionSize[node][depth][moves] > 2 * ONE_PLY)
-                  reductionSize[node][depth][moves] += ONE_PLY / 2;
-               else if (reductionSize[node][depth][moves] > 1 * ONE_PLY)
-                  reductionSize[node][depth][moves] += ONE_PLY / 4;
+			   if (lmrSize[node][depth][moves] > 2 * ONE_PLY)
+                  lmrSize[node][depth][moves] += ONE_PLY / 2;
+               else if (lmrSize[node][depth][moves] > 1 * ONE_PLY)
+                  lmrSize[node][depth][moves] += ONE_PLY / 4;
 		   }
 		}
 }
@@ -377,7 +380,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   // QUIESCENCE NULL MOVE (idea from CCC post of Vincent Diepeveen)
   if (Data.useNull
   && flagCanPrune
-  && depth <= Data.minimalNullDepth
+  && depth <= minimalNullDepth
   && !wasNull
   && p->pieceMat[p->side] > Data.matValue[N]) {
      Manipulator.DoNull(p, undoData);
@@ -392,7 +395,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   if (Data.useNull
   && flagCanPrune
-  && depth > Data.minimalNullDepth
+  && depth > minimalNullDepth
   && !wasNull
   && p->pieceMat[p->side] > Data.matValue[N]) 
   {
@@ -505,9 +508,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // LATE MOVE PRUNING near the leaves (2012-04-02: two-tier approach)
 	 if ( flagCanReduce
-     &&  depth <= Data.minimalLmrDepth  // we are near the leaf
-     &&  !InCheck(p)                    // we're not giving check	
-	 &&  movesTried > 12                // move is sufficiently down the list
+     &&  depth <= minimalLmrDepth      // we are near the leaf
+     &&  !InCheck(p)                   // we're not giving check	
+	 &&  movesTried > 12               // move is sufficiently down the list
 	 // adding !flagMoveType (= not pruning bad captures) or history restiction is worse
 	 ) {
  		 if ( movesTried > 20 ) 
@@ -520,13 +523,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 if  ( !flagInCheck 
 	 && !depthChange 
 	 && AvoidReduction(move, flagMoveType)
-     &&  Data.minimalLmrDepth           // we have some depth left
+     &&  depth >= minimalLmrDepth       // we have some depth left
 	 &&  movesTried > 3                 // we're sufficiently down the move list
      &&  !InCheck(p)                    // we're not giving check
 	 &&  History.MoveIsBad(move)        // current move has bad history score
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
-		    depthChange -= reductionSize[nodeType+1][depth][movesTried];
+		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
 		    History.OnMoveReduced(move);
  	        flagIsReduced = 1;
 		 }
