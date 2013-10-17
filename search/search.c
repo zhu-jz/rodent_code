@@ -34,15 +34,16 @@
 
 void sSearcher::Init(void)
 {
-	minimalLmrDepth  = 2 * ONE_PLY; // TRY 3 * ONE_PLY
-    minimalNullDepth = 2 * ONE_PLY; // TRY 3 * ONE_PLY
+	minimalLmrDepth  = 2 * ONE_PLY; // 3 is worse
+    minimalNullDepth = 2 * ONE_PLY; // 3 is worse
 
+	// set late move reduction depth using modified Stockfish formula
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
-		// set late move reduction depth using modified Stockfish formula
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
            lmrSize[0][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // all node
 		   lmrSize[1][depth][moves] = 4* (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
 		   lmrSize[2][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // cut node
+
 		   for (int node = 0; node <= 2; node++) {
 			   if (lmrSize[node][depth][moves] > 2 * ONE_PLY)
                   lmrSize[node][depth][moves] += ONE_PLY / 2;
@@ -216,11 +217,9 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
   // MATE DISTANCE PRUNING
    alpha = Max(-MATE, alpha);
    beta  = Min( MATE, beta);
-   if (alpha >= beta)
-       return alpha;
+   if (alpha >= beta) return alpha;
 
-  // TRANSPOSITION TABLE READ
-  // at root we only get a move for sorting purposes
+  // TRANSPOSITION TABLE READ (at root we only get a move for sorting purposes)
   TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, 0);
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
@@ -335,7 +334,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // QUIESCENCE SEARCH ENTRY POINT
   if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, 0, pv);
-  //if ( depth < ONE_PLY ) return QuiesceSmart(p, ply, 0, alpha, beta, 0, pv); // with check extension moved up 49,1% out of 2000 games
+  //if ( depth < ONE_PLY ) return QuiesceSmart(p, ply, 0, alpha, beta, 0, pv); // with check extension moved down got 49,1% out of 2000 games
 
   nodes++;
   nodesPerBranch++;
@@ -431,13 +430,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
    if (nodeType != PV_NODE 
    && !flagInCheck 
    && !move
-   && depth <= 3*ONE_PLY){
-        int threshold = beta - 300 - (depth-ONE_PLY)*15;
-        if (Eval.ReturnFull(p, alpha, beta) < threshold)
-		{
-		   score = Quiesce(p, ply, 0, alpha, beta, 0, pv); 
-           if (score < threshold) return score;
-        }
+   && depth <= 3*ONE_PLY) {
+      int threshold = beta - 300 - (depth-ONE_PLY) * 15;
+
+      if (Eval.ReturnFull(p, alpha, beta) < threshold) {
+		 score = Quiesce(p, ply, 0, alpha, beta, 0, pv); 
+         if (score < threshold) return score;
+      }
    } // end of razoring code
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering

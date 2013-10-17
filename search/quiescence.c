@@ -195,10 +195,10 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
     }
   }
 
- // }
+  //}
 
 
-  /*  if (flagInCheck) {
+  /**  if (flagInCheck) {
 
   Selector.InitMoveList(p, move, 0);
 
@@ -234,7 +234,7 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
     }
   }
 
-  }*/
+  }/**/
 
 
   // SAVE SEARCH RESULT IN TRANSPOSITION TABLE
