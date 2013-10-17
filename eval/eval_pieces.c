@@ -251,7 +251,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 
 		// king distance
 		//AddMisc(side, 0, (Data.distance[sq] [p->kingSquare[side]] * passUnitEg) / 4);
-		AddMisc(side, 0, (-Data.distance[sq] [p->kingSquare[Opp(side)]] * passUnitEg) / 5);
+		AddMisc(side, 0, (-Data.distance[sq] [p->kingSquare[Opp(side)]] * passUnitEg) / 6);
 
 		// blocked and unblocked passers
 		if (bbStop &~bbOccupied) AddMisc(side,  passUnitMg,  passUnitEg);
