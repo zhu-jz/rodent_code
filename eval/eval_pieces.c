@@ -249,6 +249,10 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 		passUnitMg = Data.pawnProperty[PASSED][MG][side][sq] / 5;
 		passUnitEg = Data.pawnProperty[PASSED][EG][side][sq] / 5;
 
+		// king distance
+		//AddMisc(side, 0, (Data.distance[sq] [p->kingSquare[side]] * passUnitEg) / 4);
+		AddMisc(side, 0, (-Data.distance[sq] [p->kingSquare[Opp(side)]] * passUnitEg) / 5);
+
 		// blocked and unblocked passers
 		if (bbStop &~bbOccupied) AddMisc(side,  passUnitMg,  passUnitEg);
 		else                     AddMisc(side, -passUnitMg, -passUnitEg);
