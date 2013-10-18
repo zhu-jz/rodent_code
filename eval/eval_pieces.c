@@ -39,8 +39,7 @@
   const int rookSemiOpenMg  = 5;
   const int rookSemiOpenEg  = 5;
 
-  // data for attack evaluation
-  //                                    for Rodent curve                    for Stockfish-like curve
+  // data for attack evaluation:        for Rodent curve                    for Stockfish-like curve
   //                                    P    N    B    R    Q    K          P   N   B   R   Q   K
   const int attPerPc     [2]  [7] = { { 0,  10,  10,  20,  40,   0,  0} , { 0,  2,  2,  3,  5,  0,  0} };
   const int canCheckWith [2]  [7] = { { 0,   0,  10,  40,  100,  0,  0} , { 0,  1,  1,  2,  3,  0,  0} }; 
@@ -58,7 +57,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	bbAllAttacks[side] |= bbControl;                 // update attack data
 	bbControl &= ~p->bbCl[side];                     // exclude squares occupied by own pieces
 	ScoreMinorPawnRelation(p, side, sq);             // knight attacked / defended by pawn
-	ScoreOutpost(p, side, N, sq);                    // outposts
+	ScorePieceInHole(p, side, N, sq);                    
 
 	// king attacks (if our queen is present)
 	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
@@ -88,7 +87,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	bbControl = GenCache.GetBishMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                 // update attack data
 	ScoreMinorPawnRelation(p, side, sq);             // bishop attacked / defended by pawn
-	ScoreOutpost(p, side, B, sq);                    // outposts
+	ScorePieceInHole(p, side, B, sq);               
 
     // king attack (if our queen is present)
 	if (bbBCanAttack[sq] [KingSq(p, side ^ 1) ] 
@@ -124,7 +123,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
     sq = PopFirstBit(&bbPieces);                     // set piece location and clear it from bbPieces
 	bbControl = GenCache.GetRookMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                 // update attack data
-	ScoreOutpost(p, side, R, sq);                    // rook outpost
+	ScorePieceInHole(p, side, R, sq);                
 
 	U64 bbFrontSpan = GetFrontSpan(SqBb(sq), side );
 	if (bbFrontSpan & bbPc(p, Opp(side), Q) ) AddMisc(side, 5, 5); // rook and enemy queen in the same file
@@ -249,8 +248,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 		passUnitMg = Data.pawnProperty[PASSED][MG][side][sq] / 5;
 		passUnitEg = Data.pawnProperty[PASSED][EG][side][sq] / 5;
 
-		// king distance
-		//AddMisc(side, 0, (Data.distance[sq] [p->kingSquare[side]] * passUnitEg) / 4);
+		// enemy king distance to a passer (failed to find good value for a friendly king)
 		AddMisc(side, 0, (-Data.distance[sq] [p->kingSquare[Opp(side)]] * passUnitEg) / 6);
 
 		// blocked and unblocked passers
@@ -285,7 +283,7 @@ void sEvaluator::AddMisc(int side, int mg, int eg)
 	egMisc[side] += eg;
 }
 
-void sEvaluator::ScoreOutpost(sPosition *p, int side, int piece, int sq) 
+void sEvaluator::ScorePieceInHole(sPosition *p, int side, int piece, int sq) 
 {
 	// constant bonus if piece occupies hole of enemy pawn structure
 	if ( SqBb(sq) & ~bbPawnCanControl[Opp(side)] ) {

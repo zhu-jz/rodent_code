@@ -25,14 +25,14 @@
 
 const int attMult[15]     = {0, 0, 4, 10, 14, 26, 42, 52, 64, 70, 76, 82, 86, 92, 100};
 
-void sEvaluator::InitStatic(void) 
+void sEvaluator::InitStaticScore(void) 
 {
      mgScore            = 0;   egScore            = 0;  // clear midgame/endgame score component
      pawnScoreMg[WHITE] = 0;   pawnScoreMg[BLACK] = 0;  // clear midgame pawn scores
      pawnScoreEg[WHITE] = 0;   pawnScoreEg[BLACK] = 0;  // clear endgame pawn scores	 
 }
 
-void sEvaluator::InitDynamic(sPosition *p) 
+void sEvaluator::InitDynamicScore(sPosition *p) 
 {
      attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
 	 attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
@@ -193,7 +193,7 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
   int score = GetMaterialScore(p) + CheckmateHelper(p);
   p->side == WHITE ? score+=5 : score-=5;
 
-  InitStatic();
+  InitStaticScore();
   SetScaleFactor(p);
   EvalPawns(p);
   
@@ -210,7 +210,7 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
   // if score seems already very high/very low
   if (temp_score > alpha - Data.lazyMargin 
   &&  temp_score < beta +  Data.lazyMargin) {
-	  InitDynamic(p);
+	  InitDynamicScore(p);
 
       ScoreN(p, WHITE);
       ScoreN(p, BLACK);
@@ -263,7 +263,7 @@ int sEvaluator::ReturnFast(sPosition *p)
   int score = GetMaterialScore(p) + CheckmateHelper(p);
   p->side == WHITE ? score+=5 : score-=5;
 
-  InitStatic();
+  InitStaticScore();
   SetScaleFactor(p);
   EvalPawns(p);
 

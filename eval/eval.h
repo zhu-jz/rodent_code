@@ -59,8 +59,8 @@ private:
   void AddPieceAttack(int side, int pc, int cnt);
   void AddPawnProperty(int pawnProperty, int side, int sq);
   int CheckmateHelper(sPosition *p);
-  void InitStatic(void);            
-  void InitDynamic(sPosition *p);            
+  void InitStaticScore(void);            
+  void InitDynamicScore(sPosition *p);            
   void SetScaleFactor(sPosition *p);
   int SetDegradationFactor(sPosition *p, int stronger);
   int Interpolate(void);
@@ -75,7 +75,7 @@ private:
   void ScoreP(sPosition *p, int side);
   void ScoreKingShield(sPosition *p, int side);
   void ScoreKingAttacks(int side);
-  void ScoreOutpost(sPosition *p, int side, int piece, int sq);
+  void ScorePieceInHole(sPosition *p, int side, int piece, int sq);
   void ScoreMinorPawnRelation(sPosition *p, int side, int sq);
   void ScoreHanging(sPosition *p, int side);
   int  EvalKingFile(sPosition * p, int side, U64 bbFile);
