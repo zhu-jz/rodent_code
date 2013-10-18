@@ -110,7 +110,8 @@ void sParser::UciLoop(void)
 	  ptr = ParseToken(ptr, token);
       Book.FeedMainBook(p, atoi(token));
     } else if (strcmp(token, "bookdoctor") == 0) {
-      Book.BookDoctor(p);
+      ptr = ParseToken(ptr, token);
+      Book.BookDoctor(p, atoi(token));
     } else if (strcmp(token, "print") == 0) {
       PrintBoard(p);
     } else if (strcmp(token, "eval") == 0) {
@@ -418,7 +419,7 @@ void sParser::ReadIniFile(char *fileName)
 
 void sParser::PrintEngineHeader() 
 {
-    printf("id name Rodent 1.1");
+    printf("id name Rodent 1.2");
 	printf(" (build %d)\n", BUILD);
     printf("id author Pawel Koziol (based on Sungorus by Pablo Vazquez)\n");
 }

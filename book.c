@@ -28,7 +28,7 @@
 #include "search/search.h"
 #include "book.h"
 
-#define DELETE_MOVE 888
+#define DELETE_MOVE 88888
 
 void sBook::Init(sPosition * p) 
 {
@@ -41,8 +41,8 @@ void sBook::Init(sPosition * p)
 	 if (!hasMainBook && !hasGuideBook) ReadInternalToGuideBook(p);
 }
 
-void sBook::BookDoctor(sPosition * p) {
-	 int move;
+void sBook::BookDoctor(sPosition * p, int maxDepth) {
+	 int move, depth;
 	 char moveStr[6];
 	 UNDO u;
 
@@ -54,12 +54,14 @@ void sBook::BookDoctor(sPosition * p) {
 	 
 	 for (int i = 0; i < 10000; i++ ) {
 		 SetPosition(p, START_POS);
+		 depth = 0;
 		 printf("\n");
 		 fprintf(doctorFile, "\n");
 
         for (;;) {
 		   move = GetBookMove(p, 0, &flagIsProblem);
-		   if (move) { 
+		   if (move && depth < maxDepth) { 
+              depth++;
 			  Manipulator.DoMove(p, move, &u);
               if (flagIsProblem) break; 
 			  PrintMove(move);

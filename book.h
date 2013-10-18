@@ -29,7 +29,7 @@ struct sBookEntry {
 
 struct sBook {
 private:
-   sBookEntry myBook[1024000];
+   sBookEntry myBook[2048000];
    sBookEntry guideBook[48000];
    int nOfRecords;
    int nOfGuideRecords;
@@ -53,7 +53,7 @@ public:
    void Init(sPosition *p);
    int ReadOwnBookFile(char *filename);
    int ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedColor);
-   void BookDoctor(sPosition * p);
+   void BookDoctor(sPosition * p, int maxDepth);
    void FileFixer(char *inFileName, char *outFileName, int task);
    int GetBookMove(sPosition *p, int canPrint, int *flagIsProblem);
    void FeedMainBook(sPosition *p, int verifyDepth);
