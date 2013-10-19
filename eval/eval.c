@@ -53,12 +53,12 @@ void sEvaluator::InitDynamicScore(sPosition *p)
 	 
 	 // set squares from which king can be checked 
 	 U64 bbOccupied = OccBb(p);
-	 kingStraightChecks[WHITE] = RAttacks(bbOccupied, KingSq(p, WHITE) );  
-	 kingStraightChecks[BLACK] = RAttacks(bbOccupied, KingSq(p, BLACK) );  
-	 kingDiagChecks[WHITE]     = BAttacks(bbOccupied, KingSq(p, WHITE) );  
-	 kingDiagChecks[BLACK]     = BAttacks(bbOccupied, KingSq(p, BLACK) );  
-	 kingKnightChecks[WHITE]   = bbKnightAttacks[KingSq(p, WHITE)];
-	 kingKnightChecks[BLACK]   = bbKnightAttacks[KingSq(p, BLACK)];
+	 bbStraightChecks[WHITE] = RAttacks(bbOccupied, KingSq(p, WHITE) );  
+	 bbStraightChecks[BLACK] = RAttacks(bbOccupied, KingSq(p, BLACK) );  
+	 bbDiagChecks[WHITE]     = BAttacks(bbOccupied, KingSq(p, WHITE) );  
+	 bbDiagChecks[BLACK]     = BAttacks(bbOccupied, KingSq(p, BLACK) );  
+	 bbKnightChecks[WHITE]   = bbKnightAttacks[KingSq(p, WHITE)];
+	 bbKnightChecks[BLACK]   = bbKnightAttacks[KingSq(p, BLACK)];
 }
 
 void sEvaluator::SetScaleFactor(sPosition *p) 

@@ -70,7 +70,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	AddMobility(N, side, PopCnt15(bbControl) );      // evaluate mobility
 
     // check threats (excluding checks from squares controlled by enemy pawns)
-	if (bbControl & kingKnightChecks[Opp(side)] )
+	if (bbControl & bbKnightChecks[Opp(side)] )
 		attCount[side] += canCheckWith[Data.safetyStyle][N]; 
   }
 }
@@ -103,7 +103,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	AddMobility(B, side, PopCnt15(bbControl) );      // evaluate mobility
 
     // check threats (with false positive due to queen transparency)
-	if (bbControl & kingDiagChecks[Opp(side)] )
+	if (bbControl & bbDiagChecks[Opp(side)] )
 		attCount[side] += canCheckWith[Data.safetyStyle][B];
 
 	// penalize bishop blocked by own pawns
@@ -117,7 +117,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
   int sq;
   U64 bbControl, bbAttZone;
   U64 bbPieces   = bbPc(p, side, R);
-  U64 bbOccupied = OccBb(p) ^ bbPc(p, side, Q) ^ bbPc(p, side, R);
+  U64 bbOccupied = OccBb(p) ^ bbPc(p, side, Q) ^ bbPc(p, side, R); // R and Q are considered transparent
 
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);                     // set piece location and clear it from bbPieces
@@ -129,12 +129,11 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	if (bbFrontSpan & bbPc(p, Opp(side), Q) ) AddMisc(side, 5, 5); // rook and enemy queen in the same file
 
 	// evaluate rook on an open file
-	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {
-	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) 
-	   {
+	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {                     // no own pawns in front of the rook
+	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) {            // no enemy pawns - open file
 		  AddMisc(side, rookOpenMg, rookOpenEg);
 		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += rookOpenAttack[Data.safetyStyle];
-	   } else {
+	   } else {                                                    // enemy pawns present - semi-open file
 		  AddMisc(side, rookSemiOpenMg, rookSemiOpenEg);
 		  if (bbFrontSpan & bbKingZone[side][p->kingSquare[Opp(side)]] ) attCount[side] += rookSemiOpenAttack[Data.safetyStyle];
 	   }
@@ -148,7 +147,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	}
 
     // check threats (including false positives due to queen/rook transparency)
-	if (bbControl & kingStraightChecks[Opp(side)] )
+	if (bbControl & bbStraightChecks[Opp(side)] )
 		attCount[side] += canCheckWith[Data.safetyStyle][R];
 
 	// king attack (if our queen is present)
@@ -172,7 +171,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
   U64 bbPieces       = bbPc(p, side, Q); 
   U64 bbOccupied     = OccBb(p); // real occupancy, since we'll look for contact checks
   U64 bbTransparent  = bbPc(p, side, R) | bbPc(p, side, B);
-  U64 bbCanCheckFrom = kingStraightChecks[Opp(side)] | kingDiagChecks[Opp(side)];
+  U64 bbCanCheckFrom = bbStraightChecks[Opp(side)] | bbDiagChecks[Opp(side)];
 
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);                      // set piece location and clear it from bbPieces 

@@ -40,10 +40,10 @@ private:
   int pawnScoreEg[2];      // endgame pawn structure scores
   U64 bbPawnControl[2];    // squares controlled by pawns, used in mobility eval (pawn eval uses only occupancy masks)
   U64 bbPawnCanControl[2]; // squares that can be controlled by pawns as they advance, used in outpost eval
-  U64 kingDiagChecks[2];
-  U64 kingStraightChecks[2];
-  U64 kingKnightChecks[2];
-  U64 bbMinorCoorAttacks[2];    // bitboard to detect coordinated attacks on enemy king
+  U64 bbDiagChecks[2];
+  U64 bbStraightChecks[2];
+  U64 bbKnightChecks[2];
+  U64 bbMinorCoorAttacks[2]; // bitboard to detect coordinated attacks on enemy king
   U64 bbAllAttacks[2];     // squares attacked by a side
   int attCount[2];         // attack counter based on square control
   int attNumber[2];        // no. of pieces participating in the attack
