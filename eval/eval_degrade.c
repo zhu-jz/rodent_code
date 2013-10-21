@@ -156,9 +156,9 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	  // TODO: back rank defense
 	}
 
-    // TODO: KRPPKRP, no passers
+	// TODO: KRPPKRP with no passers
     // TODO: KBPKP with blockade and wrong bishop
-
+	
 	return 64; // no degradation
 }
 

@@ -74,7 +74,7 @@ private:
   void ScoreQ(sPosition *p, int side);
   void ScoreP(sPosition *p, int side);
   void ScoreKingShield(sPosition *p, int side);
-  void ScoreKingAttacks(int side);
+  void ScoreKingAttacks(sPosition *p, int side);
   void ScorePieceInHole(sPosition *p, int side, int piece, int sq);
   void ScoreMinorPawnRelation(sPosition *p, int side, int sq);
   void ScoreHanging(sPosition *p, int side);

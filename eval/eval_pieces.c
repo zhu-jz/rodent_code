@@ -32,6 +32,7 @@
   const int rookOpenAttack    [2] = { 100, 0 };
   const int rookSemiOpenAttack[2] = {  50, 0 };
   const int queenContactCheck [2] = { 300, 6 };
+  const int rookContactCheck  [2] = { 200, 4 };
   const int rookSeventhMg   = 20;
   const int rookSeventhEg   = 20; // BEST 20, 40 is worse
   const int rookOpenMg      = 10;
@@ -114,8 +115,8 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 
 void sEvaluator::ScoreR(sPosition *p, int side) 
 {
-  int sq;
-  U64 bbControl, bbAttZone;
+  int sq, contactSq;
+  U64 bbControl, bbAttZone, bbContact;
   U64 bbPieces   = bbPc(p, side, R);
   U64 bbOccupied = OccBb(p) ^ bbPc(p, side, Q) ^ bbPc(p, side, R); // R and Q are considered transparent
 
@@ -147,8 +148,19 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	}
 
     // check threats (including false positives due to queen/rook transparency)
-	if (bbControl & bbStraightChecks[Opp(side)] )
+	if (bbControl & bbStraightChecks[Opp(side)] ) {
 		attCount[side] += canCheckWith[Data.safetyStyle][R];
+        // safe contact checks
+	    bbContact = bbControl & bbKingAttacks[ p->kingSquare[Opp(side)] ] & bbStraightChecks[Opp(side)];
+	    while (bbContact) {
+           contactSq = PopFirstBit(&bbContact);
+
+	       if ( Swap(p, sq, contactSq) >= 0 ) {
+			  attCount[side] += rookContactCheck[Data.safetyStyle]; 
+		      break;
+	       }
+	    }
+	}
 
 	// king attack (if our queen is present)
 	if ( bbRCanAttack[sq] [KingSq(p, side ^ 1) ]  

@@ -151,7 +151,7 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
   return result + EvalFileStorm  ( bbFile & bbPc(p, Opp(side), P), side );
 }
 
-void sEvaluator::ScoreKingAttacks(int side) 
+void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
 {
 	if (Data.safetyStyle == KS_RODENT)    {
 	   if (attWood[side] > 14) attWood[side] = 14;
@@ -222,8 +222,8 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
       ScoreQ(p, BLACK);
 	  ScoreKingShield(p, WHITE);
 	  ScoreKingShield(p, BLACK);
-	  ScoreKingAttacks(WHITE);
-	  ScoreKingAttacks(BLACK);
+	  ScoreKingAttacks(p, WHITE);
+	  ScoreKingAttacks(p, BLACK);
 	  ScoreHanging(p, WHITE);
 	  ScoreHanging(p, BLACK);
 
