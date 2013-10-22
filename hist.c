@@ -23,17 +23,15 @@
 
 void sHistory::OnNewSearch(void)
 {
-  int i, j;
-
-  for (i = 0; i < 64; i++)
-    for (j = 0; j < 64; j++)
+  for (int i = 0; i < 64; i++)
+    for (int j = 0; j < 64; j++)
       cutoff[i][j] = 100;
+  
+  for (int i = 0; i < 12; i++)
+    for (int j = 0; j < 64; j++)
+      history[i][j] /= 16; // leave some information from previous search
 
-  for (i = 0; i < 12; i++)
-    for (j = 0; j < 64; j++)
-      history[i][j] /= 16;
-
-  for (i = 0; i < MAX_PLY-2; i++) {
+  for (int i = 0; i < MAX_PLY-2; i++) {
     killer[i][0] = killer[i+2][0];
     killer[i][1] = killer[i+2][1];
   }
@@ -41,23 +39,21 @@ void sHistory::OnNewSearch(void)
 
 void sHistory::OnNewGame(void)
 {
-  int i, j;
-
-  for (i = 0; i < 64; i++)
-    for (j = 0; j < 64; j++)
+  for (int i = 0; i < 64; i++)
+    for (int j = 0; j < 64; j++)
       cutoff[i][j] = 100;
 
-  for (i = 0; i < 12; i++)
-    for (j = 0; j < 64; j++)
+  for (int i = 0; i < 12; i++)
+    for (int j = 0; j < 64; j++)
       history[i][j] = 0;
 
-  for (i = 0; i < MAX_PLY-2; i++) {
+  for (int i = 0; i < MAX_PLY-2; i++) {
     killer[i][0] = 0;
     killer[i][1] = 0;
   }
 }
 
-void sHistory::Reduce(void)
+void sHistory::ReducePeaks(void)
 {
   for (int i = 0; i < 12; i++)
     for (int j = 0; j < 64; j++)
@@ -89,7 +85,7 @@ void sHistory::OnGoodMove(sPosition *p, int move, int depth, int ply)
 int sHistory::GetMoveHistoryValue(int pc, int sq_to) 
 {
     int val = history[pc][sq_to];
-	if ( val > (1 << 15) ) History.Reduce();
+	if ( val > (1 << 15) ) History.ReducePeaks();
 	return val;
 }
 

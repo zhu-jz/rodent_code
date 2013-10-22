@@ -27,7 +27,7 @@ struct sHistory {
 	 void OnGoodMove(sPosition *p, int move, int depth, int ply);
 	 void OnNewSearch(void);
 	 void OnNewGame(void);
-	 void Reduce(void);
+	 void ReducePeaks(void);
 	 void OnMoveTried(int move);
 	 void OnMoveReduced(int move);
 	 int MoveIsBad(int move);

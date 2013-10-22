@@ -17,7 +17,7 @@ of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 II. Acknowledgments
 
@@ -78,8 +78,7 @@ IV. The most important changes (comparing with Sungorus 1.4) include:
 - adding many evaluation features and weights from Toga LOG user manual  
 - adding logarithmic king safety function  
 - some speed optimizations, including pawn hash table and specialized
-  PopCnt functions (many thanks to Dann Corbit for his patch making use
-  of advanced 64-bit instructions)
+  PopCnt functions (thanks to Dann Corbit)
 - opening book in a silly proprietary format
 - position learning
 - weaker levels of play
@@ -109,20 +108,19 @@ VI. EVALUATION
 - Fruit-like weak pawns eval
 - passed pawns eval
 - outposts (B, N, even R), further bonus if defended by a pawn
-- logaritmically scaled King safety 
-  (with bigger bonus for the first attack by a piece) 
-- possibility to give check and safe queen contact checks
+- two different King safety functions, including attacks on king zone,
+  check threats and attacking material
 - hanging pieces
 - minor pieces attacked/defended by a pawn (overlaps with hanging pieces)
 - bad bishops (using bitmask of obstructing pawns)
-- (half)open files for rooks with additional tmibonus if they target enemy king
+- (half)open files for rooks with additional bonus if they target enemy king
 - rook on 7th rank cutting off enemy king or attacking pawns
 
-Mobility evaluation is sometimes inexact due to the concept of "transparent 
-pieces". For example, own queen is considered transparent for the bishop. 
-This might cause occasional error in evaluating whether a bishop can check 
-enemy king, or force the engine to rely on search in order to avoid certain
-blockages. However, this solution passed the tests.
+Mobility and check threat evaluation is sometimes inexact due to the concept 
+of "transparent pieces". For example, own queen is considered transparent 
+for the bishop. This might cause occasional error in evaluating whether a bishop 
+can check enemy king, or force the engine to rely on search in order to avoid 
+certain blockages. However, this solution passed the tests.
 
 VII. OPENING BOOK
 
@@ -134,17 +132,16 @@ using Rodent's own ugly format (hence the file extension).
 Rodent first looks for moves from the guide book, and if none is found, 
 it falls back to big main book.
 
-guide books encodes one opening in each line, and its format looks like that:
+Guide books encode one opening in each line, and its format looks like that:
 
 e2e4 a7a6? d2d4 b7b5 a2a4 c8b7 b1d2
 e2e4 d7d5!! e4d5 d8d5 b1c3 d8d6!
 
-It allows users to write down their own book preferences if they for example 
-want to practice Ruy Lopez or Pirc Defense or force Rodent to play unusual 
-openings. Moves may be followed by punctuation marks: ? (frequency -= 100),
+It allows users to express their preferences. If they for example want
+to practice Ruy Lopez or Pirc Defense or force Rodent to play unusual lines.
+Moves may be followed by punctuation marks: ? (frequency -= 100), 
 ! (frequency += 100), ?? (frequency -= 5000), !! (frequency += 5000). 
-Additionally, a move with "xx" appended will be deleted from the main book
-permanently.
+A move with "xx" appended will be deleted from the main book permanently.
 
 A really desperate user might even create main opening book. All he needs
 is any of files called feed.txt, feedwhite.txt and feedblack.txt placed 
@@ -156,9 +153,8 @@ a file called newbook.wtf. At this stage user MUST RENAME newbook.wtf
 to bigbook.wtf. This is a precaution allowing to save old book in case that
 user considers feed files corrupt.
 
-Calling "feedbook" with a numeric parameter causes Rodent to verify new
-book moves with a search to the depth supplied by the parameter. It takes
-insanely long, though.
+Calling "feedbook" with a number causes Rodent to verify new book moves 
+with a search to the desired depth. It takes insanely long, though.
 
 Rodent contains small utility reformatting book files from something like:
 
@@ -168,11 +164,11 @@ to version with spaces between the moves. In order to do this, one needs
 to copy "dense" opening book into the file "dense.txt", open Rodent in the
 console mode and type command "split". Result will be saved in "loose.txt".
 
-Another additional command is "bookdoctor". This command causes Rodent to
-investigate its main book file and stop at first point where it finds
-either an infrequent move or missing transposition into book line. In both
-cases it would be prudent to decide whether a move should be upgraded
-or marked as unplayable.
+Another additional command is "bookdoctor". This command causes Rodent
+to investigate its main book file and stop at first point where it finds
+an infrequent move or missing transposition into book line. In both cases 
+it would be prudent to decide whether a move should be upgraded or marked 
+as unplayable. "bookdoctor" command needs a depth parameter.
 
 VIII. WEAKENING
 
@@ -209,14 +205,10 @@ X. CONVENTIONS AND STRUCTURAL DECISIONS
 
 Naming conventions:
 
-- an asterisk before a comment announcing a code segment
-  means that this part of code is undergoing modification 
-  and testing
 - variable names start with small letters
 - function names start with captital letters
 - variables treated as flags have "f" prefix, i.e. f_in_check
 - bitboard variables have "bb" prefix, i.e. bbControl 
-  in piece evaluators
 - struct definitions have "s" prefix,  i.e. sEvaluator
 
 Classes:
@@ -237,5 +229,4 @@ Classes:
 Structural decisions:
 
 - we use the same square ordering as Crafty and Stockfish (A1 = 0)
-- we DO NOT split Search function into pv and non-pv, 
-  since resulting complexity isn't worth small speed gain.
+- we DO NOT split Search function into pv and non-pv, to keep it simple.
