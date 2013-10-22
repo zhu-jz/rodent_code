@@ -77,7 +77,6 @@
 #define REL_SQ(sq,cl)   ( sq ^ (cl * 56) )
 #define RelSqBb(sq,cl)  ( SqBb(REL_SQ(sq,cl) ) )
 
-extern const U64 bbRank [8];
 extern const U64 bbFile [8];
 extern const U64 bbRelRank [2] [8];
 

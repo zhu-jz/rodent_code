@@ -36,16 +36,12 @@ void InitKindergartenBitboards()
     bbLineMask[VER][i] = bbFILE_A << (i & 007);
 
     j = File(i) - Rank(i);
-    if (j > 0)
-      bbLineMask[DIAG_AH][i] = bbDIAG_A1H8 >> (j * 8);
-    else
-      bbLineMask[DIAG_AH][i] = bbDIAG_A1H8 << (-j * 8);
+    if (j > 0) bbLineMask[DIAG_AH][i] = bbDIAG_A1H8 >> (j * 8);
+    else       bbLineMask[DIAG_AH][i] = bbDIAG_A1H8 << (-j * 8);
 
     j = File(i) - (RANK_8 - Rank(i));
-    if (j > 0)
-      bbLineMask[DIAG_HA][i] = bbDIAG_A8H1 << (j * 8);
-    else
-      bbLineMask[DIAG_HA][i] = bbDIAG_A8H1 >> (-j * 8);
+    if (j > 0) bbLineMask[DIAG_HA][i] = bbDIAG_A8H1 << (j * 8);
+    else       bbLineMask[DIAG_HA][i] = bbDIAG_A8H1 >> (-j * 8);
   }
 
   // init sliding piece attacks

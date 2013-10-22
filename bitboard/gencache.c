@@ -35,8 +35,8 @@ U64 sGenCache::GetRookMob(U64 bbOccupied, int sq)
 	}	
 }
 
-U64 sGenCache::GetBishMob(U64 bbOccupied, int sq) {
-
+U64 sGenCache::GetBishMob(U64 bbOccupied, int sq) 
+{
 	U64 bbRelevantOcc = bbOccupied & bbBAttacksOnEmpty[sq];
 	if (bbRelevantOcc == bbBOcc[sq])
 		return bbBMob[sq];

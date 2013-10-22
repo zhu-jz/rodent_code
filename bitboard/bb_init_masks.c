@@ -34,10 +34,10 @@ void InitPassedMask()
 
 void InitAdjacentMask() 
 {
-  for (int i = 0; i < 8; i++) {
-    bbAdjacentMask[i] = 0;
-    if (i > 0) bbAdjacentMask[i] |= bbFILE_A << (i - 1);
-    if (i < 7) bbAdjacentMask[i] |= bbFILE_A << (i + 1);
+  for (int col = 0; col < 8; col++) {
+    bbAdjacentMask[col] = 0ULL;
+    if (col > 0) bbAdjacentMask[col] |= bbFILE_A << (col - 1);
+    if (col < 7) bbAdjacentMask[col] |= bbFILE_A << (col + 1);
   }
 }
 
@@ -50,16 +50,14 @@ void InitPossibleAttacks()
 	  bbRAttacksOnEmpty[i] = RAttacks(0ULL, i); 
 
 	  // can a piece on a given square attack zone around enemy king?
-	  bbRCanAttack[i][j] = 0;
-	  bbBCanAttack[i][j] = 0;
-	  bbQCanAttack[i][j] = 0;
+	  bbRCanAttack[i][j] = bbBCanAttack[i][j] = bbQCanAttack[i][j] = 0ULL;
 	  if ( RAttacks(0ULL, i) & bbKingAttacks[j] ) { bbRCanAttack[i][j] = 1; bbQCanAttack[i][j] = 1; };
 	  if ( BAttacks(0ULL, i) & bbKingAttacks[j] ) { bbBCanAttack[i][j] = 1; bbQCanAttack[i][j] = 1; };
 	}
   }
 }
 
-void InitPawnSupport() 
+void InitPawnSupport() // pawn is supported if we find friendly pawns on masked squares
 {
   for (int sq = 0; sq < 64; sq++) {
       bbPawnSupport[WHITE][sq] = ShiftWest(SqBb(sq)) | ShiftEast(SqBb(sq));
