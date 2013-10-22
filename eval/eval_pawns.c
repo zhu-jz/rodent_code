@@ -22,7 +22,10 @@
 #include "../rodent.h"
 #include "eval.h"
 
-#define CENT_DEFENSE 5
+const int centDefense = 5;
+const int doubledPawn [2] = {-20, -10};
+const int pawnIsolatedOnOpen = -15;
+const int pawnBackwardOnOpen = -15;
 
 void sEvaluator::EvalPawns(sPosition *p)
 {
@@ -53,12 +56,12 @@ void sEvaluator::EvalPawns(sPosition *p)
 void sEvaluator::EvalPawnCenter(sPosition *p, int side)
 {
       if (bbPc(p, side, P) & RelSqBb(D4,side) ) {
-          if (bbPc(p, side, P) & RelSqBb(E3,side) )  pawnScoreMg[side] += CENT_DEFENSE;
-          if (bbPc(p, side, P) & RelSqBb(C3,side) )  pawnScoreMg[side] += CENT_DEFENSE;
+          if (bbPc(p, side, P) & RelSqBb(E3,side) )  pawnScoreMg[side] += centDefense;
+          if (bbPc(p, side, P) & RelSqBb(C3,side) )  pawnScoreMg[side] += centDefense;
       }
 
       if (bbPc(p, side, P) & RelSqBb(E4,side) && bbPc(p, side, P) & RelSqBb(D3,side) ) 
-         pawnScoreMg[side] += CENT_DEFENSE;	
+         pawnScoreMg[side] += centDefense;	
 }
 
 void sEvaluator::SinglePawnScore(sPosition *p, int side)
@@ -81,8 +84,8 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	
 	// doubled pawn
 	if ( bbFrontSpan & bbOwnPawns ) {
-	    pawnScoreMg[side] += Data.doubledPawn[MG];
-	    pawnScoreEg[side] += Data.doubledPawn[EG];
+	    pawnScoreMg[side] += doubledPawn[MG];
+	    pawnScoreEg[side] += doubledPawn[EG];
     }
 
 	if (flagIsPhalanx) {
@@ -93,11 +96,11 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	if (flagIsOpen) {
 		U64 bbObstacles = bbPassedMask[side][sq] & bbPc(p, Opp(side), P);
 		
-	    // passed pawn
+	    // passed pawn (some more eval will be done in ScoreP() in eval_pieces.c)
 		if (!bbObstacles) AddPawnProperty(PASSED,side,sq);
-
+		
 	    // candidate passer
-		if (flagIsPhalanx) {
+		if (flagIsPhalanx) { // test lower bonus when !flagIsWeak
 		    if (PopCntSparse(bbObstacles) == 1) AddPawnProperty(CANDIDATE,side,sq);
 	    }
 	}
@@ -106,12 +109,12 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 		if (!(bbAdjacentMask[File(sq)] & bbOwnPawns)) // isolated
 		{ 
 		   AddPawnProperty(ISOLATED,side,sq);
-		   if (flagIsOpen) pawnScoreMg[side] += Data.pawnIsolatedOnOpen;
+		   if (flagIsOpen) pawnScoreMg[side] += pawnIsolatedOnOpen;
 		}
 		else // backward
 		{
 		   AddPawnProperty(BACKWARD,side,sq);
-		   if (flagIsOpen) pawnScoreMg[side] += Data.pawnBackwardOnOpen;
+		   if (flagIsOpen) pawnScoreMg[side] += pawnBackwardOnOpen;
 		}
 	}
   }

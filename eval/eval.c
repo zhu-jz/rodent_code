@@ -159,7 +159,7 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
        attScore[side] = (attCount[side] * attMult[attWood[side]]) / 100;
 	}
 	if (Data.safetyStyle == KS_STOCKFISH) {
-       attCount[side] += (attWood[side] / 2); // TESTING
+       attCount[side] += (attWood[side] / 2); // bonus for material involved in the attack
  	   if(attCount[side] > 99) attCount[side] = 99;
 	   if(attNumber[side] < 2) attCount[side] = 0;
 	   attScore[side] = Data.kingDanger[attCount[side]] * 10;

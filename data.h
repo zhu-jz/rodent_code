@@ -35,7 +35,6 @@ public:
  int pstEg[2][6][64];
  int outpost[2][6][64];
  int pawnProperty [PAWN_PROPERTIES][2][2][64];
- int doubledPawn[2];
  int mobBonusMg[6][28];
  int mobBonusEg[6][28];
  int mobSidePercentage[2];
@@ -46,11 +45,8 @@ public:
  int oppAttack;
  int bishopPair;
  int badBishopPenalty[2][64];
- int pawnIsolatedOnOpen;
- int pawnBackwardOnOpen;
  int kingDanger[100];
  int safetyStyle;
-
 
  // search data
  int aspiration;       // size of aspiration window

@@ -168,10 +168,6 @@ void sData::InitEvalVars(void)
 	 ownAttack       = 100; 
 	 oppAttack       = 100; 
 	 bishopPair      =  50; 
-	 doubledPawn[MG] = -20;
-     doubledPawn[EG] = -10;
-	 pawnIsolatedOnOpen = -15;
-	 pawnBackwardOnOpen = -15;
 }
 
 // used at the beginning of search to set scaling factors for eval components
