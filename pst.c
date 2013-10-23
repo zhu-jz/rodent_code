@@ -59,30 +59,6 @@ const int pstBishopMg[64] =
     -5,  -5,  -5,  -5,  -5,  -5,  -5,  -5
 };
 
-const int pstRookMg[64] = 
-{  
-  	 0,   0,   2,   4,   4,   2,   0,   0,
-    -4,  -2,   0,   2,   2,   0,  -2,  -4,
-    -4,  -2,   0,   2,   2,   0,  -2,  -4,
-    -4,  -2,   0,   2,   2,   0,  -2,  -4,
-    -4,  -2,   0,   2,   2,   0,  -2,  -4,
-    -4,  -2,   0,   2,   2,   0,  -2,  -4,
-    -4,  -2,   0,   2,   2,   0,  -2,  -4,
-     4,   4,   4,   4,   4,   4,   4,   4
-};
-
-const int pstQueenEg[64] = 
-{
-   -24, -16, -12,  -8,  -8, -12, -16, -24,
-   -16, -12,  -4,   0,   0,  -4, -12, -16,
-   -12,  -4,   0,   4,   4,   0,  -4, -12,
-    -8,   0,   4,   8,   8,   4,   0,  -8,
-    -8,   0,   4,   8,   8,   4,   0,  -8,
-   -12,  -4,   0,   4,   4,   0,  -4, -12,
-   -16, -12,  -4,   0,   0,  -4, -12, -16,
-   -24, -16, -12,  -8,  -8, -12, -16, -24
-};
-
 const int pstKingMg[64] = 
 {  
     40,  50,  30,  10,  10,  30,  50,  40,
@@ -139,7 +115,7 @@ void sData::InitPstValues(void)
 	  pstMg[side][P][REL_SQ(sq,side)] = GetPawnMgPst(sq);
 	  pstMg[side][N][REL_SQ(sq,side)] = pstKnightMg[sq];
 	  pstMg[side][B][REL_SQ(sq,side)] = pstBishopMg[sq];
-	  pstMg[side][R][REL_SQ(sq,side)] = pstRookMg[sq];
+	  pstMg[side][R][REL_SQ(sq,side)] = GetRookMgPst(sq); 
 	  pstMg[side][Q][REL_SQ(sq,side)] = GetQueenMgPst(sq);
 	  pstMg[side][K][REL_SQ(sq,side)] = pstKingMg[sq];
 
@@ -147,7 +123,7 @@ void sData::InitPstValues(void)
 	  pstEg[side][N][REL_SQ(sq,side)] = 5 * ( knightEg[Rank(sq)] + knightEg[File(sq)] );
 	  pstEg[side][B][REL_SQ(sq,side)] = GetBishopEgPst(sq);
 	  pstEg[side][R][REL_SQ(sq,side)] = 0;
-	  pstEg[side][Q][REL_SQ(sq,side)] = pstQueenEg[sq];
+	  pstEg[side][Q][REL_SQ(sq,side)] = 4 *  ( biased[Rank(sq)] + biased[File(sq)] ); 
 	  pstEg[side][K][REL_SQ(sq,side)] = 12 * ( biased[Rank(sq)] + biased[File(sq)] );
 
 	  pawnProperty[PHALANX]  [MG] [side] [REL_SQ(sq,side)] = GetPhalanxPstMg(sq);
@@ -183,6 +159,15 @@ int sData::GetBishopEgPst(int sq)
 	if ( Rank(sq) == RANK_2 || Rank(sq) == RANK_7 || File(sq) == FILE_B || File(sq) == FILE_G) return  0;
 	if ( Rank(sq) == RANK_3 || Rank(sq) == RANK_6 || File(sq) == FILE_C || File(sq) == FILE_F) return  5;
 	return 10;
+}
+
+int sData::GetRookMgPst(int sq)
+{
+	if (sq == D1 || sq == E1) return 4;
+	if (sq == C1 || sq == F1) return 2;
+	if (Rank(sq) == RANK_1)   return 0;
+	if (Rank(sq) == RANK_8)   return 4;
+    return neutral[File(sq)] -1;
 }
 
 int sData::GetQueenMgPst(int sq)

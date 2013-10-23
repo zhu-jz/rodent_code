@@ -27,7 +27,7 @@ int Swap(sPosition *p, int from, int to)
   int score[32];
   U64 bbPieceType;
 
-  int side        = side = Opp(p->side); 
+  int side        = Opp(p->side); 
   int type        = TpOnSq(p, from);
   U64 bbAttackers = AttacksTo(p, to);
   U64 bbOcupied   = OccBb(p) ^ SqBb(from);   // clear the moving piece

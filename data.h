@@ -88,6 +88,7 @@ public:
  int GetPawnMgPst(int sq);
  int GetBishopEgPst(int sq);
  int GetQueenMgPst(int sq);
+ int GetRookMgPst(int sq);
  int GetPhalanxPstMg(int sq);
 };
 
