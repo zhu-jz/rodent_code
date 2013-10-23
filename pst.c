@@ -106,12 +106,12 @@ void sData::InitPstValues(void)
 	  pstMg[side][N][REL_SQ(sq,side)] = pstKnightMg[sq];
 	  pstMg[side][B][REL_SQ(sq,side)] = pstBishopMg[sq];
 	  pstMg[side][R][REL_SQ(sq,side)] = GetRookMgPst(sq); 
-	  pstMg[side][Q][REL_SQ(sq,side)] = GetQueenMgPst(sq);
+	  pstMg[side][Q][REL_SQ(sq,side)] = -5 * (Rank(sq) == RANK_1); // 0 on remaining ranks
 	  pstMg[side][K][REL_SQ(sq,side)] = 10*(kingRank[Rank(sq)] + kingFile[File(sq)]);
 
 	  pstEg[side][P][REL_SQ(sq,side)] = 10;
 	  pstEg[side][N][REL_SQ(sq,side)] = 5 * ( knightEg[Rank(sq)] + knightEg[File(sq)] );
-	  pstEg[side][B][REL_SQ(sq,side)] = GetBishopEgPst(sq);
+	  pstEg[side][B][REL_SQ(sq,side)] = 5 * ( neutral[Rank(sq)] + neutral[File(sq)] );
 	  pstEg[side][R][REL_SQ(sq,side)] = 0;
 	  pstEg[side][Q][REL_SQ(sq,side)] = 4 *  ( biased[Rank(sq)] + biased[File(sq)] ); 
 	  pstEg[side][K][REL_SQ(sq,side)] = 12 * ( biased[Rank(sq)] + biased[File(sq)] );
@@ -143,14 +143,6 @@ int sData::GetPawnMgPst(int sq)
     return neutral[File(sq)] * 5;
 }
 
-int sData::GetBishopEgPst(int sq)
-{
-    if ( Rank(sq) == RANK_1 || Rank(sq) == RANK_8 || File(sq) == FILE_A || File(sq) == FILE_H) return -5;
-	if ( Rank(sq) == RANK_2 || Rank(sq) == RANK_7 || File(sq) == FILE_B || File(sq) == FILE_G) return  0;
-	if ( Rank(sq) == RANK_3 || Rank(sq) == RANK_6 || File(sq) == FILE_C || File(sq) == FILE_F) return  5;
-	return 10;
-}
-
 int sData::GetRookMgPst(int sq)
 {
 	if (sq == D1 || sq == E1) return 4;
@@ -158,12 +150,6 @@ int sData::GetRookMgPst(int sq)
 	if (Rank(sq) == RANK_1)   return 0;
 	if (Rank(sq) == RANK_8)   return 4;
     return neutral[File(sq)] -1;
-}
-
-int sData::GetQueenMgPst(int sq)
-{
-	if ( Rank(sq) == RANK_1) return -5;
-	else                     return 0;
 }
 
 int sData::GetPhalanxPstMg(int sq)
