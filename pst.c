@@ -28,6 +28,8 @@ const int neutral[8]  = {-3, -1, 1, 3, 3, 1, -1, -3};
 const int biased[8]   = {-3, -1, 0, 1, 1, 0, -1, -3};
 const int knightEg[8] = {-4, -2, 0, 1, 1, 0, -2, -4};
 const int pawnAdv[8]  = { 0,  1, 1, 3, 5, 8, 12,  0};
+const int kingFile[8] = { 4,  5, 3, 1, 1, 3,  5,  4};
+const int kingRank[8] = { 0, -1,-3,-4,-5,-6, -7, -8};
 
 // weak pawn penalties are file based
 const int pawnBackwardMg[8] = { -7,  -8,  -9, -10, -10,  -9,  -8,  -7 };
@@ -57,18 +59,6 @@ const int pstBishopMg[64] =
     -5,   0,   5,   5,   5,   5,   0,  -5,
     -5,   0,   0,   0,   0,   0,   0,  -5,
     -5,  -5,  -5,  -5,  -5,  -5,  -5,  -5
-};
-
-const int pstKingMg[64] = 
-{  
-    40,  50,  30,  10,  10,  30,  50,  40,
-    30,  40,  20,   0,   0,  20,  40,  30,
-    10,  20,   0, -20, -20,   0,  20,  10,
-     0,  10, -10, -30, -30, -10,  10,   0,
-   -10,   0, -20, -40, -40, -20,   0, -10,
-   -20, -10, -30, -50, -50, -30, -10, -20,
-   -30, -20, -40, -60, -60, -40, -20, -30,
-   -40, -30, -50, -70, -70, -50, -30, -40
 };
 
 const int pstKnightOutpost[64] = 
@@ -117,7 +107,7 @@ void sData::InitPstValues(void)
 	  pstMg[side][B][REL_SQ(sq,side)] = pstBishopMg[sq];
 	  pstMg[side][R][REL_SQ(sq,side)] = GetRookMgPst(sq); 
 	  pstMg[side][Q][REL_SQ(sq,side)] = GetQueenMgPst(sq);
-	  pstMg[side][K][REL_SQ(sq,side)] = pstKingMg[sq];
+	  pstMg[side][K][REL_SQ(sq,side)] = 10*(kingRank[Rank(sq)] + kingFile[File(sq)]);
 
 	  pstEg[side][P][REL_SQ(sq,side)] = 10;
 	  pstEg[side][N][REL_SQ(sq,side)] = 5 * ( knightEg[Rank(sq)] + knightEg[File(sq)] );
