@@ -46,7 +46,7 @@ void Init(void)
   InitPossibleAttacks();
   InitPawnSupport();
   Data.InitBadBishop();  // bad bishop bitboards initialization
-  Data.InitEvalVars();
+  Data.InitOptions();
   //                 name,  val, delta, phase
   Data.InitSinglePiece( P,  0,     150,  0);  // pawn material is evaluated in eval.c, so no value set here
   Data.InitSinglePiece( N,  325,   475,  1);

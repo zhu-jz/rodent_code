@@ -49,12 +49,8 @@ public:
  int safetyStyle;
 
  // search data
- int aspiration;       // size of aspiration window
  int useNull;          // shall we use null move?
  int lmrHistLimit;     // what value of history counter prevents lmr?
- int futilityBase;     // initial value of futility margin
- int futilityStep;     // margin is incremented by this value for every 1/4 ply
- int futilityDepth;
  int deltaMargin;      // margin for a delta pruning in quiescence search 
  int goodCaptMargin;   // margin of a loss that can be incurred without classifying capture as "bad"
  int lazyMargin;       // margin for lazy evaluation cutoff
@@ -81,7 +77,7 @@ public:
  void InitCastleMask(void);
  void InitSearchData(void);
  void InitDistanceBonus(void);
- void InitEvalVars(void);
+ void InitOptions(void);
  void InitBadBishop(void);
  void InitAsymmetric(int side);
  void SetBadBishopMask(int bishSq, int pawnSq, int val);

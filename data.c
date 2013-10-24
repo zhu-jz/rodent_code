@@ -134,21 +134,11 @@ void sData::InitCastleMask(void)
 
 void sData::InitSearchData(void) 
 {
-     aspiration       = 30;
 	 useNull          = 1;
 	 lmrHistLimit     = 60;      // 70 is better in very fast games (10s per game)
-	 futilityBase     = 100;
-	 futilityStep     = 20;
-	 futilityDepth    = 4;
 	 deltaMargin      = 150;
 	 goodCaptMargin   = 30;      // BxN is OK, RxB isn't
-	 lazyMargin       = 180;     // 360 is marginally worse
-	 verbose          = 0;       // no additional display
-	 elo              = MAX_ELO; // no weakening
-	 isAnalyzing      = 0;
-	 useBook          = 1;
-	 useWeakening     = 0;
-	 useLearning      = 0;
+	 lazyMargin       = 180;     // 180 best so far, 240 is marginally worse
 }
 
 void sData::InitDistanceBonus(void) 
@@ -160,7 +150,7 @@ void sData::InitDistanceBonus(void)
      }
 }
 
-void sData::InitEvalVars(void) 
+void sData::InitOptions(void) // init user-accessible stuff
 {
 	 safetyStyle     = KS_STOCKFISH;
 	 ownMobility     = 110;
@@ -168,6 +158,12 @@ void sData::InitEvalVars(void)
 	 ownAttack       = 100; 
 	 oppAttack       = 100; 
 	 bishopPair      =  50; 
+     verbose          = 0;       // no additional display
+	 elo              = MAX_ELO; // no weakening
+	 isAnalyzing      = 0;
+	 useBook          = 1;
+	 useWeakening     = 0;
+	 useLearning      = 0;
 }
 
 // used at the beginning of search to set scaling factors for eval components

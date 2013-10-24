@@ -183,14 +183,6 @@ void sParser::SetOption(char *ptr)
 	Data.ownAttack = atoi(value);
   } else if (strcmp(name, "OppAttack") == 0) {
 	Data.oppAttack = atoi(value);
-  } else if (strcmp(name, "LMRHistLimit") == 0) {
-	Data.lmrHistLimit = atoi(value);
-  } else  if (strcmp(name, "FutilityDepth") == 0) {
-	Data.futilityDepth = atoi(value);
-  } else  if (strcmp(name, "FutilityBase") == 0) {
-	Data.futilityBase = atoi(value);
-  } else if (strcmp(name, "FutilityStep") == 0) {
-	Data.futilityStep = atoi(value);
   } else if (strcmp(name, "UCI_Elo") == 0) {
 	Data.elo = atoi(value);
 	if (Data.panelStyle == PANEL_NORMAL) Data.useWeakening = 1;
@@ -232,10 +224,6 @@ void sParser::PrintUciOptions()
 	printf("option name OppMobility type spin default %d min 0 max 300\n", Data.oppMobility);
 	printf("option name OwnAttack type spin default %d min 0 max 300\n", Data.ownAttack);
 	printf("option name OppAttack type spin default %d min 0 max 300\n", Data.oppAttack);
-	printf("option name LMRHistLimit type spin default %d min 0 max 100\n", Data.lmrHistLimit);
-	printf("option name FutilityDepth type spin default %d min 0 max 8\n", Data.futilityDepth);
-	printf("option name FutilityBase type spin default %d min 0 max 1000\n", Data.futilityBase);
-	printf("option name FutilityStep type spin default %d min 0 max 100\n", Data.futilityStep);
 	printf("option name UCI_Elo type spin default %d min 600 max 2600\n", Data.elo);
 	printf("option name UCI_LimitStrength type check default false\n", Data.useWeakening);
 	}

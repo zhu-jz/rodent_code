@@ -9,7 +9,7 @@
   or (at your option) any later version.
 
   Rodent is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty 
+  but WITHOUT ANY WARRANTY; without even the implied warranty
   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
   See the GNU General Public License for more details.
 
@@ -34,6 +34,10 @@
 
 void sSearcher::Init(void)
 {
+	aspiration       = 30;
+	futilityBase     = 100;
+	futilityStep     = 20;
+	futilityDepth    = 4;
 	minimalLmrDepth  = 2 * ONE_PLY; // 3 is worse
     minimalNullDepth = 2 * ONE_PLY; // 3 is worse
 
@@ -104,7 +108,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   for (rootDepth = ONE_PLY; rootDepth <= localDepth; rootDepth+=ONE_PLY) {
 
 	DisplayRootInfo();
-	delta = Data.aspiration;
+	delta = aspiration;
 
 	if (rootDepth <= 6 * ONE_PLY) { alpha = -INF;      beta = INF;       }
 	else                          { alpha = val-delta; beta = val+delta; }
@@ -456,7 +460,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 if (IsMoveOrdinary(flagMoveType) ) {
 
 	     if (++normalMoveCnt == 1) {   
-            if ( depth < Data.futilityDepth * ONE_PLY  // we are sufficiently close to the leaf
+            if ( depth < futilityDepth * ONE_PLY  // we are sufficiently close to the leaf
             && flagCanPrune
             && alpha > -MAX_EVAL ) {
                if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
@@ -510,7 +514,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      &&  depth <= minimalLmrDepth      // we are near the leaf
      &&  !InCheck(p)                   // we're not giving check	
 	 &&  movesTried > 12               // move is sufficiently down the list
-	 // adding !flagMoveType (= not pruning bad captures) or history restiction is worse
+	 // not pruning bad captures is worse
 	 ) {
  		 if ( movesTried > 20 ) 
 		    { Manipulator.UndoMove(p, move, undoData); continue; }
@@ -600,7 +604,7 @@ int sSearcher::SetNullDepth(int depth)
 
 int sSearcher::SetFutilityMargin(int depth) 
 {
-	return Data.futilityBase + depth * Data.futilityStep;
+	return futilityBase + depth * futilityStep;
 }
 
 int sSearcher::IsRepetition(sPosition *p)

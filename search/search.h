@@ -34,6 +34,10 @@ private:
 	int flagAbortSearch;
 	void CheckInput(void);
 	int isReporting;
+	int aspiration;       // initial size of aspiration window
+    int futilityBase;     // initial value of futility margin
+    int futilityStep;     // margin is incremented by this value for every 1/4 ply
+    int futilityDepth;
 	U64 stat[END_OF_STATS];
 
 	int Blunder(sPosition *p, int ply, int depth, int flag, int move, int lastMove, int flagInCheck);

@@ -24,10 +24,10 @@
 
 const int passerMg    = 10;
 const int passerEg    = 13;
+const int pawnAdv[8]  = { 0,  1, 1, 3, 5, 8, 12,  0};
 const int neutral[8]  = {-3, -1, 1, 3, 3, 1, -1, -3};
 const int biased[8]   = {-3, -1, 0, 1, 1, 0, -1, -3};
 const int knightEg[8] = {-4, -2, 0, 1, 1, 0, -2, -4};
-const int pawnAdv[8]  = { 0,  1, 1, 3, 5, 8, 12,  0};
 const int kingFile[8] = { 4,  5, 3, 1, 1, 3,  5,  4};
 const int kingRank[8] = { 0, -1,-3,-4,-5,-6, -7, -8};
 
@@ -145,11 +145,11 @@ int sData::GetPawnMgPst(int sq)
 
 int sData::GetRookMgPst(int sq)
 {
-	if (sq == D1 || sq == E1) return 4;
+	/**/if (sq == D1 || sq == E1) return 4;
 	if (sq == C1 || sq == F1) return 2;
 	if (Rank(sq) == RANK_1)   return 0;
-	if (Rank(sq) == RANK_8)   return 4;
-    return neutral[File(sq)] -1;
+	if (Rank(sq) == RANK_8)   return 4;/**/
+    return neutral[File(sq)] - 1 /*+ 4*(Rank(sq) == RANK_8) + 2*(Rank(sq) == RANK_1)/**/;
 }
 
 int sData::GetPhalanxPstMg(int sq)
