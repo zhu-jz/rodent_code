@@ -89,7 +89,7 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 
 	nOfChoices = 0;
 
-	if (Data.isAnalyzing) return 0; // book movea aren't returned in analyse mode
+	if (Data.isAnalyzing) return 0; // book moves aren't returned in analyse mode
 
 	for (i = 0; i < nOfGuideRecords; i++ ) {
 		if (guideBook[i].hash == localHash
@@ -135,19 +135,22 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
 	}
 
 	// find a convenient starting point to avoid looping through entire book
-	int iStart  = 0;
-	i = 1;
-	if (nOfRecords > 10000) {
-	   for(;;) {
-         if (myBook[i*10000].hash < localHash) iStart = i*10000;
-	     else break;         
-	     i++;
-	     if (i*10000 > nOfRecords) break;
-	   }
+	int iStart = 0;
+	int iEnd   = nOfRecords;
+	int iDist  = (iEnd - iStart) / 2;
+	if (myBook[iStart + iDist].hash < localHash) iStart += iDist;
+	
+	for (;;) {
+	iDist = (iEnd - iStart) / 2;
+	if (myBook[iStart + iDist].hash < localHash) iStart += iDist;
+	if (myBook[iEnd - iDist].hash > localHash) iEnd -= (iDist-20);
+	if (iDist < 10000) break;
 	}
 
+	if (canPrint) printf("info string from %d to %d\n", iStart, iEnd);
+
 	// find possible book moves
-	for (i = iStart; i < nOfRecords; i++ ) {
+	for (i = iStart; i < iEnd; i++ ) {
         if (myBook[i].hash > localHash) break;
 
 		if (myBook[i].hash == localHash
@@ -559,9 +562,9 @@ void sBook::FeedMainBook(sPosition *p, int verifyDepth)
 	 SaveBookInOwnFormat("newbook.wtf");
 }
 
-// Arbitrary definition of an infrequent move: less than 100 entries
-// and less than 15% of frequency of the most popular move.
 int sBook::IsInfrequent(int val, int maxFreq)
 {
-	return ( val < 100 && val < maxFreq / 15); 
+	if (maxFreq > 2 && val < 2) return 1; // if possible, pick a move tried at least twice
+	if (val < 100 && val < maxFreq / 15) return 1;
+	return 0;
 }
