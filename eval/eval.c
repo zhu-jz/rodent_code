@@ -37,6 +37,7 @@ void sEvaluator::InitDynamicScore(sPosition *p)
      attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
 	 attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
 	 attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
+	 checkCount[WHITE]       = 0;   checkCount[BLACK]  = 0;
 	 attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
 	 mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
 	 egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
@@ -156,13 +157,15 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
 	if (Data.safetyStyle == KS_RODENT)    {
 	   if (attWood[side] > 14) attWood[side] = 14;
        if (attNumber[side] > 1 ) attWood[side] += 1;
-       attScore[side] = (attCount[side] * attMult[attWood[side]]) / 100;
+       attScore[side] = ( (attCount[side]+checkCount[side]) * attMult[attWood[side]]) / 100;
 	}
 	if (Data.safetyStyle == KS_STOCKFISH) {
-       attCount[side] += (attWood[side] / 2); // bonus for material involved in the attack
- 	   if(attCount[side] > 99) attCount[side] = 99;
-	   if(attNumber[side] < 2) attCount[side] = 0;
-	   attScore[side] = Data.kingDanger[attCount[side]] * 10;
+	   int attUnit = attCount[side];    // attacks on squares near enemy king
+	   attUnit += checkCount[side];     // check and contact check threats
+       attUnit += (attWood[side] / 2);  // material involved in the attack
+ 	   if(attUnit > 99) attUnit = 99;   // bounds checking
+	   if(attNumber[side] < 2) attUnit = 0;
+	   attScore[side] = Data.kingDanger[attUnit] * 10;
 	}
 	ScaleValue(&attScore[side]  , Data.attSidePercentage[side]);
 }

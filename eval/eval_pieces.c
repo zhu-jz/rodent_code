@@ -34,7 +34,7 @@
   const int queenContactCheck [2] = { 300, 6 };
   const int rookContactCheck  [2] = { 200, 4 };
   const int rookSeventhMg   = 20;
-  const int rookSeventhEg   = 20; // BEST 20, 40 is worse
+  const int rookSeventhEg   = 20; // BEST 20, 30 is worse
   const int rookOpenMg      = 10;
   const int rookOpenEg      = 10;
   const int rookSemiOpenMg  = 5;
@@ -72,7 +72,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 
     // check threats (excluding checks from squares controlled by enemy pawns)
 	if (bbControl & bbKnightChecks[Opp(side)] )
-		attCount[side] += canCheckWith[Data.safetyStyle][N]; 
+		checkCount[side] += canCheckWith[Data.safetyStyle][N]; 
   }
 }
 
@@ -105,7 +105,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 
     // check threats (with false positive due to queen transparency)
 	if (bbControl & bbDiagChecks[Opp(side)] )
-		attCount[side] += canCheckWith[Data.safetyStyle][B];
+		checkCount[side] += canCheckWith[Data.safetyStyle][B];
 
 	// penalize bishop blocked by own pawns
 	if ( bbBadBishopMasks[side][sq] & bbPc(p, side, P) )
@@ -149,14 +149,14 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
     // check threats (including false positives due to queen/rook transparency)
 	if (bbControl & bbStraightChecks[Opp(side)] ) {
-		attCount[side] += canCheckWith[Data.safetyStyle][R];
+		checkCount[side] += canCheckWith[Data.safetyStyle][R];
         // safe contact checks
 	    bbContact = bbControl & bbKingAttacks[ p->kingSquare[Opp(side)] ] & bbStraightChecks[Opp(side)];
 	    while (bbContact) {
            contactSq = PopFirstBit(&bbContact);
 
 	       if ( Swap(p, sq, contactSq) >= 0 ) {
-			  attCount[side] += rookContactCheck[Data.safetyStyle]; 
+			  checkCount[side] += rookContactCheck[Data.safetyStyle]; 
 		      break;
 	       }
 	    }
@@ -200,7 +200,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	if (bbControl & bbCanCheckFrom ) {
 
 		// queen check threats (unlike with other pieces, we *count the number* of possible checks here)
-		attCount[side] += PopCntSparse( bbControl & bbCanCheckFrom ) * canCheckWith[Data.safetyStyle][Q];
+		checkCount[side] += PopCntSparse( bbControl & bbCanCheckFrom ) * canCheckWith[Data.safetyStyle][Q];
 
         // safe contact checks
 	    bbContact = bbControl & bbKingAttacks[ p->kingSquare[Opp(side)] ];
@@ -208,7 +208,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
            contactSq = PopFirstBit(&bbContact);
 
 	       if ( Swap(p, sq, contactSq) >= 0 ) {
-			  attCount[side] += queenContactCheck[Data.safetyStyle]; 
+			  checkCount[side] += queenContactCheck[Data.safetyStyle]; 
 		      break;
 	       }
 	    }
