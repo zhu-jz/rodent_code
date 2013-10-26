@@ -141,12 +141,12 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
 {
-	if (Data.safetyStyle == KS_RODENT)    {
+	if (Data.safetyStyle == KS_SECONDARY)    {
 	   if (attWood[side] > 14) attWood[side] = 14;
        if (attNumber[side] > 1 ) attWood[side] += 1;
        attScore[side] = ( (attCount[side]+checkCount[side]) * attMult[attWood[side]]) / 100;
 	}
-	if (Data.safetyStyle == KS_STOCKFISH) {
+	if (Data.safetyStyle == KS_DOMINANT) {
 		int attUnit = attCount[side];    // attacks on squares near enemy king
 		attUnit += checkCount[side];     // check and contact check threats
 		attUnit += (attWood[side] / 2);  // material involved in the attack
