@@ -78,7 +78,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 
 void sEvaluator::ScoreB(sPosition *p, int side) 
 {
-  int sq;
+  int sq, ownPawnCount, oppPawnCount;
   U64 bbControl, bbAttZone;
   U64 bbPieces    = bbPc(p, side, B);
   U64 bbOccupied  = OccBb(p) ^ bbPc(p, side, Q);     // accept mobility through own queen
@@ -88,7 +88,18 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	bbControl = GenCache.GetBishMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                 // update attack data
 	ScoreMinorPawnRelation(p, side, sq);             // bishop attacked / defended by pawn
-	ScorePieceInHole(p, side, B, sq);               
+	ScorePieceInHole(p, side, B, sq);    
+
+	/**/ // pawns on bishop color
+	if (bbWhiteSq & SqBb(sq) ) { 
+		ownPawnCount = PopCntSparse( bbWhiteSq & bbPc(p, side, P) ) - 4;
+		oppPawnCount = PopCntSparse( bbWhiteSq & bbPc(p, Opp(side), P) ) - 4;
+	} else {
+		ownPawnCount = PopCntSparse( bbBlackSq & bbPc(p, side, P) ) - 4;
+		oppPawnCount = PopCntSparse( bbBlackSq & bbPc(p, Opp(side), P) ) - 4;
+	}
+	AddMisc(side,-3*ownPawnCount-oppPawnCount, -3*ownPawnCount-oppPawnCount);
+	/**/
 
     // king attack (if our queen is present)
 	if (bbBCanAttack[sq] [KingSq(p, side ^ 1) ] 
