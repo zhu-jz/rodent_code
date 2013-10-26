@@ -152,7 +152,7 @@ void sData::InitDistanceBonus(void)
 
 void sData::InitOptions(void) // init user-accessible stuff
 {
-	 safetyStyle     = KS_STOCKFISH;
+	 safetyStyle     = KS_DOMINANT;
 	 ownMobility     = 110;
 	 oppMobility     = 110;
 	 ownAttack       = 100; 

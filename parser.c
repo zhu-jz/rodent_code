@@ -79,9 +79,9 @@ void sParser::UciLoop(void)
 
 	// king safety type
 	if (strstr(command, "setoption name SafetyConsiderations value secondary"))
-		Data.safetyStyle = KS_RODENT;
+		Data.safetyStyle = KS_SECONDARY;
 	if (strstr(command, "setoption name SafetyConsiderations value dominant"))
-		Data.safetyStyle = KS_STOCKFISH;
+		Data.safetyStyle = KS_DOMINANT;
 
     if (strcmp(token, "uci") == 0) {
       flagProtocol = PROTO_UCI;
