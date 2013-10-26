@@ -98,19 +98,6 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
 	}
 }
 
- int sEvaluator::ScorePatterns(sPosition *p, int side)
- {
-	 int score = 0;
-      
-	 if  ( ( bbPc(p, side, N) & RelSqBb(C3,side) )
-	 &&    ( bbPc(p, side, P) & RelSqBb(C2,side) ) 
-	 &&    ( bbPc(p, side, P) & RelSqBb(D4,side) )
-	 &&   !( bbPc(p, side, P) & RelSqBb(E4,side) )
-	 ) score -= 15; // avoid blocking "c" pawn with a knight
-
-	 return score;
- }
-
 void sEvaluator::ScoreKingShield(sPosition *p, int side)
 {
   const U64 bbQSCastle[2] = { SqBb(A1) | SqBb(B1) | SqBb(C1) | SqBb(A2) | SqBb(B2) | SqBb(C2), 
@@ -248,9 +235,6 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  egScore += ( egMisc[WHITE]     - egMisc[BLACK]     );
       score   += Interpolate();    // merge middlegame and endgame scores
 	  score   += ( attScore[WHITE]  - attScore[BLACK] );
-
-    //  score += ScorePatterns(p, WHITE);
-	//  score -= ScorePatterns(p, BLACK);
   }
   else score = temp_score; 
 
