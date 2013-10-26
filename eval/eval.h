@@ -65,7 +65,6 @@ private:
   void SetScaleFactor(sPosition *p);
   int SetDegradationFactor(sPosition *p, int stronger);
   int Interpolate(void);
-  int ScorePatterns(sPosition *p, int side);
   void SinglePawnScore(sPosition *p, int side); // eval_pawns.c
   void EvalPawnCenter(sPosition *p, int side);  // eval_pawns.c
   void EvalPawns(sPosition *p);				    // eval_pawns.c

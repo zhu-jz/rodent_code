@@ -160,12 +160,12 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
        attScore[side] = ( (attCount[side]+checkCount[side]) * attMult[attWood[side]]) / 100;
 	}
 	if (Data.safetyStyle == KS_STOCKFISH) {
-	   int attUnit = attCount[side];    // attacks on squares near enemy king
-	   attUnit += checkCount[side];     // check and contact check threats
-       attUnit += (attWood[side] / 2);  // material involved in the attack
- 	   if(attUnit > 99) attUnit = 99;   // bounds checking
-	   if(attNumber[side] < 2) attUnit = 0;
-	   attScore[side] = Data.kingDanger[attUnit] * 10;
+		int attUnit = attCount[side];    // attacks on squares near enemy king
+		attUnit += checkCount[side];     // check and contact check threats
+		attUnit += (attWood[side] / 2);  // material involved in the attack
+		if(attUnit > 99) attUnit = 99;   // bounds checking
+		if(attNumber[side] < 2) attUnit = 0;
+		attScore[side] = Data.kingDanger[attUnit] * 10;
 	}
 	ScaleValue(&attScore[side]  , Data.attSidePercentage[side]);
 }
@@ -249,8 +249,8 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
       score   += Interpolate();    // merge middlegame and endgame scores
 	  score   += ( attScore[WHITE]  - attScore[BLACK] );
 
-      score += ScorePatterns(p, WHITE);
-	  score -= ScorePatterns(p, BLACK);
+    //  score += ScorePatterns(p, WHITE);
+	//  score -= ScorePatterns(p, BLACK);
   }
   else score = temp_score; 
 

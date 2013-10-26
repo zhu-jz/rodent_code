@@ -158,7 +158,7 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 
 	// TODO: KRPPKRP with no passers
     // TODO: KBPKP with blockade and wrong bishop
-	
+
 	return 64; // no degradation
 }
 
