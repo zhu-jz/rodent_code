@@ -50,6 +50,7 @@ private:
    void SaveBookInOwnFormat(char *filename);
    void SortMainBook(void);
 public:
+   U64 GetPolyglotKey(sPosition *p);
    void Init(sPosition *p);
    int ReadOwnBookFile(char *filename);
    int ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedColor);
