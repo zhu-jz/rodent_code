@@ -28,11 +28,8 @@
 // calculates full hash key from scratch
 U64 sTransTable::InitHashKey(sPosition *p)
 {
-  int i;
-  U64 key;
-
-  key = 0;
-  for (i = 0; i < 64; i++) {
+  U64 key = 0;
+  for (int i = 0; i < 64; i++) {
     if (p->pc[i] != NO_PC)
       key ^= zobPiece[p->pc[i]][i];
   }
@@ -51,11 +48,9 @@ U64 sTransTable::InitHashKey(sPosition *p)
 // calculates pawn hash key from scratch
 U64 sTransTable::InitPawnKey(sPosition *p)
 {
-  int i;
-  U64 pawnKey;
+  U64 pawnKey = 0;
 
-  pawnKey = 0;
-  for (i = 0; i < 64; i++)
+  for (int i = 0; i < 64; i++)
     if ( p->bbTp[P] & SqBb(i) )
       pawnKey ^= zobPiece[p->pc[i]][i];
 

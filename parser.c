@@ -426,8 +426,8 @@ void sParser::PrintBoard(sPosition *p)
 	  if ( (sq+1) % 8 == 0) printf(" %d\n", 9 - ((sq+1) / 8) );
   }
   printf("\na b c d e f g h\n");
-  printf("Incremental  hash: %llu pawn: %llu \n", p->hashKey, p->pawnKey);
-  printf("Recalculated hash: %llu pawn: %llu \n", TransTable.InitHashKey(p), TransTable.InitPawnKey(p));
+  printf("Incremental  hash: %016llX pawn: %016llX \n", p->hashKey, p->pawnKey);
+  printf("Recalculated hash: %016llX pawn: %016llX \n", TransTable.InitHashKey(p), TransTable.InitPawnKey(p));
   printf("Incremental  pst : mg %d eg %d\n", p->pstMg[WHITE]-p->pstMg[BLACK], p->pstEg[WHITE]-p->pstEg[BLACK]);
   Eval.DebugPst(p);
   printf("\n");
