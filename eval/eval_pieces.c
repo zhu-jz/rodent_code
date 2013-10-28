@@ -90,7 +90,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	ScoreMinorPawnRelation(p, side, sq);             // bishop attacked / defended by pawn
 	ScorePieceInHole(p, side, B, sq);    
 
-	/**/ // pawns on bishop color
+	// pawns on bishop color
 	if (bbWhiteSq & SqBb(sq) ) { 
 		ownPawnCount = PopCntSparse( bbWhiteSq & bbPc(p, side, P) ) - 4;
 		oppPawnCount = PopCntSparse( bbWhiteSq & bbPc(p, Opp(side), P) ) - 4;
@@ -99,7 +99,6 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 		oppPawnCount = PopCntSparse( bbBlackSq & bbPc(p, Opp(side), P) ) - 4;
 	}
 	AddMisc(side,-3*ownPawnCount-oppPawnCount, -3*ownPawnCount-oppPawnCount);
-	/**/
 
     // king attack (if our queen is present)
 	if (bbBCanAttack[sq] [KingSq(p, side ^ 1) ] 
@@ -259,7 +258,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 
 	if (bbStop &~bbOccupied) {           // this pawn is mobile
 	   if (Data.pstMg[side][P][sq] > 0)  // and placed on a good square
-		   AddMisc(side, Data.pstMg[side][P][sq] / 5, Data.pstEg[side][P][sq] / 5);
+		   AddMisc(side, Data.pstMg[side][P][sq] / 5, 2);
 	   else AddMisc(side, 2, 1);
 	}
 	   
