@@ -23,7 +23,7 @@
 #include "eval.h"
 
 const int centDefense = 5;
-const int doubledPawn [2] = {-20, -10};
+const int doubledPawn [2] = {-25, -15};
 const int pawnIsolatedOnOpen = -15;
 const int pawnBackwardOnOpen = -15;
 
