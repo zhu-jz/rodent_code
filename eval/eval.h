@@ -27,6 +27,11 @@ struct sPawnHashEntry {
   int egPawns;
 };
 
+struct sEvalHashEntry {
+  U64 key;
+  int score;
+};
+
 #define PAWN_HASH_SIZE  512 * 512
 
 struct sEvaluator {
