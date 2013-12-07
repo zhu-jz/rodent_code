@@ -17,6 +17,8 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#define LAZY_EVAL
+
 #include <stdio.h>
 #include "../bitboard/bitboard.h"
 #include "../data.h"
@@ -92,8 +94,8 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
     while (bbHanging) {
        sq  = FirstOne(bbHanging);
 	   pc  = TpOnSq(p, sq);
-	   val = Data.matValue[pc] / 32;
-	   AddMisc(side, 5+val, 10+val);
+	   val = Data.matValue[pc] / 64;
+	   AddMisc(side, 10+val, 18+val);
 	   bbHanging &= bbHanging - 1;
 	}
 }
@@ -111,13 +113,12 @@ void sEvaluator::ScoreKingShield(sPosition *p, int side)
   U64 bbKingFile, bbNextFile;
   int result = 0;
   int sq = p->kingSquare[side];
-  
-  bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
 
-  // we use generic score for castled king to avoid changing shield score by, say, Kh1-g1
+  // use generic square for castled king to avoid changing shield score by, say, Kh1-g1
   if (SqBb(sq) & bbKSCastle[side]) sq = kCastle[side];
   if (SqBb(sq) & bbQSCastle[side]) sq = qCastle[side];
 
+  // evaluate pawn shield and pawn storms
   bbKingFile = FillNorth(SqBb(sq) ) | FillSouth(SqBb(sq));
   result += EvalKingFile(p, side, bbKingFile);
    
@@ -141,6 +142,8 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
 {
+	bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
+
 	if (Data.safetyStyle == KS_SECONDARY)    {
 	   if (attWood[side] > 14) attWood[side] = 14;
        if (attNumber[side] > 1 ) attWood[side] += 1;
@@ -159,9 +162,8 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
 
 int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side) 
 {
-	// values taken from Fruit
 	if ( !bbOwnPawns ) return -36;
-	if ( bbOwnPawns & bbRelRank[side][RANK_2] ) return    2;  // scores about the same as original 0
+	if ( bbOwnPawns & bbRelRank[side][RANK_2] ) return    2;
 	if ( bbOwnPawns & bbRelRank[side][RANK_3] ) return  -11;
 	if ( bbOwnPawns & bbRelRank[side][RANK_4] ) return  -20;
 	if ( bbOwnPawns & bbRelRank[side][RANK_5] ) return  -27;
@@ -195,12 +197,15 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
   mgScore += (p->pstMg[WHITE] - p->pstMg[BLACK]);
   egScore += (p->pstEg[WHITE] - p->pstEg[BLACK]);
   
+#ifdef LAZY_EVAL
   int temp_score = score + Interpolate();
 
   // lazy evaluation - avoids costly calculations
   // if score seems already very high/very low
   if (temp_score > alpha - Data.lazyMargin 
   &&  temp_score < beta +  Data.lazyMargin) {
+#endif
+
 	  InitDynamicScore(p);
 
       ScoreN(p, WHITE);
@@ -211,8 +216,8 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  ScoreR(p, BLACK);
       ScoreQ(p, WHITE);
       ScoreQ(p, BLACK);
-	  ScoreKingShield(p, WHITE);
-	  ScoreKingShield(p, BLACK);
+      ScoreKingShield(p, WHITE);
+      ScoreKingShield(p, BLACK);
 	  ScoreKingAttacks(p, WHITE);
 	  ScoreKingAttacks(p, BLACK);
 	  ScoreHanging(p, WHITE);
@@ -235,8 +240,10 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  egScore += ( egMisc[WHITE]     - egMisc[BLACK]     );
       score   += Interpolate();    // merge middlegame and endgame scores
 	  score   += ( attScore[WHITE]  - attScore[BLACK] );
+#ifdef LAZY_EVAL
   }
   else score = temp_score; 
+#endif
 
   score = PullToDraw(p, score);    // decrease score in drawish endgames
   score = FinalizeScore(p, score); // bounds, granulatity and weakening
