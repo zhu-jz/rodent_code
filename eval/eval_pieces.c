@@ -63,9 +63,13 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	// king attacks (if our queen is present)
 	bbAttZone = bbControl & bbKingZone[side][p->kingSquare[Opp(side)]];
 	if (bbAttZone && p->pcCount[side][Q] ) {
-		AddPieceAttack(side, N, PopCntSparse(bbAttZone) ); 
+		AddPieceAttack(side, N, PopCntSparse(bbAttZone) );
 		bbMinorCoorAttacks[side] ^= bbAttZone;
 	}
+
+	// participation in own king defence (if enemy queen is present)
+	if (bbControl & bbKingZone[Opp(side)][p->kingSquare[side]] 
+	&& p->pcCount[Opp(side)][Q] ) AddMisc(side, 5, 0);
 
 	bbControl &= ~bbPawnControl[Opp(side)];          // exclude squares controlled by enemy pawns
 	AddMobility(N, side, PopCnt15(bbControl) );      // evaluate mobility
@@ -110,10 +114,14 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	   }
    }
 
+	// participation in own king defence (if enemy queen is present)
+	if (bbControl & bbKingZone[Opp(side)][p->kingSquare[side]] 
+	&& p->pcCount[Opp(side)][Q] ) AddMisc(side, 5, 0);
+
 	bbControl &= ~bbPawnControl[Opp(side)];          // exclude squares controlled by enemy pawns
 	AddMobility(B, side, PopCnt15(bbControl) );      // evaluate mobility
 
-    // check threats (with false positive due to queen transparency)
+    // check threats (including false positives due to queen transparency)
 	if (bbControl & bbDiagChecks[Opp(side)] )
 		checkCount[side] += canCheckWith[Data.safetyStyle][B];
 
@@ -139,7 +147,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	U64 bbFrontSpan = GetFrontSpan(SqBb(sq), side );
 	if (bbFrontSpan & bbPc(p, Opp(side), Q) ) AddMisc(side, 5, 5); // rook and enemy queen in the same file
 
-	// evaluate rook on an open file
+	// evaluate rook on an open file (ignoring pawns behind a rook)
 	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {                     // no own pawns in front of the rook
 	   if ( !(bbFrontSpan & bbPc(p, Opp(side), P) ) ) {            // no enemy pawns - open file
 		  AddMisc(side, rookOpenMg, rookOpenEg);
@@ -150,7 +158,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	   }
 	}
 
-	// evaluate rook on 7th rank if it attacks pawns or cuts off enemy king
+	// evaluate rook on 7th rank if rook attacks pawns or cuts off enemy king
 	if (SqBb(sq) & bbRelRank[side][RANK_7] ) {
        if ( bbPc(p, Opp(side), P) & bbRelRank[side][RANK_7]
 	   || bbPc(p, Opp(side), K) & bbRelRank[side][RANK_8]
@@ -200,7 +208,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	bbControl = GenCache.GetQueenMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbControl;                  // update attack data
 
-	// evaluate queen on 7th rank if it attacks pawns or cuts off enemy king
+	// evaluate queen on 7th rank if queen attacks pawns or cuts off enemy king
 	if (SqBb(sq) & bbRelRank[side][RANK_7] ) {
        if ( bbPc(p, Opp(side), P) & bbRelRank[side][RANK_7]
 	   || bbPc(p, Opp(side), K) & bbRelRank[side][RANK_8]
@@ -248,16 +256,29 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 void sEvaluator::ScoreP(sPosition *p, int side) 
 {
   int sq, passUnitMg, passUnitEg;
+  int flagIsWeak;
   U64 bbPieces = bbPc(p, side, P);
   U64 bbOccupied = OccBb(p);
-  U64 bbStop, bbObstacles;
+  U64 bbStop, bbBack, bbObstacles;
 
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);
 	bbStop = ShiftFwd(SqBb(sq), side);
+	bbBack = SqBb(sq) ^ ShiftFwd(SqBb(sq), Opp(side));
+	flagIsWeak = ( ( bbPawnSupport[side][sq] & bbPc(p,side, P) ) == 0);
 
-	if (bbStop &~bbOccupied) {           // this pawn is mobile
-	   if (Data.pstMg[side][P][sq] > 0)  // and placed on a good square
+	// technically speaking, this pawn is not weak, 
+	// but it has lost contact with the pawn mass,
+	// so it is at least slightly vulnerable.
+
+	if (!(bbBack & bbPawnControl[side]) 
+	&& !flagIsWeak) AddMisc(side,-4,-8); // was 2,4
+
+	// this pawn is mobile; bonus grows bigger when
+	// it is placed on a good square (as shown by midgame pst)
+	
+	if (bbStop &~bbOccupied) {           
+	   if (Data.pstMg[side][P][sq] > 0)
 		   AddMisc(side, Data.pstMg[side][P][sq] / 5, 2);
 	   else AddMisc(side, 2, 1);
 	}
