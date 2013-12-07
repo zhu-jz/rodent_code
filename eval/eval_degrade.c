@@ -68,8 +68,7 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	   // KBPK(P) draws with edge pawn and wrong bishop
 	   if (p->pieceMat[stronger] == Data.matValue[B]
 	   &&  p->pieceMat[weaker]   == 0
-	   &&  p->pcCount[stronger][P]  == 1
-	   /*&&  p->pcCount[weaker][P]  == 0*/) {
+	   &&  p->pcCount[stronger][P]  == 1 ) {
 
 	      if (bbPc(p, stronger, P) & bbFILE_H
           && NotOnBishColor(p, stronger, REL_SQ(H8,stronger))
