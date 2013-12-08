@@ -35,9 +35,9 @@
 void sSearcher::Init(void)
 {
 	aspiration       = 30;
-	futilityBase     = 100;
-	futilityStep     = 20;
-	futilityDepth    = 4;
+	futilityBase     = 100; // 80 and 120 are worse
+	futilityStep     = 20;  // by this much futility margin increases each quarter ply
+	futilityDepth    = 4;   // 5 is worse
 	minimalLmrDepth  = 2 * ONE_PLY; // 3 is worse
     minimalNullDepth = 2 * ONE_PLY; // 3 is worse
 
@@ -85,6 +85,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 {
   int val = 0;
   int curVal, alpha, beta, delta;
+  rootSide = p->side;
 
   rootList.Init(p);
   int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
@@ -122,7 +123,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 	if (curVal >= beta || curVal <= alpha) {
 
         // fail-low, it might be prudent to assign some more time
-        if (curVal < val) Timer.SetData(FLAG_ROOT_FAIL_LOW, 1);
+        if (curVal < val) Timer.OnRootFailLow();
 
 		if (curVal >= beta)  beta  = val +3*delta;
 		if (curVal <= alpha) alpha = val -3*delta;
@@ -159,36 +160,11 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   }
 }
 
-int sSearcher::VerifyValue(sPosition *p, int depth, int move) 
-{
-  int val = 0;
-  UNDO  undoData[1];  // data required to undo a move
-  int pv[MAX_PLY];
-
-  rootList.Init(p);
-
-  Data.isAnalyzing = 1;
-  isReporting = 0;
-  if (move != 0) Manipulator.DoMove(p, move, undoData);    
-
-  for (rootDepth = ONE_PLY; rootDepth <= depth * ONE_PLY; rootDepth+=ONE_PLY) {
-      val = SearchRoot(p, -INF, INF, rootDepth, pv);
-	  bestMove = pv[0];
-  }
-
-  Data.isAnalyzing = 0;
-
-  if (move != 0) {
-	  Manipulator.UndoMove(p, move, undoData);
-      return -val;
-  }
-  return val;
-}
-
 int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 {
   int best,                     // best value found at this node
 	  score,                    // score returned by a search started in this node
+	  scoreChange = 0,          // has root move changed?
 	  move,                     // a move we are searching right now
 	  depthChange,              // extension/reduction value
 	  newDepth,                 // depth of a new search started in this node
@@ -281,6 +257,7 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 	 // SCORE CHANGE
      if (score > best) {
          best = score;
+		 if (best != -INF) scoreChange++;
 		 if (movesTried > 1 && depth > 2*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
          if (score > alpha) {
             alpha = score;
@@ -300,6 +277,8 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
    } else
      TransTable.Store(p->hashKey, 0, best, UPPER, depth, 0);
 
+   if (!scoreChange) Timer.OnOldRootMove();
+   else              Timer.OnNewRootMove();
    return best;
 }
 
@@ -329,8 +308,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // EARLY EXIT / DRAW CONDITIONS
   if ( flagAbortSearch )                  return 0;
-  if ( IsRepetition(p) )                  return 0; 
-  if ( DrawBy50Moves(p) )                 return 0;
+  if ( IsRepetition(p) )                  return DrawScore(p); 
+  if ( DrawBy50Moves(p) )                 return DrawScore(p); 
   if ( !flagInCheck && RecognizeDraw(p) ) return 0;
 
   // CHECK EXTENSION
@@ -346,8 +325,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // REUSING LEARNED DATA ABOUT SCORE OF SPECIFIC POSITIONS
   if ( Data.useLearning 
-  && !Data.useWeakening
-  && ply == 2 ) // reading at bigger depths may hinder exploring alternatives to mainline
+  &&  !Data.useWeakening
+  &&   ply == 2 ) // reading at bigger depths may hinder exploring alternatives to mainline
   {
 	  int learnVal = Learner.ReadLearnData(p->hashKey, depth);
 	  if (learnVal != INVALID) return learnVal;
@@ -369,11 +348,14 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
 
   // DETERMINE IF WE CAN APPLY PRUNING
-  int flagCanPrune = (nodeType != PV_NODE) && (beta < MAX_EVAL) && !flagInCheck;
+  int flagCanPrune 
+  =  (nodeType != PV_NODE) 
+  && (beta < MAX_EVAL) 
+  && !flagInCheck;
 
   // EVAL PRUNING (inspired by DiscoCheck by Lucas Braesch) 
-  if (depth <= 3*ONE_PLY
-  && flagCanPrune) {
+  if ( depth <= 3*ONE_PLY
+  &&   flagCanPrune) {
      if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
 	 int evalMargin = 40 * depth;
 	 if (nodeEval - evalMargin >= beta)
@@ -381,11 +363,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   } // end of eval pruning code
 
   // QUIESCENCE NULL MOVE (idea from CCC post of Vincent Diepeveen)
-  if (Data.useNull
-  && flagCanPrune
-  && depth <= minimalNullDepth
-  && !wasNull
-  && p->pieceMat[p->side] > Data.matValue[N]) {
+  if ( Data.useNull
+  &&   flagCanPrune
+  &&   depth <= minimalNullDepth
+  &&  !wasNull
+  &&   p->pieceMat[p->side] > Data.matValue[N]) {
      Manipulator.DoNull(p, undoData);
      score = -Quiesce(p, ply, 0, -beta, -beta+1, 0, pv);
 	 Manipulator.UndoNull(p, undoData);
@@ -396,16 +378,22 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   // NULL MOVE - we allow opponent to move twice in a row; if he cannot beat
   // beta this way, then we assume that there is no need to search any further.
 
-  if (Data.useNull
-  && flagCanPrune
-  && depth > minimalNullDepth
-  && !wasNull
-  && p->pieceMat[p->side] > Data.matValue[N]) 
+  if ( Data.useNull
+  &&   flagCanPrune
+  &&   depth > minimalNullDepth
+  &&  !wasNull
+  &&   p->pieceMat[p->side] > Data.matValue[N]) 
   {
     if ( beta <= Eval.ReturnFull(p, alpha, beta) ) {
 
-      Manipulator.DoNull(p, undoData);
-	  newDepth = SetNullDepth(depth);                             // ALL_NODE
+      newDepth = SetNullDepth(depth);
+
+	  // normal search fails low, so null move search shouldn't fail high
+      if (TransTable.Retrieve(p->hashKey, &nullRefutation, &nullScore, alpha, beta, newDepth, ply) ) {
+		  if (nullScore <= alpha) goto avoidNull;
+	  }
+		  
+      Manipulator.DoNull(p, undoData);                            // NODE_ALL
       nullScore = -Search(p, ply + 1, -beta, -beta + 1, newDepth, NEW_NODE(nodeType), WAS_NULL, 0, newPv);
 
 	  // extract refutation of a null move from transposition table; usually 
@@ -430,11 +418,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
     }
   } // end of null move code 
 
+  avoidNull:
+
    // RAZORING based on Toga II 4.0
-   if (nodeType != PV_NODE 
-   && !flagInCheck 
-   && !move
-   && depth <= 3*ONE_PLY) {
+   if ( nodeType != PV_NODE 
+   &&  !flagInCheck 
+   &&  !move
+   &&   depth <= 3*ONE_PLY) {
       int threshold = beta - 300 - (depth-ONE_PLY) * 15;
 
       if (Eval.ReturnFull(p, alpha, beta) < threshold) {
@@ -468,6 +458,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
                // this node looks bad enough, so we may apply futility pruning
                if ( (nodeEval + SetFutilityMargin(depth) ) < beta ) flagFutility = 1;
+			   // TODO: smaller margin for later moves (requires restructuring)
             }
 	     }
 	 }
@@ -497,13 +488,18 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 // EXTENSIONS might be placed here
 
 	 // DETERMINE IF A MOVE CAN BE REDUCED
-	 int flagCanReduce = (nodeType != PV_NODE) && !flagInCheck && !depthChange && AvoidReduction(move, flagMoveType);
+	 int flagCanReduce
+	 = ( nodeType != PV_NODE) 
+	 && !flagInCheck 
+	 && !InCheck(p) 
+	 && !depthChange 
+	 && AvoidReduction(move, flagMoveType);
 
 	 // FUTILITY PRUNING 
 	 if ( flagCanReduce
-	 && flagFutility
-	 && IsMoveOrdinary(flagMoveType)   // not a tt move, not a capture, not a killer move
-	 && movesTried > 1                 // we have found at least one legal move
+	 &&	  flagFutility
+	 &&   IsMoveOrdinary(flagMoveType)  // not a tt move, not a capture, not a killer move
+	 &&   movesTried > 1                // we have found at least one legal move
 	 ) {
         Manipulator.UndoMove(p, move, undoData);
         continue;
@@ -511,10 +507,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // LATE MOVE PRUNING near the leaves (2012-04-02: two-tier approach)
 	 if ( flagCanReduce
-     &&  depth <= minimalLmrDepth      // we are near the leaf
-     &&  !InCheck(p)                   // we're not giving check	
-	 &&  movesTried > 12               // move is sufficiently down the list
-	 // not pruning bad captures is worse
+     &&   depth <= minimalLmrDepth      // we are near the leaf	
+	 &&   movesTried > 12               // move is sufficiently down the list
+	 // not pruning bad captures is worse - retested 2013-11-14
 	 ) {
  		 if ( movesTried > 20 ) 
 		    { Manipulator.UndoMove(p, move, undoData); continue; }
@@ -524,12 +519,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // LATE MOVE REDUCTION
 	 if  ( !flagInCheck 
-	 && !depthChange 
-	 && AvoidReduction(move, flagMoveType)
-     &&  depth >= minimalLmrDepth       // we have some depth left
-	 &&  movesTried > 3                 // we're sufficiently down the move list
-     &&  !InCheck(p)                    // we're not giving check
-	 &&  History.MoveIsBad(move)        // current move has bad history score
+	 &&    !depthChange 
+	 &&     AvoidReduction(move, flagMoveType)
+     &&     depth >= minimalLmrDepth    // we have some depth left
+	 &&     movesTried > 3              // we're sufficiently down the move list
+	 &&     History.MoveIsBad(move)     // current move has bad history score
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
@@ -660,4 +654,13 @@ void sSearcher::CheckInput(void)
     && !Timer.IsInfiniteMode()
     && Timer.TimeHasElapsed() )
        flagAbortSearch = 1;
+}
+
+int sSearcher::DrawScore(sPosition *p)
+{
+	int scale = Min(24, p->phase);
+	int score = (-Data.contempt * scale) / 24;
+
+    if ( p->side == rootSide ) return score;
+	else                       return -score;
 }
