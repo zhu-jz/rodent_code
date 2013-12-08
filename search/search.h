@@ -31,6 +31,7 @@ enum eStatEntries { FAIL_HIGH, FAIL_FIRST, Q_NODES, END_OF_STATS};
 
 struct sSearcher {
 private:
+	int rootSide;
 	int flagAbortSearch;
 	void CheckInput(void);
 	int isReporting;
@@ -79,13 +80,13 @@ private:
 public:
 	void Init(void);
 	int bestMove;
+	int DrawScore(sPosition *p);
 	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int isRoot, int *pv);
 	int QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int beta, int isRoot, int *pv); 
 	void Think(sPosition *, int *);
 	void ShowPerft(sPosition *p, int depth);
 	void Divide(sPosition *p, int ply, int depth);
 	void Bench(int depth);
-	int VerifyValue(sPosition *p, int depth, int move);
 };
 
 extern struct sSearcher Searcher;
