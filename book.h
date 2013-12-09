@@ -27,37 +27,39 @@ struct sBookEntry {
   int freq;
 };
 
+struct polyglot_move {
+    U64	key;
+    int	move;
+    int weight;
+    int	n;
+    int	learn;
+};
+
 struct sBook {
 private:
    sBookEntry myBook[2048000];
    sBookEntry guideBook[48000];
-   int nOfRecords;
    int nOfGuideRecords;
    int moves[100];
    int nOfChoices;
    char testString [12];
    void AddMoveToGuideBook(U64 hash, int move, int val);
-   void AddMoveToMainBook(U64 hash, int move, int val);
-   int AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor);
-   void AddLineToMainBook(sPosition *p, char *ptr, int excludedColor, int verifyDepth);
+   int AddLineToGuideBook(sPosition *p, char *ptr);
    U64 GetBookHash(sPosition *p);
    int IsInfrequent(int val, int maxFreq);
-   int IsMoveInBook(U64 hashKey, int move);
    void ParseBookEntry(char * ptr, int line_no);
-   int PrintMissingMoves(sPosition *p);
-   void ReadInternalToGuideBook(sPosition *p);
-   void ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedColor, int verifyDepth);
-   void SaveBookInOwnFormat(char *filename);
-   void SortMainBook(void);
+   void PrintMissingMoves(sPosition *p);
+   int FindPos(U64 key);
+   void ReadEntry(polyglot_move * entry, int n);
+   U64 ReadInteger(int size);
 public:
+   int GetPolyglotMove(sPosition *p, int printOutput);
    U64 GetPolyglotKey(sPosition *p);
+   void OpenPolyglot(char *fileName);
+   void ClosePolyglot(char *fileName);
    void Init(sPosition *p);
-   int ReadOwnBookFile(char *filename);
-   int ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedColor);
-   void BookDoctor(sPosition * p, int maxDepth);
-   void FileFixer(char *inFileName, char *outFileName, int task);
+   int ReadTextFileToGuideBook(sPosition *p, char *fileName);
    int GetBookMove(sPosition *p, int canPrint, int *flagIsProblem);
-   void FeedMainBook(sPosition *p, int verifyDepth);
 };
 
 extern sBook Book;
