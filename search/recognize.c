@@ -14,7 +14,7 @@ int sSearcher::RecognizeDraw(sPosition *p)
 	   
 	  if (p->pieceMat[WHITE] < 400 
 	  &&  p->pieceMat[BLACK] < 400
-	  &&  (bbPc(p, WHITE, K)& bbRim) == 0
+	  &&  (bbPc(p, WHITE, K) & bbRim) == 0
 	  &&  (bbPc(p, BLACK, K) & bbRim) == 0 ) {
 		  if ( !IllegalPosition(p) ) return 1;
 	  }   // Km vs Km; just in case we ensure that neither king is on the rim 
