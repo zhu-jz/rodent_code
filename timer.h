@@ -24,6 +24,7 @@ enum eTimeData {
 	 B_TIME,
 	 W_INC,
 	 B_INC,
+	 OLD_TIME,
 	 TIME,
 	 INC,
 	 MOVES_TO_GO,
@@ -49,6 +50,9 @@ public:
 	void SetStartTime();
 	void SetMoveTiming(void);
 	void SetIterationTiming(void);
+	void OnNewRootMove(void);
+	void OnOldRootMove(void);
+	void OnRootFailLow(void);
 	int FinishIteration(void);
 	int GetMS(void);
 	int GetElapsedTime(void);
