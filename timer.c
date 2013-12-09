@@ -53,6 +53,26 @@ void sTimer::SetStartTime(void) {
   startTime = GetMS();
 }
 
+void sTimer::OnNewRootMove() {
+	if (!data[MOVE_TIME] && data[TIME] < ((data[OLD_TIME] * 125 ) / 100) ) {
+	    data[TIME] *= 105;
+	    data[TIME] /= 100;
+	}
+}
+
+void sTimer::OnOldRootMove() {
+	if (!data[MOVE_TIME] && data[TIME] > ((data[OLD_TIME] * 75 ) / 100) ) {
+	    data[TIME] *= 95;
+	    data[TIME] /= 100;
+	}
+}
+
+void sTimer::OnRootFailLow() {
+	 SetData(FLAG_ROOT_FAIL_LOW, 1);
+	 if (data[TIME] < data[OLD_TIME] )
+		 data[TIME] = data[OLD_TIME];
+}
+
 void sTimer::SetMoveTiming(void)
 { 
   // user-defined time per move, no tricks available
@@ -155,6 +175,7 @@ int sTimer::GetData(int slot) {
 
 void sTimer::SetData(int slot, int val) {
     data[slot] = val;
+	if (slot == TIME) data[OLD_TIME] = val;
 }
 
 void sTimer::SetSideData(int side) 
