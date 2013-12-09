@@ -28,19 +28,16 @@
 #include "trans.h"
 #include "search/search.h"
 #include "book.h"
+#include <math.h>
 
 #define DELETE_MOVE 88888
 
+static FILE * bookFile;
+static int bookSize;
+
  // Random numbers from PolyGlot, used to compute book hash keys
-  const union {
-    U64 PolyGlotRandoms[781];
-    struct {
-      U64 psq[12][64];  // [piece][square]
-      U64 castle[4];    // [castle right]
-      U64 enpassant[8]; // [file]
-      U64 turn;
-    } Zobrist;
-  } PG = {{
+  const U64 PG[781]
+  = {
     0x9D39247E33776D41ULL, 0x2AF7398005AAA5C7ULL, 0x44DB015024623547ULL,
     0x9C15F73E62A76AE2ULL, 0x75834465489C0C89ULL, 0x3290AC3A203001BFULL,
     0x0FBBAD1F61042279ULL, 0xE83A908FF2FB60CAULL, 0x0D7E765D58755C10ULL,
@@ -302,7 +299,7 @@
     0x003A93D8B2806962ULL, 0x1C99DED33CB890A1ULL, 0xCF3145DE0ADD4289ULL,
     0xD0E4427A5514FB72ULL, 0x77C621CC9FB3A483ULL, 0x67A34DAC4356550BULL,
     0xF8D626AAAF278509ULL
-  }};
+  };
 
 
 U64 sBook::GetPolyglotKey(sPosition *p)
@@ -310,72 +307,185 @@ U64 sBook::GetPolyglotKey(sPosition *p)
  U64 key = 0;
 
  for (int sq = 0; sq < 64; sq++) {
-	  if      (p->bbTp[P] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG.PolyGlotRandoms[64*1+8*Rank(sq)+File(sq)]; else key ^= PG.PolyGlotRandoms[64*0+8*Rank(sq)+File(sq)]; }
-	  else if (p->bbTp[N] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG.PolyGlotRandoms[64*3+8*Rank(sq)+File(sq)]; else key ^= PG.PolyGlotRandoms[64*2+8*Rank(sq)+File(sq)]; }
-	  else if (p->bbTp[B] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG.PolyGlotRandoms[64*5+8*Rank(sq)+File(sq)]; else key ^= PG.PolyGlotRandoms[64*4+8*Rank(sq)+File(sq)]; }
-	  else if (p->bbTp[R] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG.PolyGlotRandoms[64*7+8*Rank(sq)+File(sq)]; else key ^= PG.PolyGlotRandoms[64*6+8*Rank(sq)+File(sq)]; }
-	  else if (p->bbTp[Q] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG.PolyGlotRandoms[64*9+8*Rank(sq)+File(sq)]; else key ^= PG.PolyGlotRandoms[64*8+8*Rank(sq)+File(sq)]; }
-	  else if (p->bbTp[K] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG.PolyGlotRandoms[64*11+8*Rank(sq)+File(sq)];else key ^= PG.PolyGlotRandoms[64*10+8*Rank(sq)+File(sq)]; }
+	  if      (p->bbTp[P] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG[64*1+8*Rank(sq)+File(sq)]; else key ^= PG[64*0+8*Rank(sq)+File(sq)]; }
+	  else if (p->bbTp[N] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG[64*3+8*Rank(sq)+File(sq)]; else key ^= PG[64*2+8*Rank(sq)+File(sq)]; }
+	  else if (p->bbTp[B] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG[64*5+8*Rank(sq)+File(sq)]; else key ^= PG[64*4+8*Rank(sq)+File(sq)]; }
+	  else if (p->bbTp[R] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG[64*7+8*Rank(sq)+File(sq)]; else key ^= PG[64*6+8*Rank(sq)+File(sq)]; }
+	  else if (p->bbTp[Q] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG[64*9+8*Rank(sq)+File(sq)]; else key ^= PG[64*8+8*Rank(sq)+File(sq)]; }
+	  else if (p->bbTp[K] & SqBb(sq) ) { if ( p->bbCl[WHITE] & SqBb(sq) ) key ^= PG[64*11+8*Rank(sq)+File(sq)];else key ^= PG[64*10+8*Rank(sq)+File(sq)]; }
   }
 
-  if (p->side == WHITE) key ^= PG.Zobrist.turn;
+  if (p->side == WHITE) key ^= PG[780];
 
-  if (p->castleFlags & W_KS) key ^= PG.PolyGlotRandoms[768];
-  if (p->castleFlags & W_QS) key ^= PG.PolyGlotRandoms[768+1];
-  if (p->castleFlags & B_KS) key ^= PG.PolyGlotRandoms[768+2];
-  if (p->castleFlags & B_QS) key ^= PG.PolyGlotRandoms[768+3];
+  if (p->castleFlags & W_KS) key ^= PG[768];
+  if (p->castleFlags & W_QS) key ^= PG[768+1];
+  if (p->castleFlags & B_KS) key ^= PG[768+2];
+  if (p->castleFlags & B_QS) key ^= PG[768+3];
 
   if (p->epSquare != NO_SQ)
-	  key ^= PG.PolyGlotRandoms[772+File(p->epSquare)];
+	  key ^= PG[772+File(p->epSquare)];
 
   return key;
+}
+
+void sBook::OpenPolyglot(char *fileName)
+{
+   bookFile = fopen(fileName,"rb");
+
+   if (bookFile != NULL) {
+
+      if (fseek(bookFile,0,SEEK_END) == -1) {
+         bookFile = NULL; return;
+      }
+
+      bookSize = ftell(bookFile) / 16;
+	  if (bookSize == -1) { bookFile = NULL; return; }
+   }
+}
+
+int my_random(int n) 
+{
+   double r;
+   r = double(rand()) / (double(RAND_MAX) + 1.0);
+   return int(floor(r*double(n)));
+}
+
+int sBook::GetPolyglotMove(sPosition *p, int printOutput) {
+
+   int bestMove  = 0;
+   int bestScore = 0;
+   int maxWeight = 0;
+   int sumOfWeights = 0;
+   int pos;
+   polyglot_move entry[1];
+   int move;
+   int score;
+   int values[100];
+   U64 key = GetPolyglotKey(p);
+   char moveString[6];
+
+   nOfChoices = 0;
+
+   if (bookFile != NULL && bookSize != 0) {
+	  srand(Timer.GetMS() );
+
+      for (pos = FindPos(key); pos < bookSize; pos++) {
+
+         ReadEntry(entry,pos);
+         if (entry->key != key) break;
+
+         move = entry->move;
+		 score = entry->weight;
+
+		 // ugly hack to convert polyglot move to a real one
+		 int fsq = Tsq(move);
+		 int tsq = Fsq(move);
+
+		 // correction for castling moves
+		 if (fsq == E1 && tsq == H1 && p->kingSquare[WHITE] == E1) tsq = G1;
+		 if (fsq == E8 && tsq == H8 && p->kingSquare[BLACK] == E8) tsq = G8;
+		 if (fsq == E1 && tsq == A1 && p->kingSquare[WHITE] == E1) tsq = C1;
+		 if (fsq == E8 && tsq == A8 && p->kingSquare[BLACK] == E8) tsq = C8;
+
+		 // now we want to get a move with full data, not only from and to squares
+		 int realMove = (tsq << 6) | fsq;
+		 MoveToStr(realMove, moveString);
+		 realMove = StrToMove(p, moveString);
+
+		 if (maxWeight < score) maxWeight = score;
+		 sumOfWeights += score;
+		 moves[nOfChoices] = realMove;
+		 values[nOfChoices] = score;
+		 nOfChoices++;
+      }
+
+      // pick a move, filtering out those with significantly lower weight
+	  for (int i = 0; i<nOfChoices; i++) {
+
+		 // report about possible choices and rejected moves
+		 if (values[i] > 1 || maxWeight == 1) {
+            if (printOutput) {
+		       printf("info string ");
+		       PrintMove(moves[i]);
+		       printf(" %d %%", (values[i] * 100) / sumOfWeights );
+			   if (IsInfrequent(values[i], maxWeight)) printf(" infrequent ");
+			}
+		 }
+		 
+		 // shall we pick this move?
+		 if (!IsInfrequent(values[i], maxWeight)) {
+		    bestScore += values[i];
+            if (my_random(bestScore) < values[i]) bestMove = moves[i];
+		 }
+		 
+		 printf("\n");
+
+	  }
+   }
+   if (printOutput) PrintMissingMoves(p);
+   return bestMove;
+}
+
+int sBook::FindPos(U64 key) {
+
+   int left, right, mid;
+   polyglot_move entry[1];
+
+   // binary search (finds the leftmost entry)
+
+   left = 0;
+   right = bookSize-1;
+
+   while (left < right) {
+      mid = (left + right) / 2;
+      ReadEntry(entry, mid);
+
+      if (key <= entry->key) right = mid;
+      else                   left = mid+1;
+   }
+
+   ReadEntry(entry, left);
+
+   return (entry->key == key) ? left : bookSize;
+}
+
+void sBook::ReadEntry(polyglot_move * entry, int n) {
+
+   fseek(bookFile,n*16,SEEK_SET);
+   entry->key    = ReadInteger(8);
+   entry->move   = (int)ReadInteger(2);
+   entry->weight = (int)ReadInteger(2);
+   entry->n      = (int)ReadInteger(2);
+   entry->learn  = (int)ReadInteger(2);
+}
+
+U64 sBook::ReadInteger(int size)
+{
+    U64 n = 0;
+    int b;
+
+    for (int i = 0; i < size; i++) {
+        b = fgetc(bookFile);
+        n = (n << 8) | b;
+    }
+
+    return n;
+}
+
+void sBook::ClosePolyglot(char *fileName)
+{
+	if (bookFile != NULL) {
+		fclose(bookFile);
+		bookFile = NULL;
+	}
 }
 
 void sBook::Init(sPosition * p) 
 {
 	 Timer.SetStartTime();
-	 nOfRecords = 0;
 	 nOfGuideRecords = 0;
-	 
-	 int hasMainBook  = ReadOwnBookFile("bigbook.wtf"); // read main book
-	 int hasGuideBook = ReadTextFileToGuideBook(p, "guidebook.txt", NO_CL);
-	 if (!hasMainBook && !hasGuideBook) ReadInternalToGuideBook(p);
-}
-
-void sBook::BookDoctor(sPosition * p, int maxDepth) {
-	 int move, depth;
-	 char moveStr[6];
-	 UNDO u;
-
-	 FILE *doctorFile; 
-     doctorFile = fopen("doctor.txt","a+"); 
-
-	 int flagIsProblem = 0;
-	 printf("First line that might need Your decision will be saved to doctor.txt\n");
-	 
-	 for (int i = 0; i < 10000; i++ ) {
-		 SetPosition(p, START_POS);
-		 depth = 0;
-		 printf("\n");
-		 fprintf(doctorFile, "\n");
-
-        for (;;) {
-		   move = GetBookMove(p, 0, &flagIsProblem);
-		   if (move && depth < maxDepth) { 
-              depth++;
-			  Manipulator.DoMove(p, move, &u);
-              if (flagIsProblem) break; 
-			  PrintMove(move);
-			  MoveToStr(move, moveStr);
-			  fprintf(doctorFile, "%s", moveStr);
-	          printf(" ");
-			  fprintf(doctorFile, " ");
-		 }
-		 else break;
-		}
-		if (flagIsProblem) break;
-	 }
-     fclose(doctorFile);
+     bookFile = NULL;
+     bookSize = 0;
 }
 
 int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
@@ -435,86 +545,16 @@ int sBook::GetBookMove(sPosition *p, int canPrint, int *flagIsProblem) {
        return moves[choice];
 	}
 
-	// find a convenient starting point to avoid looping through entire book
-	int iStart = 0;
-	int iEnd   = nOfRecords;
-	int iDist  = (iEnd - iStart) / 2;
-	if (myBook[iStart + iDist].hash < localHash) iStart += iDist;
-	
-	for (;;) {
-	iDist = (iEnd - iStart) / 2;
-	if (myBook[iStart + iDist].hash < localHash) iStart += iDist;
-	if (myBook[iEnd - iDist].hash > localHash) iEnd -= (iDist-20);
-	if (iDist < 10000) break;
-	}
-
-	if (canPrint) printf("info string from %d to %d\n", iStart, iEnd);
-
-	// find possible book moves
-	for (i = iStart; i < iEnd; i++ ) {
-        if (myBook[i].hash > localHash) break;
-
-		if (myBook[i].hash == localHash
-		&& IsLegal(p, myBook[i].move ) ) {
-			moves[nOfChoices]  = myBook[i].move;
-			values[nOfChoices] = myBook[i].freq;
-			nOfChoices++;
-		}
-	}
-
-	if (nOfChoices) {
-       // get maximum frequency of a move - it will be used
-       // to filter out moves that were played not often enough
-	   for (i = 0; i < nOfChoices; i++ ) {
-          if (values[i] > maxFreq ) maxFreq = values[i];
-	   }
-
-       srand(Timer.GetMS() );
-
-	   for (i = 0; i < nOfChoices; i++ ) {
-		   
-		   // display info about possible choices
-		   if (canPrint) printf("info string ");
-		   MoveToStr(moves[i], testString);
-		   if (canPrint || (values[i] > 0 && IsInfrequent(values[i], maxFreq) ) ) printf( testString );
-
-		   if (values[i] > 0 ) 
-		   { 
-			   if ( IsInfrequent(values[i], maxFreq) ) {
-					values[i] = 0;
-					printf(" infrequent ");
-					*flagIsProblem = 1;
-			   }
-			   if (canPrint) printf(" %d ", values[i] );
-		   }
-		   else if (canPrint) printf("? ");
-		   
-           // pick move randomly, based on its value
-		   // (we add 5 to ensure choice between equally rare moves)
-		   if (values[i] > 0) curVal = 1 + rand() % (values[i] + 5); 
-		   else curVal = -1;
-		   if (curVal > bestVal) {
-			   bestVal = curVal;
-			   choice  = i;
-		   }
-		   if (canPrint) printf("\n");
-	   }
-
-      if ( PrintMissingMoves(p) ) *flagIsProblem = 1;
-      if (bestVal > 0) return moves[choice];
-	}
-
-	if ( PrintMissingMoves(p) ) *flagIsProblem = 1;
-    return 0;
+	return GetPolyglotMove(p, 1);
 }
 
-int sBook::PrintMissingMoves(sPosition *p) {
+void sBook::PrintMissingMoves(sPosition *p) {
     // show non-book moves leading to book positions
     sSelector Selector;
 	UNDO undoData[1];
 	int move = 0;
 	int flagMoveType;
-	int isProblem = 0;
+	int unusedFlag;
 
     Selector.InitMoveList(p, move, MAX_PLY);
 
@@ -527,30 +567,14 @@ int sBook::PrintMissingMoves(sPosition *p) {
 		  continue; 
 	   }
      
-	   for (int i = 0; i < nOfRecords; i++) 
-	   {
-		   if (myBook[i].hash == GetBookHash(p) ) {
-
-              int isUsed = 0;
-		      for (int j = 0; j < nOfChoices; j++) {
-			      if (moves[j] == move) isUsed = 1;
-		      }
-
-		      if (!isUsed) {
-		         printf("info string missing ");
-			     isProblem = 1;
-		         MoveToStr(move, testString);
-		         printf( testString );
-		         printf("\n");
-		      }
-		      break;
-	       }
+       if (GetPolyglotMove(p, 0)) {
+          printf("info string missing ");
+		  PrintMove(move);
+		  printf("\n");
 	   }
 
 	   Manipulator.UndoMove(p, move, undoData); 
   }
-
-  return isProblem;
 }
 
 void sBook::AddMoveToGuideBook(U64 hashKey, int move, int val) 
@@ -571,42 +595,7 @@ void sBook::AddMoveToGuideBook(U64 hashKey, int move, int val)
 	 nOfGuideRecords++;
 }
 
-void sBook::AddMoveToMainBook(U64 hashKey, int move, int val) 
-{
-    // if move is already in the book, just change its frequency 
-	for (int i = 0; i < nOfRecords; i++ ) 
-	{
-         if ( myBook[i].hash == hashKey 
-		 &&   myBook[i].move == move) {
-			 if (val == DELETE_MOVE) myBook[i].hash = 0;
-			 if (myBook[i].freq <= 20000 || val != 1) myBook[i].freq += val;
-			 return;
-		 }
-	 }  
-
-	 // otherwise save it in the last slot
-	 if (val != DELETE_MOVE) {
-	    myBook[nOfRecords].hash = hashKey;
-	    myBook[nOfRecords].move = move;
-	    myBook[nOfRecords].freq = val;
-	 }
-	 nOfRecords++;
-}
-
-int sBook::IsMoveInBook(U64 hashKey, int move)
-{
-	if (nOfRecords == 0) return 0;
-
-	for (int i = 0; i < nOfRecords; i++ ) {
-		if ( myBook[i].hash == hashKey 
-		&&   myBook[i].move == move) {
-		 return 1;
-		}
-	}
-	return 0;
-}
-
-int sBook::AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor)
+int sBook::AddLineToGuideBook(sPosition *p, char *ptr)
 {
   char token[512];
   UNDO u[1];
@@ -631,10 +620,7 @@ int sBook::AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor)
         if (strstr(token, "??")) freq = -4900;
 		if (strstr(token, "!!")) freq = +900;
 
-		// add move to book if we accept moves of a given color
-		if (p->side != excludedColor)
-		   AddMoveToGuideBook( GetBookHash(p), move, freq);
-        
+		AddMoveToGuideBook( GetBookHash(p), move, freq);
 		Manipulator.DoMove(p, move, u);
 	}
 	else { flagIsProblem = 1; break; };
@@ -645,52 +631,7 @@ int sBook::AddLineToGuideBook(sPosition *p, char *ptr, int excludedColor)
     return flagIsProblem;
 }
 
-void sBook::AddLineToMainBook(sPosition *p, char *ptr, int excludedColor, int verifyDepth)
-{
-  char token[2048];
-  UNDO u[1];
-  int move;
-  int freq;
-    
-  SetPosition(p, START_POS);
-
-  for (;;) {
-    ptr = Parser.ParseToken(ptr, token);
-	  
-    if (*token == '\0') break;
-
-	move = StrToMove(p, token);
-      
-	if (IsLegal(p, move)) {
-		// apply move frequency modifiers
-		freq = 1;
-        if (strstr(token, "?")) freq  = -100;
-		if (strstr(token, "!")) freq  = +100;
-        if (strstr(token, "??")) freq = -4900;
-		if (strstr(token, "!!")) freq = +900;
-		if (strstr(token, "xx")) freq = DELETE_MOVE;
-
-		// if asked for, verify new move with a search
-        if (freq == 1 && !IsMoveInBook( GetBookHash(p), move ) && p->side != excludedColor && verifyDepth)
-		{
-			if ( Searcher.VerifyValue(p, verifyDepth, move) < -75 ) freq = -100;
-		}
-
-		// add move to book if we accept moves of a given color
-		if (p->side != excludedColor)
-		   AddMoveToMainBook( GetBookHash(p), move, freq);
-        
-		Manipulator.DoMove(p, move, u);
-	}
-	  else break;
-
-    if (p->reversibleMoves == 0)
-        p->head = 0;
-    }
-}
-
-
-int sBook::ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedColor)
+int sBook::ReadTextFileToGuideBook(sPosition *p, char *fileName)
 {
     FILE *bookFile; 
 	char line[256];
@@ -701,68 +642,11 @@ int sBook::ReadTextFileToGuideBook(sPosition *p, char *fileName, int excludedCol
     // process book file line by line 
 	while ( fgets(line, 250, bookFile) ) {
 	  if ( line[0] == ';' ) continue; // don't process comment lines
-	  if ( AddLineToGuideBook(p, line, excludedColor) ) { printf("Guide book error: "); printf(line); printf("\n"); }
+	  if ( AddLineToGuideBook(p, line) ) { printf("Guide book error: "); printf(line); printf("\n"); }
 	}
 	fclose(bookFile);
 	return 1;
  }
-
-void sBook::FileFixer(char *inFileName, char *outFileName, int task)
-{
-    FILE *inFile, *outFile;
-	char line[256];
-
-    // exit if input file doesn't exist
-	if ( (inFile = fopen(inFileName, "r")) == NULL ) { printf("File %s not found!\n", inFileName); return; };
-
-	outFile = fopen(outFileName,"w"); 
-
-    // process input file line by line 
-	while ( fgets(line, 250, inFile) ) {
-	   int length = strlen(line);
-
-	   if (task == SPLIT_CONTINOUS) {
-	      for (int i = 0; i < length;  i++) {
-		     printf("%c", line[i]);
-		     fprintf(outFile, "%c", line[i]);
-		     if ( (i+1) % 4 == 0) fprintf(outFile," ");
-	      }
-	   }
-	   else if (task == ADD_QUOTES) {
-		  fprintf(outFile, "%c", '"');
-
-		  for (int i = 0; i < length;  i++) {
-			 printf("%c", line[i]);
-			 fprintf(outFile, "%c", line[i]);
-			 if (i== length-2) fprintf(outFile, "%c", '"');
-		  }
-	   }
-	}
-	fclose(inFile);
-	fclose(outFile);
- }
-
-void sBook::ReadMainBookFromOwnFile(sPosition *p, char *fileName, int excludedColor, int verifyDepth)
-{
-	FILE *bookFile; 
-	char line[2048];
-	int line_no = 0;
-
-    // exit if book file doesn't exist
-	if ( (bookFile = fopen(fileName, "r")) == NULL ) { printf("File %s not found!\n", fileName); return; };
-
-    // process book file line by line 
-	while ( fgets(line, 2040, bookFile) ) {
-	    ++line_no;
-		if ( line_no % 100 == 0 ) printf("Adding line no. %d\r",line_no);
-	    if(line[0] == ';') continue; // don't process comment lines
-	    AddLineToMainBook(p, line, excludedColor, verifyDepth);
-	}
-
-	printf("Adding line no. %d\r",line_no);
-	fclose(bookFile);
- }
-
 
 U64 sBook::GetBookHash(sPosition *p) 
 {
@@ -770,37 +654,6 @@ U64 sBook::GetBookHash(sPosition *p)
 	if (bookKey < 0) bookKey *= -1;
     return (signed long long) (bookKey);
 }
-
-void sBook::SaveBookInOwnFormat(char *fileName) 
-{
-	FILE *bookFile; 
-
-    bookFile = fopen(fileName,"a+"); 
-	for (int i = 0; i < nOfRecords; i++ ) {
-		if (myBook[i].hash != 0)
-		fprintf(bookFile, "%I64u, %d, %d \n", myBook[i].hash, myBook[i].move, myBook[i].freq);
-	}
-    fclose(bookFile);
-}
-
-int sBook::ReadOwnBookFile(char *fileName)
-{
-	FILE *bookFile; 
-	char line[256];
-	nOfRecords = 0;
-
-    // exit if book file doesn't exist...
-	if ( (bookFile = fopen(fileName, "r")) == NULL ) return 0;
-
-    // ...else process book file line by line 
-	while ( fgets(line, 250, bookFile) ) {
-	   ParseBookEntry(line, nOfRecords);
-	   ++nOfRecords;
-	}
-
-	fclose(bookFile);
-	return 1;
- }
 
 void sBook::ParseBookEntry(char * ptr, int line_no)
 {
@@ -818,54 +671,9 @@ void sBook::ParseBookEntry(char * ptr, int line_no)
    }
 }
 
-void sBook::SortMainBook(void) {
-	int i, j, change;
-	sBookEntry tmp;
- 
-   for (i=0; i<nOfRecords-1; ++i) {
-       if (i % 100 == 0 ) printf ("%d   \r", i);
-
-      change = 0;
-      for (j = 0; j<nOfRecords-1-i; j++) { 
-		  if (myBook[j+1].hash < myBook[j].hash // comparing neighbours
-		  || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) ) {  
-              tmp = myBook[j];      
-              myBook[j] = myBook[j+1];
-              myBook[j+1] = tmp;    // bubble goes up     
-              change = 1;
-          }
-      }
-
-      if(!change) break;      // no changes - book is sorted
-
-      for (j=nOfRecords-2; j>1; j--) { 
-		   if (myBook[j+1].hash < myBook[j].hash // comparing neighbours
-		   || (myBook[j+1].hash == myBook[j].hash && myBook[j+1].freq < myBook[j].freq ) ) {  
-              tmp = myBook[j];      
-              myBook[j] = myBook[j+1];
-              myBook[j+1] = tmp;    // bubble goes down     
-              change = 1;
-          }
-      }
-   }
-};
-
-void sBook::FeedMainBook(sPosition *p, int verifyDepth) 
-{
-	 printf("Feeding book moves for both sides\n");
-	 ReadMainBookFromOwnFile(p, "feed.txt", NO_CL, verifyDepth);
-	 printf("\nFeeding book moves for white only\n");
-	 ReadMainBookFromOwnFile(p, "feed_white.txt", BLACK, verifyDepth);
-	 printf("\nFeeding book moves for black only\n");
-	 ReadMainBookFromOwnFile(p, "feed_black.txt", WHITE, verifyDepth);
-	 printf("\nSorting book moves\n");
-	 SortMainBook();
-	 SaveBookInOwnFormat("newbook.wtf");
-}
-
 int sBook::IsInfrequent(int val, int maxFreq)
 {
 	if (maxFreq > 2 && val < 2) return 1; // if possible, pick a move tried at least twice
-	if (val < 100 && val < maxFreq / 15) return 1;
+	if (val < maxFreq / 10) return 1; // moves played less than 10% of time are filtered out
 	return 0;
 }
