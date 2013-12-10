@@ -95,8 +95,8 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   Data.InitAsymmetric(p->side);          // set asymmetric eval parameters, dependent on the side to move
   Timer.SetData(FLAG_ROOT_FAIL_LOW, 0);  // we haven't failed low yet
 
-  // check whether one move has a potential to be easy
-  Timer.SetData(FLAG_EASY_MOVE,     1);  
+  // check whether of the moves is potentially easy
+  Timer.SetData(FLAG_EASY_MOVE,     1);
   for(int i = 0; i < rootList.nOfMoves; i ++)
   {
 	  if (rootList.moves[i] != rootList.bestMove
@@ -388,7 +388,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
       newDepth = SetNullDepth(depth);
 
-	  // normal search fails low, so null move search shouldn't fail high
+	  // normal search would fail low, so null move search shouldn't fail high
       if (TransTable.Retrieve(p->hashKey, &nullRefutation, &nullScore, alpha, beta, newDepth, ply) ) {
 		  if (nullScore <= alpha) goto avoidNull;
 	  }
@@ -527,8 +527,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
-		    History.OnMoveReduced(move);
- 	        flagIsReduced = 1;
+			if (depth + depthChange < ONE_PLY) depthChange = 0; // don't reduce into qs
+			else {
+		        History.OnMoveReduced(move);
+ 	            flagIsReduced = 1;
+			}
 		 }
 	 } // end of late move reduction code
 
