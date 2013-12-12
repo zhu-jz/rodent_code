@@ -33,6 +33,7 @@ struct sEvalHashEntry {
 };
 
 #define PAWN_HASH_SIZE  512 * 512
+#define EVAL_HASH_SIZE  512 * 512
 
 struct sEvaluator {
 private:
@@ -58,6 +59,7 @@ private:
   int mgScore, egScore;    // partial midgame and endgame scores (to be scaled)
 
   sPawnHashEntry PawnTT[PAWN_HASH_SIZE]; // pawn transposition table
+  sEvalHashEntry EvalTT[EVAL_HASH_SIZE]; // eval transposition table
   
   int GetMaterialScore(sPosition *p);
   void AddMobility(int pc, int side, int cnt);
