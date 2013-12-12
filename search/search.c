@@ -86,13 +86,14 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   int val = 0;
   int curVal, alpha, beta, delta;
   rootSide = p->side;
+  Data.InitAsymmetric(p->side);          // set asymmetric eval parameters, dependent on the side to move
 
   rootList.Init(p);
   int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
   if (rootList.nOfMoves == 1) localDepth = 4 * ONE_PLY; // single reply
 
   Timer.SetIterationTiming();            // define additional rules for starting next iteration
-  Data.InitAsymmetric(p->side);          // set asymmetric eval parameters, dependent on the side to move
+  // TODO: move in front of rootList.init and see whether eval hash discrepancies are caused by this!!!
   Timer.SetData(FLAG_ROOT_FAIL_LOW, 0);  // we haven't failed low yet
 
   // check whether of the moves is potentially easy
@@ -341,7 +342,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   if (alpha >= beta) return alpha;
 
   // TRANSPOSITION TABLE READ
-  if (TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply))
+  if (TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply)) 
      return score;
   
   // SAFEGUARD AGAINST HITTING MAX PLY LIMIT
@@ -353,10 +354,10 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   && (beta < MAX_EVAL) 
   && !flagInCheck;
 
-  // EVAL PRUNING (inspired by DiscoCheck by Lucas Braesch) 
+  // EVAL PRUNING (aka "post futility pruning", inspired by DiscoCheck by Lucas Braesch) 
   if ( depth <= 3*ONE_PLY
   &&   flagCanPrune) {
-     if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
+	 if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
 	 int evalMargin = 40 * depth;
 	 if (nodeEval - evalMargin >= beta)
 		return nodeEval - evalMargin;
@@ -527,7 +528,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
-			if (depth + depthChange < ONE_PLY) depthChange = 0; // don't reduce into qs
+			if (depth + depthChange < ONE_PLY)
+				depthChange = 0; // don't reduce into qs
 			else {
 		        History.OnMoveReduced(move);
  	            flagIsReduced = 1;
