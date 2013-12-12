@@ -87,13 +87,10 @@ void sSearcher::Iterate(sPosition *p, int *pv)
   int curVal, alpha, beta, delta;
   rootSide = p->side;
   Data.InitAsymmetric(p->side);          // set asymmetric eval parameters, dependent on the side to move
-
-  rootList.Init(p);
+  rootList.Init(p);                      // create sorted root move list (using quiescence search scores)
   int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
   if (rootList.nOfMoves == 1) localDepth = 4 * ONE_PLY; // single reply
-
   Timer.SetIterationTiming();            // define additional rules for starting next iteration
-  // TODO: move in front of rootList.init and see whether eval hash discrepancies are caused by this!!!
   Timer.SetData(FLAG_ROOT_FAIL_LOW, 0);  // we haven't failed low yet
 
   // check whether of the moves is potentially easy
