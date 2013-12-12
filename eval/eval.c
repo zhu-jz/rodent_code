@@ -18,6 +18,7 @@
 */
 
 #define LAZY_EVAL
+//#define HASH_EVAL
 
 #include <stdio.h>
 #include "../bitboard/bitboard.h"
@@ -183,6 +184,15 @@ int sEvaluator::EvalFileStorm(U64 bbOppPawns, int side)
 
 int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 {
+#ifdef HASH_EVAL
+	int addr = p->hashKey % EVAL_HASH_SIZE;
+	if (EvalTT[addr].key == p->hashKey) {
+		int hashScore = EvalTT[addr].score;
+		return p->side == WHITE ? hashScore : -hashScore;
+	}
+#endif
+
+  int fullEval = 0;
   int score = GetMaterialScore(p) + CheckmateHelper(p);
   p->side == WHITE ? score+=5 : score-=5;
 
@@ -205,7 +215,7 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
   if (temp_score > alpha - Data.lazyMargin 
   &&  temp_score < beta +  Data.lazyMargin) {
 #endif
-
+	  fullEval = 1;
 	  InitDynamicScore(p);
 
       ScoreN(p, WHITE);
@@ -247,6 +257,13 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 
   score = PullToDraw(p, score);    // decrease score in drawish endgames
   score = FinalizeScore(p, score); // bounds, granulatity and weakening
+
+#ifdef HASH_EVAL
+  if (fullEval) {
+  EvalTT[addr].key = p->hashKey;
+  EvalTT[addr].score = score;
+  }
+#endif
 
   // return score relative to the side to move
   return p->side == WHITE ? score : -score;
