@@ -53,6 +53,12 @@ void sHistory::OnNewGame(void)
   }
 }
 
+int sHistory::MoveChangesMaterialBalance(sPosition *p, int move)
+{
+    if (p->pc[Tsq(move)] != NO_PC || IsProm(move) || MoveType(move) == EP_CAP) return 1;
+	return 0;
+}
+
 void sHistory::ReducePeaks(void)
 {
   for (int i = 0; i < 12; i++)
@@ -60,26 +66,38 @@ void sHistory::ReducePeaks(void)
       history[i][j] /= 2;
 }
 
+void sHistory::UpdateKillers(int move, int ply)
+{
+  if (move != killer[ply][0]) {
+     killer[ply][1] = killer[ply][0];
+     killer[ply][0] = move;
+  }
+}
+
+void sHistory::UpdateHistory(sPosition *p, int move, int depth)
+{
+     history[p->pc[Fsq(move)]][Tsq(move)] += depth * depth;
+}
+
+void sHistory::UpdateCutoff(int move)
+{
+	cutoff [Fsq(move)] [Tsq(move)] += 8; 
+	// NOTE: 8 and 9 work equally well in self-play, 7 and 10 untested
+}
+
 void sHistory::OnGoodMove(sPosition *p, int move, int depth, int ply)
 {
-  // no history update if a move changes material balance
-  if (p->pc[Tsq(move)] != NO_PC 
-  || IsProm(move) 
-  || MoveType(move) == EP_CAP)
-    return;
+     if (MoveChangesMaterialBalance(p,move) ) return;
+     UpdateCutoff(move); // update table used for cutoff decisions
+     UpdateHistory(p, move, depth);
+     UpdateKillers(move, ply);
+}
 
-  // update cutoff table used for reduction decisions
-  cutoff [Fsq(move)] [Tsq(move)] += 8; // 8 and 9 work equally well in self-play, 7 and 10 untested
-
-  // update history table used for move sorting
-  int hist_change = depth * depth;
-  history[p->pc[Fsq(move)]][Tsq(move)] += hist_change;
-
-  // update killer moves
-  if (move != killer[ply][0]) {
-    killer[ply][1] = killer[ply][0];
-    killer[ply][0] = move;
-  }
+void sHistory::UpdateSortOnly(sPosition *p, int move, int depth, int ply)
+{
+     if (MoveChangesMaterialBalance(p,move) ) return;
+     UpdateHistory(p, move, depth);
+     UpdateKillers(move, ply);
 }
 
 int sHistory::GetMoveHistoryValue(int pc, int sq_to) 
