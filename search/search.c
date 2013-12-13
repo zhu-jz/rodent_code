@@ -340,7 +340,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // TRANSPOSITION TABLE READ
   if (TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply)) 
+  {
+	  if (score >= beta)
+		  History.UpdateSortOnly(p, move, depth / ONE_PLY, ply);
      return score;
+  }
   
   // SAFEGUARD AGAINST HITTING MAX PLY LIMIT
   if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
