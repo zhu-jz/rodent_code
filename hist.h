@@ -19,15 +19,21 @@
 
 #pragma once
 
-struct sHistory {
+class sHistory {
+private:
      int history[12][64];
 	 int cutoff[64][64];  
 	 int killer[MAX_PLY][2];
-
+	 int MoveChangesMaterialBalance(sPosition *p, int move);
+	 void ReducePeaks(void);
+	 void UpdateCutoff(int move);
+	 void UpdateKillers(int move, int ply);
+	 void UpdateHistory(sPosition *p, int move, int depth);
+public:
 	 void OnGoodMove(sPosition *p, int move, int depth, int ply);
+	 void UpdateSortOnly(sPosition *p, int move, int depth, int ply);
 	 void OnNewSearch(void);
 	 void OnNewGame(void);
-	 void ReducePeaks(void);
 	 void OnMoveTried(int move);
 	 void OnMoveReduced(int move);
 	 int MoveIsBad(int move);
