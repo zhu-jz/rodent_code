@@ -40,8 +40,10 @@ void sHistory::OnNewSearch(void)
 void sHistory::OnNewGame(void)
 {
   for (int i = 0; i < 64; i++)
-    for (int j = 0; j < 64; j++)
+    for (int j = 0; j < 64; j++) {
       cutoff[i][j] = 100;
+	  refutation[i][j] = 0;
+	}
 
   for (int i = 0; i < 12; i++)
     for (int j = 0; j < 64; j++)
@@ -85,7 +87,12 @@ void sHistory::UpdateCutoff(int move)
 	// NOTE: 8 and 9 work equally well in self-play, 7 and 10 untested
 }
 
-void sHistory::OnGoodMove(sPosition *p, int move, int depth, int ply)
+void sHistory::UpdateRefutation(int lastMove, int move)
+{
+	refutation [Fsq(lastMove)] [Tsq(lastMove)] = move;
+}
+
+void sHistory::OnGoodMove(sPosition *p, int lastMove, int move, int depth, int ply)
 {
      if (MoveChangesMaterialBalance(p,move) ) return;
      UpdateCutoff(move); // update table used for cutoff decisions
@@ -125,4 +132,9 @@ void sHistory::OnMoveTried(int move)
 int sHistory::MoveIsBad(int move) 
 {
     return (cutoff [Fsq(move)] [Tsq(move)] < Data.lmrHistLimit);
+}
+
+int sHistory::Refutes(int lastMove, int move)
+{
+	return (refutation [Fsq(lastMove)] [Tsq(lastMove)] == move);
 }
