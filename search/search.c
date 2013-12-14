@@ -247,7 +247,7 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 		 if (movesTried > 1 && depth > 2*ONE_PLY) Timer.SetData(FLAG_EASY_MOVE, 0);
 		 IncStat(FAIL_HIGH);
 		 if (movesTried == 1) IncStat(FAIL_FIRST);
-         History.OnGoodMove(p, move, depth / ONE_PLY, 0);
+         History.OnGoodMove(p, 0, move, depth / ONE_PLY, 0);
          TransTable.Store(p->hashKey, move, score, LOWER, depth, 0);
          return score;
      }
@@ -270,7 +270,7 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 
    // SAVE SEARCH RESULT IN TRANSPOSITION TABLE
    if (*pv) {
- 	 History.OnGoodMove(p, *pv, depth / ONE_PLY, 0);
+ 	 History.OnGoodMove(p, 0, *pv, depth / ONE_PLY, 0);
      TransTable.Store(p->hashKey, *pv, best, EXACT, depth, 0);
    } else
      TransTable.Store(p->hashKey, 0, best, UPPER, depth, 0);
@@ -511,6 +511,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 if ( flagCanReduce
      &&   depth <= minimalLmrDepth      // we are near the leaf	
 	 &&   movesTried > 12               // move is sufficiently down the list
+	 &&  !History.Refutes(lastMove, move)
 	 // not pruning bad captures is worse - retested 2013-11-14
 	 ) {
  		 if ( movesTried > 20 ) 
@@ -526,6 +527,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      &&     depth >= minimalLmrDepth    // we have some depth left
 	 &&     movesTried > 3              // we're sufficiently down the move list
 	 &&     History.MoveIsBad(move)     // current move has bad history score
+	 &&    !History.Refutes(lastMove, move)
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
@@ -567,7 +569,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 if (score >= beta) {
 		 IncStat(FAIL_HIGH);
 		 if (movesTried == 1) IncStat(FAIL_FIRST);
-         History.OnGoodMove(p, move, depth / ONE_PLY, ply);
+         History.OnGoodMove(p, lastMove, move, depth / ONE_PLY, ply);
+		 if (History.MoveChangesMaterialBalance(p, move) )
+		    History.UpdateRefutation(lastMove, move);
          TransTable.Store(p->hashKey, move, score, LOWER, depth, ply);
          return score;
      }
@@ -587,7 +591,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
    // SAVE SEARCH RESULT IN TRANSPOSITION TABLE
    if (*pv) {
- 	 History.OnGoodMove(p, *pv, depth / ONE_PLY, ply);
+ 	 History.OnGoodMove(p, lastMove, *pv, depth / ONE_PLY, ply);
      TransTable.Store(p->hashKey, *pv, best, EXACT, depth, ply);
    } else
      TransTable.Store(p->hashKey, 0, best, UPPER, depth, ply);
