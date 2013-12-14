@@ -22,23 +22,26 @@
 class sHistory {
 private:
      int history[12][64];
-	 int cutoff[64][64];  
+	 int cutoff[64][64];
+	 int refutation[64][64];
 	 int killer[MAX_PLY][2];
-	 int MoveChangesMaterialBalance(sPosition *p, int move);
 	 void ReducePeaks(void);
 	 void UpdateCutoff(int move);
 	 void UpdateKillers(int move, int ply);
 	 void UpdateHistory(sPosition *p, int move, int depth);
 public:
-	 void OnGoodMove(sPosition *p, int move, int depth, int ply);
+	 int MoveChangesMaterialBalance(sPosition *p, int move);
+	 void OnGoodMove(sPosition *p, int lastMove, int move, int depth, int ply);
 	 void UpdateSortOnly(sPosition *p, int move, int depth, int ply);
 	 void OnNewSearch(void);
 	 void OnNewGame(void);
 	 void OnMoveTried(int move);
 	 void OnMoveReduced(int move);
 	 int MoveIsBad(int move);
+	 void UpdateRefutation(int lastMove, int move);
 	 int GetMoveHistoryValue(int pc, int sq_to);
 	 int GetKiller(int ply, int slot);
+	 int Refutes(int lastMove, int move);
 };
 
 extern sHistory History;
