@@ -43,7 +43,7 @@
   // data for attack evaluation:        for Rodent curve                    for Stockfish-like curve
   //                                    P    N    B    R    Q    K          P   N   B   R   Q   K
   const int attPerPc     [2]  [7] = { { 0,  10,  10,  20,  40,   0,  0} , { 0,  2,  2,  3,  5,  0,  0} };
-  const int canCheckWith [2]  [7] = { { 0,   0,  10,  40,  100,  0,  0} , { 0,  1,  1,  2,  3,  0,  0} }; 
+  const int canCheckWith [2]  [7] = { { 0,   0,  10,  40,  100,  0,  0} , { 0,  1,  1,  3,  4,  0,  0} }; // WAS 1,1,3,4
   const int woodPerPc         [7] =   { 0,   1,   1,   2,   4,   0,  0};
 
 void sEvaluator::ScoreN(sPosition *p, int side) 
@@ -100,7 +100,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 		oppPawnCount = PopCntSparse( bbWhiteSq & bbPc(p, Opp(side), P) ) - 4;
 	} else {
 		ownPawnCount = PopCntSparse( bbBlackSq & bbPc(p, side, P) ) - 4;
-		oppPawnCount = PopCntSparse( bbBlackSq & bbPc(p, Opp(side), P) ) - 4;
+		oppPawnCount = PopCntSparse( bbBlackSq & bbPc(p, Opp(side), P) ) - 4; 
 	}
 	AddMisc(side,-3*ownPawnCount-oppPawnCount, -3*ownPawnCount-oppPawnCount);
 
@@ -212,7 +212,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	if (SqBb(sq) & bbRelRank[side][RANK_7] ) {
        if ( bbPc(p, Opp(side), P) & bbRelRank[side][RANK_7]
 	   || bbPc(p, Opp(side), K) & bbRelRank[side][RANK_8]
-	   )  AddMisc(side, 10, 5); // correct would be 5/10, but it is for the next test
+	   )  AddMisc(side, 10, 5);
 	}
 
 	if (bbControl & bbCanCheckFrom ) {
