@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 5
-#define BENCH_8 1088614
+#define BUILD 24
+#define BENCH_8 1014914
 // #define FAST_TUNING 100000 // node limit for ultra-past tests
 
 #undef CDECL
@@ -75,11 +75,12 @@ enum eMoveFlag {
 };
 
 // move macros
-#define Fsq(x)          ((x) & 63)          // "from" square of a move "x"
-#define Tsq(x)          (((x) >> 6) & 63)   // "to" square of a move "x"
-#define MoveType(x)     ((x) >> 12)         // type of a move "x" (see eMoveType)
-#define IsProm(x)       ((x) & 0x4000)      // is this move a promotion?
-#define PromType(x)     (((x) >> 12) - 3)   // kind of promoted piece
+#define Fsq(move)				((move) & 63)				// "from" square of a move "x"
+#define Tsq(move)				(((move) >> 6) & 63)		// "to" square of a move "x"
+#define MoveType(move)			((move) >> 12)				// type of a move "x" (see eMoveType)
+#define IsProm(move)			((move) & 0x4000)			// is this move a promotion?
+#define PromType(move)			(((move) >> 12) - 3)		// kind of promoted piece
+#define SetMove(flag,fr,to)     ( (flag<<12)|(to<<6)|fr )
 
 // search depth variables
 #define ONE_PLY         4
@@ -165,6 +166,7 @@ typedef struct  // set of move lists subdivided into move classes
   int transMove;
   int killer1;
   int killer2;
+  int refutation;
   int *next;
   int *last;
   int move[MAX_MOVES];
@@ -184,7 +186,7 @@ private:
 public:
 	int CaptureIsBad(sPosition *p, int move);
 	void InitCaptureList(sPosition *p, int hashMove);
-	void InitMoveList(sPosition *p, int transMove, int ply);
+	void InitMoveList(sPosition *p, int refMove, int transMove, int ply);
 	int NextMove(int refutationSq, int *flag);
 	int NextCapture(void);
 };  // implemented in selector.c
