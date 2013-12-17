@@ -31,11 +31,12 @@ and sorting of moves.
 #include "hist.h"
 
 // initializes data needed for move ordering
-void sSelector::InitMoveList(sPosition *p, int transMove, int ply)
+void sSelector::InitMoveList(sPosition *p, int refMove, int transMove, int ply)
 {
   m->p = p;
   m->phase = 0;
   m->transMove = transMove;
+  m->refutation = refMove;
   m->killer1 = History.GetKiller(ply, 0);
   m->killer2 = History.GetKiller(ply, 1);
 }
@@ -158,9 +159,9 @@ void sSelector::ScoreCaptures(int hashMove)
     *valuep++ = (MvvLva(m->p, *movep) + (1000 * (*movep == hashMove) ) );
 }
 
-// ScoreQuiet() sorts quiet moves by history heuristic, increasing 
-// the value of a move that evades a capture which  had  refuted  
-// null move in the same node and doesn't cause large material losses.
+// ScoreQuiet() sorts quiet moves by history heuristic. For to classes
+// of moves, base score is increased. They are (1) escapes from a capture
+// that refuted null move in the same node and (2) moves from refutation table
 
 void sSelector::ScoreQuiet(int refutationSq)
 {
@@ -172,14 +173,15 @@ void sSelector::ScoreQuiet(int refutationSq)
     
 	// assign base sort value
 	sortVal =  History.GetMoveHistoryValue(m->p->pc[Fsq(*movep)], Tsq(*movep) );
-	//sortVal = Data.pstMg[WHITE][B][Tsq(*movep)] - Data.pstMg[WHITE][B][Fsq(*movep)];
 
-    // null move refutations are sorted much higher	
-	if ( Fsq(*movep) == refutationSq ) { 
-		if ( Swap(m->p, Fsq(*movep), Tsq(*movep) ) >= -100 ) { // TODO: try -50
-		   sortVal *= 2;
-		   sortVal += 10000;
-		}
+    // null move refutations and ordinary refutation moves are sorted much higher	
+	if ( Fsq(*movep) == refutationSq 
+	||       *movep == m->refutation
+	 ) { 
+		 if ( Swap(m->p, Fsq(*movep), Tsq(*movep) ) >= -100 ) {
+		     sortVal *= 2;
+		     sortVal += 10000;
+	   }
     }
 
     *valuep++ = sortVal;
@@ -290,7 +292,7 @@ void sFlatMoveList::Init(sPosition * p)
 	UNDO  undoData[1];       // data required to undo a move
 	int pv[MAX_PLY];
 
-	Selector.InitMoveList(p, 0, 0); // prepare move selector
+	Selector.InitMoveList(p, 0, 0, 0); // prepare move selector
 	nOfMoves = 0;
 	bestMove = 0;
 	bestVal = -INF;
