@@ -70,7 +70,9 @@ void sSearcher::Think(sPosition *p, int *pv)
   Timer.SetStartTime();
   ClearStats();
   pv[0] = 0; // for tests where book move is disabled
-  if (Data.useBook) pv[0] = Book.GetBookMove(p, 1, &flagBookProblem); 
+  if (Data.useBook) {
+	  pv[0] = Book.GetBookMove(p, 1, &flagBookProblem); 
+  }
 
   if (!pv[0] || !IsLegal(p, pv[0]) || Data.isAnalyzing) {
 	   if (flagProtocol == PROTO_TXT) PrintTxtHeader();
@@ -291,6 +293,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
       flagMoveType;             // move type flag, supplied by NextMove()
   sSelector Selector;           // an object responsible for maintaining move list and picking moves 
     UNDO  undoData[1];          // data required to undo a move
+	int flagPawnCapt = 0;
 
   // NODE INITIALIZATION
   int nullScore      = 0;       // result of a null move search
@@ -443,7 +446,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
-  Selector.InitMoveList(p, move, ply);
+  Selector.InitMoveList(p, History.GetRefutation(lastMove), move, ply);
 
   // LOOP THROUGH THE MOVE LIST
   while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
@@ -464,6 +467,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
             }
 	     }
 	 }
+
+	 // FLAG A MOVE
+	 if (TpOnSq(p, Tsq(move) ) == P) flagPawnCapt = 1; else flagPawnCapt = 0;
 
 	 // MAKE A MOVE
 	 Manipulator.DoMove(p, move, undoData);    
@@ -512,12 +518,23 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      &&   depth <= minimalLmrDepth      // we are near the leaf	
 	 &&   movesTried > 12               // move is sufficiently down the list
 	 &&  !History.Refutes(lastMove, move)
-	 // not pruning bad captures is worse - retested 2013-11-14
+	 // not pruning bad captures is worse - retested 2013-12-29
 	 ) {
+		 if (IsMoveOrdinary(flagMoveType) ) {
  		 if ( movesTried > 20 ) 
 		    { Manipulator.UndoMove(p, move, undoData); continue; }
 		 if ( History.MoveIsBad(move) ) 
 		    { Manipulator.UndoMove(p, move, undoData); continue; }
+		 }
+
+	 	 // FUTILITY PRUNING OF PAWN CAPTURES
+	 if ( flagPawnCapt ) {
+		if (nodeEval < beta -500) { // TODO: test 300
+             Manipulator.UndoMove(p, move, undoData);
+             continue;
+			}
+	 }
+
 	 } // end of late move pruning code
 
 	 // LATE MOVE REDUCTION
