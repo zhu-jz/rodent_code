@@ -19,6 +19,8 @@
 
 #pragma once
 
+#define LAZY_EVAL
+//#define HASH_EVAL
 #define GRAIN_SIZE 4
 
 struct sPawnHashEntry {
@@ -44,12 +46,13 @@ private:
   int egMisc[2];           // miscelanneous endgame scores
   int pawnScoreMg[2];      // midgame pawn structure scores
   int pawnScoreEg[2];      // endgame pawn structure scores
-  U64 bbPawnControl[2];    // squares controlled by pawns, used in mobility eval (pawn eval uses only occupancy masks)
-  U64 bbPawnCanControl[2]; // squares that can be controlled by pawns as they advance, used in outpost eval
+  U64 bbPawnTakes[2];    // squares controlled by pawns, used in mobility eval (pawn eval uses only occupancy masks)
+  U64 bbPawnCanTake[2]; // squares that can be controlled by pawns as they advance, used in outpost eval
   U64 bbDiagChecks[2];
   U64 bbStraightChecks[2];
   U64 bbKnightChecks[2];
   U64 bbMinorCoorAttacks[2]; // bitboard to detect coordinated attacks on enemy king
+  U64 bbRookCoorAttacks[2];
   U64 bbAllAttacks[2];     // squares attacked by a side
   int attCount[2];         // attack counter based on square control
   int checkCount[2];       // check threat counter
@@ -59,12 +62,14 @@ private:
   int mgScore, egScore;    // partial midgame and endgame scores (to be scaled)
 
   sPawnHashEntry PawnTT[PAWN_HASH_SIZE]; // pawn transposition table
+#ifdef HASH_EVAL
   sEvalHashEntry EvalTT[EVAL_HASH_SIZE]; // eval transposition table
+#endif
   
   int GetMaterialScore(sPosition *p);
   void AddMobility(int pc, int side, int cnt);
   void AddMisc(int side, int mg, int eg);
-  void AddPieceAttack(int side, int pc, int cnt);
+  void AddKingAttack(int side, int pc, int cnt);
   void AddPawnProperty(int pawnProperty, int side, int sq);
   int CheckmateHelper(sPosition *p);
   void InitStaticScore(void);            
@@ -80,10 +85,10 @@ private:
   void ScoreR(sPosition *p, int side);
   void ScoreQ(sPosition *p, int side);
   void ScoreP(sPosition *p, int side);
+  void ScorePatterns(sPosition *p, int side);
   void ScoreKingShield(sPosition *p, int side);
   void ScoreKingAttacks(sPosition *p, int side);
-  void ScorePieceInHole(sPosition *p, int side, int piece, int sq);
-  void ScoreMinorPawnRelation(sPosition *p, int side, int sq);
+  void ScoreRelationToPawns(sPosition *p, int side, int piece, int sq);
   void ScoreHanging(sPosition *p, int side);
   int  EvalKingFile(sPosition * p, int side, U64 bbFile);
   int  EvalFileShelter(U64 bbOwnPawns, int side);
