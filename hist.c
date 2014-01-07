@@ -138,3 +138,8 @@ int sHistory::Refutes(int lastMove, int move)
 {
 	return (refutation [Fsq(lastMove)] [Tsq(lastMove)] == move);
 }
+
+int sHistory::GetRefutation(int lastMove)
+{
+	return refutation [Fsq(lastMove)] [Tsq(lastMove)];
+}
