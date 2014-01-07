@@ -78,10 +78,11 @@ void sParser::UciLoop(void)
 		Data.verbose = (strstr(command, "value true") != 0);
 
 	// king safety type
-	if (strstr(command, "setoption name SafetyConsiderations value secondary"))
-		Data.safetyStyle = KS_SECONDARY;
-	if (strstr(command, "setoption name SafetyConsiderations value dominant"))
-		Data.safetyStyle = KS_DOMINANT;
+	if (strstr(command, "setoption name Safety value quadratic"))
+		Data.safetyStyle = KS_QUADRATIC;
+	if (strstr(command, "setoption name Safety value handmade"))
+		Data.safetyStyle = KS_HANDMADE;
+
 
     if (strcmp(token, "uci") == 0) {
       flagProtocol = PROTO_UCI;
@@ -102,16 +103,6 @@ void sParser::UciLoop(void)
       ParseGo(p, ptr);
     } else if (strcmp(token, "step") == 0) {
       ParseMoves(p, ptr);
-    } else if (strcmp(token, "split") == 0) {
-	  Book.FileFixer("dense.txt","loose.txt", SPLIT_CONTINOUS);
-    } else if (strcmp(token, "quotes") == 0) {
-      Book.FileFixer("noquote.txt","quote.txt", ADD_QUOTES);
-    } else if (strcmp(token, "feedbook") == 0) {
-	  ptr = ParseToken(ptr, token);
-      Book.FeedMainBook(p, atoi(token));
-    } else if (strcmp(token, "bookdoctor") == 0) {
-      ptr = ParseToken(ptr, token);
-      Book.BookDoctor(p, atoi(token));
     } else if (strcmp(token, "print") == 0) {
       PrintBoard(p);
     } else if (strcmp(token, "eval") == 0) {
@@ -181,10 +172,16 @@ void sParser::SetOption(char *ptr)
 	Data.oppMobility = atoi(value);
   } else if (strcmp(name, "OwnAttack") == 0) {
 	Data.ownAttack = atoi(value);
-  } else if (strcmp(name, "OppAttack") == 0) {
-	Data.oppAttack = atoi(value);
+  } else if (strcmp(name, "OwnAttack") == 0) {
+	Data.ownAttack = atoi(value);
+  } else if (strcmp(name, "LazyMargin") == 0) {
+	Data.lazyMargin = atoi(value);
+  } else if (strcmp(name, "Contempt") == 0) {
+	Data.contempt = atoi(value);
   } else if (strcmp(name, "UCI_Elo") == 0) {
 	Data.elo = atoi(value);
+  } else if (strcmp(name, "BookFilter") == 0) {
+	Data.bookFilter = atoi(value);
 	if (Data.panelStyle == PANEL_NORMAL) Data.useWeakening = 1;
   } else if (strcmp(name, "Hash") == 0) {
     TransTable.Alloc(atoi(value));
@@ -207,23 +204,26 @@ void sParser::SetOption(char *ptr)
 	   strcat(bookName,value);
 	   strcat(bookName,".txt");
 	   strcpy(Data.currBook, value);
-	   Book.ReadTextFileToGuideBook(&p, bookName, NO_CL);
-  }
+	   Book.ReadTextFileToGuideBook(&p, bookName);
+  } 
 }
 
 void sParser::PrintUciOptions() 
 {		
 	if (Data.panelStyle == PANEL_POWER) {
-	printf("option name SafetyConsiderations type combo var secondary var dominant default dominant\n");
+	printf("option name Safety type combo var quadratic var handmade default handmade\n");
 	printf("option name Queen type spin default %d min 0 max 1200\n", Data.matValue[Q] );
 	printf("option name Rook type spin default %d min 0 max 1200\n", Data.matValue[R] );
 	printf("option name Bishop type spin default %d min 0 max 1200\n", Data.matValue[B] );
 	printf("option name Knight type spin default %d min 0 max 1200\n", Data.matValue[N] );
 	printf("option name BishPair type spin default %d min 0 max 100\n", Data.bishopPair );
-	printf("option name OwnMobility type spin default %d min 0 max 300\n", Data.ownMobility);
-	printf("option name OppMobility type spin default %d min 0 max 300\n", Data.oppMobility);
-	printf("option name OwnAttack type spin default %d min 0 max 300\n", Data.ownAttack);
-	printf("option name OppAttack type spin default %d min 0 max 300\n", Data.oppAttack);
+	printf("option name OwnMobility type spin default %d min 0 max 500\n", Data.ownMobility);
+	printf("option name OppMobility type spin default %d min 0 max 500\n", Data.oppMobility);
+	printf("option name OwnAttack type spin default %d min 0 max 500\n", Data.ownAttack);
+	printf("option name OppAttack type spin default %d min 0 max 500\n", Data.oppAttack);
+	printf("option name BookFilter type spin default %d min 0 max 100\n", Data.bookFilter);
+	printf("option name LazyMargin type spin default %d min -500 max 500\n", Data.lazyMargin);
+	printf("option name Contempt type spin default %d min -300 max 300\n", Data.contempt);
 	printf("option name UCI_Elo type spin default %d min 600 max 2600\n", Data.elo);
 	printf("option name UCI_LimitStrength type check default false\n", Data.useWeakening);
 	}
@@ -239,9 +239,9 @@ void sParser::PrintUciOptions()
 	   printf(" default Rodent\n");	   
 	}
 
-	   printf("option name Book type combo");
-       printf(Data.bookList);
-       printf(" default tournament\n");
+	printf("option name Book type combo");
+    printf(Data.bookList);
+    printf(" default tournament\n");
 
 	printf("option name Verbose type check default false\n", Data.verbose);
 	printf("option name Analyse type check default false\n", Data.isAnalyzing);
@@ -407,7 +407,7 @@ void sParser::ReadIniFile(char *fileName)
 
 void sParser::PrintEngineHeader() 
 {
-    printf("id name Rodent 1.2");
+    printf("id name Rodent 1.3");
 	printf(" (build %d)\n", BUILD);
     printf("id author Pawel Koziol (based on Sungorus by Pablo Vazquez)\n");
 }
@@ -426,6 +426,9 @@ void sParser::PrintBoard(sPosition *p)
 	  if ( (sq+1) % 8 == 0) printf(" %d\n", 9 - ((sq+1) / 8) );
   }
   printf("\na b c d e f g h\n");
+  printf("%d",Rank(A1));
+
+  printf("Polyglot     hash: %016llX \n", Book.GetPolyglotKey(p) );
   printf("Incremental  hash: %016llX pawn: %016llX \n", p->hashKey, p->pawnKey);
   printf("Recalculated hash: %016llX pawn: %016llX \n", TransTable.InitHashKey(p), TransTable.InitPawnKey(p));
   printf("Incremental  pst : mg %d eg %d\n", p->pstMg[WHITE]-p->pstMg[BLACK], p->pstEg[WHITE]-p->pstEg[BLACK]);
