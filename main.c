@@ -55,7 +55,10 @@ int main()
   Learner.Init("lrn.dat");
   Book.Init(&p);
   Searcher.Init();
+  Book.bookName = "rodent.bin";
+  Book.OpenPolyglot();
   Parser.UciLoop();
+  Book.ClosePolyglot();
   Learner.Save("lrn.dat");
   return 0;
 }
