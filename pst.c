@@ -51,14 +51,14 @@ const int pstKnightMg[64] =
 
 const int pstBishopMg[64] =  
 {
-    -5,  -5, -16,  -5,  -5, -16,  -5,  -5,
-    -5,   3,   3,   3,   3,   3,   3,  -5,
-    -5,   5,   5,   5,   5,   5,   5,  -5,
-    -5,   0,   5,  10,  10,   5,   0,  -5,
-    -5,   0,   5,  10,  10,   5,   0,  -5,
-    -5,   0,   5,   5,   5,   5,   0,  -5,
-    -5,   0,   0,   0,   0,   0,   0,  -5,
-    -5,  -5,  -5,  -5,  -5,  -5,  -5,  -5
+    -2,  -5, -16,  -5,  -5, -16,  -5,  -2,
+    -5,   6,   3,   3,   3,   3,   6,  -5,
+    -5,   5,   8,   5,   5,   8,   5,  -5,
+    -5,   0,   5,  13,  13,   5,   0,  -5,
+    -5,   0,   5,  13,  13,   5,   0,  -5,
+    -5,   0,   8,   5,   5,   8,   0,  -5,
+    -5,   3,   0,   0,   0,   0,   3,  -5,
+    -2,  -5,  -5,  -5,  -5,  -5,  -5,  -2
 };
 
 const int pstKnightOutpost[64] = 
@@ -109,7 +109,7 @@ void sData::InitPstValues(void)
 	  pstMg[side][Q][REL_SQ(sq,side)] = -5 * (Rank(sq) == RANK_1); // 0 on remaining ranks
 	  pstMg[side][K][REL_SQ(sq,side)] = 10*(kingRank[Rank(sq)] + kingFile[File(sq)]);
 
-	  pstEg[side][P][REL_SQ(sq,side)] = 10;
+	  pstEg[side][P][REL_SQ(sq,side)] = 10 - neutral[File(sq)];
 	  pstEg[side][N][REL_SQ(sq,side)] = 5 * ( knightEg[Rank(sq)] + knightEg[File(sq)] );
 	  pstEg[side][B][REL_SQ(sq,side)] = 5 * ( neutral[Rank(sq)] + neutral[File(sq)] );
 	  pstEg[side][R][REL_SQ(sq,side)] = 0;
@@ -145,16 +145,17 @@ int sData::GetPawnMgPst(int sq)
 
 int sData::GetRookMgPst(int sq)
 {
-	/**/if (sq == D1 || sq == E1) return 4;
+	if (sq == D1 || sq == E1) return 4;
 	if (sq == C1 || sq == F1) return 2;
 	if (Rank(sq) == RANK_1)   return 0;
-	if (Rank(sq) == RANK_8)   return 4;/**/
-    return neutral[File(sq)] - 1 /*+ 4*(Rank(sq) == RANK_8) + 2*(Rank(sq) == RANK_1)/**/;
+	if (Rank(sq) == RANK_8)   return 4;
+    return neutral[File(sq)] - 1;
 }
 
 int sData::GetPhalanxPstMg(int sq)
 {
     if (sq == D4) return 15;             // D4/E4 pawns
+	if (sq == D3) return 10;             // D3/E3 pawns
 	if (sq == C4 || sq == E4) return 10; // C4/D4 or E4/F4 pawns
 	return 0;
 }
