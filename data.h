@@ -20,7 +20,7 @@
 #pragma once
 
 enum ePanelStyle   { PANEL_NORMAL, PANEL_POWER };
-enum eSafetyStyle  { KS_SECONDARY, KS_DOMINANT };
+enum eSafetyStyle  { KS_QUADRATIC, KS_HANDMADE };
 enum ePawnProperty { PASSED, CANDIDATE, PHALANX, ISOLATED, BACKWARD, PAWN_PROPERTIES };
 
 struct sData {
@@ -47,6 +47,7 @@ public:
  int badBishopPenalty[2][64];
  int kingDanger[100];
  int safetyStyle;
+ int contempt;
 
  // search data
  int useNull;          // shall we use null move?
@@ -58,6 +59,9 @@ public:
  int useLearning;      // shall we use position learning?
  int isAnalyzing;
  int useBook;
+
+ // book data
+ int bookFilter;
 
  // modus operandi
  char styleList[512];
