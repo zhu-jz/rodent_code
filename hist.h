@@ -42,6 +42,7 @@ public:
 	 int GetMoveHistoryValue(int pc, int sq_to);
 	 int GetKiller(int ply, int slot);
 	 int Refutes(int lastMove, int move);
+	 int GetRefutation(int lastMove);
 };
 
 extern sHistory History;
