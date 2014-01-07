@@ -138,7 +138,6 @@ void sData::InitSearchData(void)
 	 lmrHistLimit     = 60;      // 70 is better in very fast games (10s per game)
 	 deltaMargin      = 150;
 	 goodCaptMargin   = 30;      // BxN is OK, RxB isn't
-	 lazyMargin       = 180;     // 180 best so far, 240 is marginally worse
 }
 
 void sData::InitDistanceBonus(void) 
@@ -152,18 +151,21 @@ void sData::InitDistanceBonus(void)
 
 void sData::InitOptions(void) // init user-accessible stuff
 {
-	 safetyStyle     = KS_DOMINANT;
-	 ownMobility     = 110;
-	 oppMobility     = 110;
-	 ownAttack       = 100; 
-	 oppAttack       = 100; 
-	 bishopPair      =  50; 
-     verbose          = 0;       // no additional display
-	 elo              = MAX_ELO; // no weakening
-	 isAnalyzing      = 0;
-	 useBook          = 1;
-	 useWeakening     = 0;
-	 useLearning      = 0;
+	 safetyStyle     = KS_QUADRATIC;
+	 ownMobility     = 110; // WAS 110
+	 oppMobility     = 110; // WAS 110
+	 ownAttack       = 100; // WAS 100
+	 oppAttack       = 100; // WAS 100
+	 bishopPair      = 50; 
+     verbose         = 0;       // no additional display
+	 elo             = MAX_ELO; // no weakening
+	 contempt        = 12;
+	 isAnalyzing     = 0;
+	 useBook         = 1;
+	 useWeakening    = 0;
+	 useLearning     = 0;
+	 bookFilter      = 10;
+	 lazyMargin      = 180;     // WAS 180
 }
 
 // used at the beginning of search to set scaling factors for eval components
