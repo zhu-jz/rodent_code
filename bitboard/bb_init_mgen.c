@@ -75,13 +75,13 @@ void InitKnightAttacks()
 {
   for (int sq = 0; sq < 64; sq++) 
     bbKnightAttacks[sq] = ShiftNE( ShiftNorth(SqBb(sq) ) )
-		                | ShiftNW( ShiftNorth(SqBb(sq) ) )
-					    | ShiftNE( ShiftEast (SqBb(sq) ) )
-					    | ShiftSE( ShiftEast (SqBb(sq) ) )
-					    | ShiftSW( ShiftSouth(SqBb(sq) ) )
-					    | ShiftSE( ShiftSouth(SqBb(sq) ) )
-					    | ShiftNW( ShiftWest (SqBb(sq) ) )
-					    | ShiftSW( ShiftWest (SqBb(sq) ) );
+		        | ShiftNW( ShiftNorth(SqBb(sq) ) )
+			| ShiftNE( ShiftEast (SqBb(sq) ) )
+			| ShiftSE( ShiftEast (SqBb(sq) ) )
+			| ShiftSW( ShiftSouth(SqBb(sq) ) )
+			| ShiftSE( ShiftSouth(SqBb(sq) ) )
+			| ShiftNW( ShiftWest (SqBb(sq) ) )
+			| ShiftSW( ShiftWest (SqBb(sq) ) );
 }
 
 void InitKingAttacks() 
