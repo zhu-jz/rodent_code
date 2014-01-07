@@ -328,9 +328,9 @@ U64 sBook::GetPolyglotKey(sPosition *p)
   return key;
 }
 
-void sBook::OpenPolyglot(char *fileName)
+void sBook::OpenPolyglot(void)
 {
-   bookFile = fopen(fileName,"rb");
+   bookFile = fopen(bookName,"rb");
 
    if (bookFile != NULL) {
 
@@ -422,7 +422,7 @@ int sBook::GetPolyglotMove(sPosition *p, int printOutput) {
 
 	  }
    }
-   if (printOutput) PrintMissingMoves(p);
+   //if (printOutput) PrintMissingMoves(p);
    return bestMove;
 }
 
@@ -472,7 +472,7 @@ U64 sBook::ReadInteger(int size)
     return n;
 }
 
-void sBook::ClosePolyglot(char *fileName)
+void sBook::ClosePolyglot(void)
 {
 	if (bookFile != NULL) {
 		fclose(bookFile);
@@ -673,7 +673,7 @@ void sBook::ParseBookEntry(char * ptr, int line_no)
 
 int sBook::IsInfrequent(int val, int maxFreq)
 {
-	if (maxFreq > 2 && val < 2) return 1; // if possible, pick a move tried at least twice
-	if (val < maxFreq / 10) return 1; // moves played less than 10% of time are filtered out
+	if (maxFreq > 2 && val < 2) return 1;     // if possible, pick a move tried at least twice
+	if (val < ( (maxFreq * Data.bookFilter) / 100 ) ) return 1; // filtering out of rare moves
 	return 0;
 }
