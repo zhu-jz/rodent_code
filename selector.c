@@ -311,7 +311,7 @@ void sFlatMoveList::Init(sPosition * p)
 		  bestVal = value[nOfMoves];
 		  bestMove = move;
 	  }
-
+	  
 	  AddMove(move);
 	  Manipulator.UndoMove(p, move, undoData);
 	}
