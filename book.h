@@ -53,10 +53,11 @@ private:
    void ReadEntry(polyglot_move * entry, int n);
    U64 ReadInteger(int size);
 public:
+   char *bookName;
    int GetPolyglotMove(sPosition *p, int printOutput);
    U64 GetPolyglotKey(sPosition *p);
-   void OpenPolyglot(char *fileName);
-   void ClosePolyglot(char *fileName);
+   void OpenPolyglot(void);
+   void ClosePolyglot(void);
    void Init(sPosition *p);
    int ReadTextFileToGuideBook(sPosition *p, char *fileName);
    int GetBookMove(sPosition *p, int canPrint, int *flagIsProblem);
