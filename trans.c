@@ -25,6 +25,7 @@
 
 //#define EVAL_SYMMETRY_TEST
 
+
 // calculates full hash key from scratch
 U64 sTransTable::InitHashKey(sPosition *p)
 {
