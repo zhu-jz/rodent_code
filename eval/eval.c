@@ -17,16 +17,44 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#define LAZY_EVAL
-//#define HASH_EVAL
-
 #include <stdio.h>
 #include "../bitboard/bitboard.h"
 #include "../data.h"
 #include "../rodent.h"
 #include "eval.h"
 
-const int attMult[15]     = {0, 0, 4, 10, 14, 26, 42, 52, 64, 70, 76, 82, 86, 92, 100};
+const int safety[ 256 ] = {
+	  0,     1,    1,    2,    2,    3,    3,    4,   4,     5,
+	  6,     7,    8,    9,   10,   11,   11,   12,   12,   13,
+	 13,    14,   14,   15,   16,   17,   18,   19,   20,   22,
+	 24,    26,   28,   30,   32,   34,   36,   39,   42,   45,
+	 48,    52,   56,   60,   64,   68,   72,   76,   80,   83,
+	 86,    89,   92,   94,   96,   98,  100,  101,  102,  103,
+	104,   105,  106,  107,  108,  109,  110,  111,  112,  113,
+	114,   115,  116,  117,  118,  119,  120,  121,  122,  123,
+	124,   125,  126,  127,  128,  129,  130,  131,  132,  133,
+	134,   135,  136,  137,  138,  139,  140,  141,  142,  143,
+	144,   145,  146,  147,  148,  149,  150,  151,  152,  153,
+	154,   155,  156,  157,  158,  159,  160,  161,  162,  163,
+	164,   165,  166,  167,  168,  169,  170,  171,  172,  173,
+	174,   175,  176,  177,  178,  179,  180,  181,  182,  183,
+	184,   185,  186,  187,  188,  189,  190,  191,  192,  193,
+	194,   195,  196,  197,  198,  199,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200                       };
+
+const int n_of_att[ 24 ] =   { 0, 6, 12, 18, 24, 32, 48, 52, 56, 60, 64, 66, 68, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70 };
+
+const int mgTwoOnSeventh  = 5;
+const int egTwoOnSeventh  = 10;
 
 void sEvaluator::InitStaticScore(void) 
 {
@@ -46,15 +74,18 @@ void sEvaluator::InitDynamicScore(sPosition *p)
 	 egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
 	 mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
 	 egMobility[WHITE]       = 0;   egMobility[BLACK]  = 0;  // clear endgame mobility	 
-	 bbPawnControl[WHITE]    = GetWPControl( bbPc(p, WHITE, P) );
-	 bbPawnControl[BLACK]    = GetBPControl( bbPc(p, BLACK, P) );
-	 bbPawnCanControl[WHITE] = FillNorth( bbPawnControl[WHITE] );
-	 bbPawnCanControl[BLACK] = FillSouth( bbPawnControl[BLACK] );
-	 bbAllAttacks[WHITE]     = bbPawnControl[WHITE];
-	 bbAllAttacks[BLACK]     = bbPawnControl[BLACK];
-	 bbMinorCoorAttacks[WHITE]   = 0ULL;
-	 bbMinorCoorAttacks[BLACK]   = 0ULL;
-	 
+	 bbPawnTakes[WHITE]    = GetWPControl( bbPc(p, WHITE, P) );
+	 bbPawnTakes[BLACK]    = GetBPControl( bbPc(p, BLACK, P) );
+	 bbPawnCanTake[WHITE] = FillNorth( bbPawnTakes[WHITE] );
+	 bbPawnCanTake[BLACK] = FillSouth( bbPawnTakes[BLACK] );
+	 bbAllAttacks[WHITE]     = bbPawnTakes[WHITE];
+	 bbAllAttacks[BLACK]     = bbPawnTakes[BLACK];
+	 bbMinorCoorAttacks[WHITE]  = 0ULL;
+	 bbMinorCoorAttacks[BLACK]  = 0ULL;
+ 	 bbRookCoorAttacks[WHITE]   = 0ULL;
+	 bbRookCoorAttacks[BLACK]   = 0ULL;
+
+
 	 // set squares from which king can be checked 
 	 U64 bbOccupied = OccBb(p);
 	 bbStraightChecks[WHITE] = RAttacks(bbOccupied, KingSq(p, WHITE) );  
@@ -78,8 +109,8 @@ int sEvaluator::Interpolate(void) {
 
 void sEvaluator::ScoreHanging(sPosition *p, int side)
 {
-	U64 bbHanging    = p->bbCl[Opp(side)] & ~bbPawnControl[Opp(side)]; 
-	U64 bbThreatened = p->bbCl[Opp(side)] & bbPawnControl[side];
+	U64 bbHanging    = p->bbCl[Opp(side)] & ~bbPawnTakes[Opp(side)]; 
+	U64 bbThreatened = p->bbCl[Opp(side)] & bbPawnTakes[side];
 	bbHanging |= bbThreatened;            // piece attacked by our pawn isn't well defended
 	bbHanging &= bbAllAttacks[side];      // obviously, hanging piece has to be attacked
 	bbHanging &= ~bbPc(p, Opp(side), P);  // currently we don't evaluate threats against pawns
@@ -88,7 +119,7 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
 	bbSpace &= ~bbRelRank[side][RANK_1];    // controlling home ground is not space advantage
 	bbSpace &= ~bbRelRank[side][RANK_2];
 	bbSpace &= ~bbRelRank[side][RANK_3];
-	bbSpace &= ~bbPawnControl[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
+	bbSpace &= ~bbPawnTakes[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
 	AddMisc(side, PopCnt(bbSpace), 0);
 	int pc, sq, val;
 
@@ -145,20 +176,20 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
 {
 	bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
 
-	if (Data.safetyStyle == KS_SECONDARY)    {
-	   if (attWood[side] > 14) attWood[side] = 14;
-       if (attNumber[side] > 1 ) attWood[side] += 1;
-       attScore[side] = ( (attCount[side]+checkCount[side]) * attMult[attWood[side]]) / 100;
-	}
-	if (Data.safetyStyle == KS_DOMINANT) {
+	if (Data.safetyStyle == KS_QUADRATIC) {
 		int attUnit = attCount[side];    // attacks on squares near enemy king
 		attUnit += checkCount[side];     // check and contact check threats
 		attUnit += (attWood[side] / 2);  // material involved in the attack
-		if(attUnit > 99) attUnit = 99;   // bounds checking
-		if(attNumber[side] < 2) attUnit = 0;
+		if (attUnit > 99) attUnit = 99;  // bounds checking
+		if (attNumber[side] < 2) attScore[side] = 0;
+		//TODO: find some way to include attacks with less than two pieces
 		attScore[side] = Data.kingDanger[attUnit] * 10;
 	}
-	ScaleValue(&attScore[side]  , Data.attSidePercentage[side]);
+	if (Data.safetyStyle == KS_HANDMADE) {
+		int attUnit = attCount[side] + checkCount[side];
+		attScore[side] = safety[ attUnit + n_of_att[attNumber[side]] ] * 10;
+	}
+	ScaleValue(&attScore[side], Data.attSidePercentage[side]);
 }
 
 int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side) 
@@ -180,6 +211,13 @@ int sEvaluator::EvalFileStorm(U64 bbOppPawns, int side)
 	if (bbOppPawns & bbRelRank[side][RANK_5] ) return -5;
 	if (bbOppPawns & bbRelRank[side][RANK_6] ) return -7;
     return 0;
+}
+
+void sEvaluator::ScorePatterns(sPosition *p, int side)
+{
+	// more than one rook on the 7th rank
+	if (MoreThanOne( ( bbPc(p,side,R) ) & bbRelRank[side][RANK_7])) 
+		AddMisc(side, mgTwoOnSeventh,egTwoOnSeventh);
 }
 
 int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
@@ -208,12 +246,13 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
   egScore += (p->pstEg[WHITE] - p->pstEg[BLACK]);
   
 #ifdef LAZY_EVAL
-  int temp_score = score + Interpolate();
+  int tempScore = score + Interpolate();
 
   // lazy evaluation - avoids costly calculations
   // if score seems already very high/very low
-  if (temp_score > alpha - Data.lazyMargin 
-  &&  temp_score < beta +  Data.lazyMargin) {
+  if (tempScore > alpha - Data.lazyMargin 
+  &&  tempScore < beta  + Data.lazyMargin
+  ) {
 #endif
 	  fullEval = 1;
 	  InitDynamicScore(p);
@@ -226,8 +265,8 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  ScoreR(p, BLACK);
       ScoreQ(p, WHITE);
       ScoreQ(p, BLACK);
-      ScoreKingShield(p, WHITE);
-      ScoreKingShield(p, BLACK);
+	  ScoreKingShield(p, WHITE);
+	  ScoreKingShield(p, BLACK);  
 	  ScoreKingAttacks(p, WHITE);
 	  ScoreKingAttacks(p, BLACK);
 	  ScoreHanging(p, WHITE);
@@ -236,6 +275,10 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  // ADDITIONAL PAWN EVAL
 	  ScoreP(p, WHITE);
 	  ScoreP(p, BLACK);
+
+	  // PATTERNS
+	  ScorePatterns(p, WHITE);
+	  ScorePatterns(p, BLACK);
       
 	  // ASYMMETRIC MOBILITY SCALING
 	  ScaleValue(&mgMobility[WHITE], Data.mobSidePercentage[WHITE]);
@@ -248,11 +291,11 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  egScore += ( egMobility[WHITE] - egMobility[BLACK] );
 	  mgScore += ( mgMisc[WHITE]     - mgMisc[BLACK]     );
 	  egScore += ( egMisc[WHITE]     - egMisc[BLACK]     );
-      score   += Interpolate();    // merge middlegame and endgame scores
+	  score   += Interpolate();    // merge middlegame and endgame scores
 	  score   += ( attScore[WHITE]  - attScore[BLACK] );
 #ifdef LAZY_EVAL
   }
-  else score = temp_score; 
+  else score = tempScore; 
 #endif
 
   score = PullToDraw(p, score);    // decrease score in drawish endgames
@@ -292,8 +335,8 @@ int sEvaluator::ReturnFast(sPosition *p)
 
 int sEvaluator::Normalize(int val, int limit) 
 {
-	if (val > limit)       return limit;
-	else if (val < -limit) return -limit;
+    if (val > limit)       return limit;
+    else if (val < -limit) return -limit;
     return val;
 }
 
@@ -313,7 +356,7 @@ int sEvaluator::FinalizeScore(sPosition * p, int score)
 void sEvaluator::ScaleValue(int * value, int factor) 
 {
      *value *= factor;
-	 *value /= 1000;
+     *value /= 1000;
 }
 
 void sEvaluator::DebugPst(sPosition *p) 
@@ -327,9 +370,9 @@ void sEvaluator::DebugPst(sPosition *p)
 	 {
 	     bbPieces = bbPc(p, cl, pc);
 	     while (bbPieces) {
-           sq = PopFirstBit(&bbPieces);
+               sq = PopFirstBit(&bbPieces);
 	       mg += Data.pstMg[cl][pc][sq] * clMult[cl];
-		   eg += Data.pstEg[cl][pc][sq] * clMult[cl];
+	       eg += Data.pstEg[cl][pc][sq] * clMult[cl];
 	     }
 	 }
 	 printf("Recalculated pst : mg %d eg %d\n", mg, eg);
