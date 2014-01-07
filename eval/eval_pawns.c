@@ -61,7 +61,7 @@ void sEvaluator::EvalPawnCenter(sPosition *p, int side)
       }
 
       if (bbPc(p, side, P) & RelSqBb(E4,side) && bbPc(p, side, P) & RelSqBb(D3,side) ) 
-         pawnScoreMg[side] += centDefense;	
+         pawnScoreMg[side] += centDefense;
 }
 
 void sEvaluator::SinglePawnScore(sPosition *p, int side)
