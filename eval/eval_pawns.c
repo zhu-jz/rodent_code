@@ -55,7 +55,8 @@ void sEvaluator::EvalPawns(sPosition *p)
 
 void sEvaluator::EvalPawnCenter(sPosition *p, int side)
 {
-      if (bbPc(p, side, P) & RelSqBb(D4,side) ) {
+      //here we care about defending central pawns; see midgame phalanx pst for more
+	  if (bbPc(p, side, P) & RelSqBb(D4,side) ) {
           if (bbPc(p, side, P) & RelSqBb(E3,side) )  pawnScoreMg[side] += centDefense;
           if (bbPc(p, side, P) & RelSqBb(C3,side) )  pawnScoreMg[side] += centDefense;
       }
@@ -68,7 +69,7 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 {
   int sq; 
   int flagIsOpen, flagIsWeak;
-  U64 flagIsPhalanx;
+  U64 flagIsPhalanx, flagIsDoubled;
   U64 bbPieces = bbPc(p, side, P);
   U64 bbOwnPawns = bbPieces;
   U64 bbFrontSpan;
@@ -78,12 +79,12 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 
     // gather information about a pawn that is evaluated
 	bbFrontSpan    = GetFrontSpan(SqBb(sq), side );
+	flagIsDoubled  = bbFrontSpan & bbOwnPawns;
     flagIsOpen     = ( ( bbFrontSpan & bbPc(p, Opp(side), P) ) == 0 );
 	flagIsPhalanx  = ShiftEast(SqBb(sq) ) & bbOwnPawns;
 	flagIsWeak     = ( ( bbPawnSupport[side][sq] & bbOwnPawns ) == 0);
 	
-	// doubled pawn
-	if ( bbFrontSpan & bbOwnPawns ) {
+	if (flagIsDoubled) {
 	    pawnScoreMg[side] += doubledPawn[MG][File(sq)];
 	    pawnScoreEg[side] += doubledPawn[EG][File(sq)];
     }
@@ -97,7 +98,10 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 		U64 bbObstacles = bbPassedMask[side][sq] & bbPc(p, Opp(side), P);
 		
 	    // passed pawn (some more eval will be done in ScoreP() in eval_pieces.c)
-		if (!bbObstacles) AddPawnProperty(PASSED,side,sq);
+		if (!bbObstacles) {
+			if (flagIsDoubled) AddPawnProperty(CANDIDATE,side,sq); // back doubled passer is scored like candidate,
+			else               AddPawnProperty(PASSED,side,sq);    // only frontmost passer gets full credit
+		}
 		
 	    // candidate passer
 		if (flagIsPhalanx) { // test lower bonus when !flagIsWeak
