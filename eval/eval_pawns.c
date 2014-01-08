@@ -23,7 +23,7 @@
 #include "eval.h"
 
 const int centDefense = 5;
-const int doubledPawn [2] = {-25, -15};
+const int doubledPawn [2] [8]= { {-25, -25, -25, -25, -25, -25, -25, -25 }, {-15, -17, -19, -19, -19, -19, -17, -15 } };
 const int pawnIsolatedOnOpen = -15;
 const int pawnBackwardOnOpen = -15;
 
@@ -84,8 +84,8 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	
 	// doubled pawn
 	if ( bbFrontSpan & bbOwnPawns ) {
-	    pawnScoreMg[side] += doubledPawn[MG];
-	    pawnScoreEg[side] += doubledPawn[EG];
+	    pawnScoreMg[side] += doubledPawn[MG][File(sq)];
+	    pawnScoreEg[side] += doubledPawn[EG][File(sq)];
     }
 
 	if (flagIsPhalanx) {
