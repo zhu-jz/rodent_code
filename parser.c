@@ -172,8 +172,12 @@ void sParser::SetOption(char *ptr)
 	Data.oppMobility = atoi(value);
   } else if (strcmp(name, "OwnAttack") == 0) {
 	Data.ownAttack = atoi(value);
-  } else if (strcmp(name, "OwnAttack") == 0) {
-	Data.ownAttack = atoi(value);
+  } else if (strcmp(name, "OppAttack") == 0) {
+	Data.oppAttack = atoi(value);
+  } else if (strcmp(name, "PawnStructure") == 0) {
+	  Data.pawnStruct = atoi(value);
+  } else if (strcmp(name, "PassedPawns") == 0) {
+	  Data.passedPawns = atoi(value);
   } else if (strcmp(name, "LazyMargin") == 0) {
 	Data.lazyMargin = atoi(value);
   } else if (strcmp(name, "Contempt") == 0) {
@@ -221,6 +225,8 @@ void sParser::PrintUciOptions()
 	printf("option name OppMobility type spin default %d min 0 max 500\n", Data.oppMobility);
 	printf("option name OwnAttack type spin default %d min 0 max 500\n", Data.ownAttack);
 	printf("option name OppAttack type spin default %d min 0 max 500\n", Data.oppAttack);
+	printf("option name PawnStructure type spin default %d min 0 max 500\n", Data.pawnStruct);
+	printf("option name PassedPawns type spin default %d min 0 max 500\n", Data.passedPawns);
 	printf("option name BookFilter type spin default %d min 0 max 100\n", Data.bookFilter);
 	printf("option name LazyMargin type spin default %d min -500 max 500\n", Data.lazyMargin);
 	printf("option name Contempt type spin default %d min -300 max 300\n", Data.contempt);
