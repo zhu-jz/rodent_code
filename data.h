@@ -43,6 +43,8 @@ public:
  int oppMobility;
  int ownAttack;
  int oppAttack;
+ int passedPawns;
+ int pawnStruct;
  int bishopPair;
  int badBishopPenalty[2][64];
  int kingDanger[100];
