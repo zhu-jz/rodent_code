@@ -35,6 +35,8 @@ void sEvaluator::EvalPawns(sPosition *p)
   if ( PawnTT[pawnHash].pawnKey == p->pawnKey) {
 	  mgScore += PawnTT[pawnHash].mgPawns;
 	  egScore += PawnTT[pawnHash].egPawns;
+	  mgScore += PawnTT[pawnHash].mgPassers;
+	  egScore += PawnTT[pawnHash].egPassers;
   }
   else
   {
@@ -43,13 +45,17 @@ void sEvaluator::EvalPawns(sPosition *p)
 	  EvalPawnCenter(p, WHITE);
 	  EvalPawnCenter(p, BLACK);
  
-      mgScore += (pawnScoreMg[WHITE] - pawnScoreMg[BLACK]);
-      egScore += (pawnScoreEg[WHITE] - pawnScoreEg[BLACK]);
+	  mgScore += ( ( (pawnScoreMg[WHITE] - pawnScoreMg[BLACK]) * Data.pawnStruct ) / 100 );
+      egScore += ( ( (pawnScoreEg[WHITE] - pawnScoreEg[BLACK]) * Data.pawnStruct ) / 100 );
+      mgScore += ( ( (passerScoreMg[WHITE] - passerScoreMg[BLACK]) * Data.passedPawns ) / 100 );
+      egScore += ( ( (passerScoreEg[WHITE] - passerScoreEg[BLACK]) * Data.passedPawns ) / 100 );
 
       // save score to pawn hashtable
       PawnTT[pawnHash].pawnKey = p->pawnKey;
-      PawnTT[pawnHash].mgPawns = (pawnScoreMg[WHITE] - pawnScoreMg[BLACK]);
-      PawnTT[pawnHash].egPawns = (pawnScoreEg[WHITE] - pawnScoreEg[BLACK]);
+      PawnTT[pawnHash].mgPawns   = ( ( (pawnScoreMg[WHITE] - pawnScoreMg[BLACK])* Data.pawnStruct ) / 100 );
+      PawnTT[pawnHash].egPawns   = ( ( (pawnScoreEg[WHITE] - pawnScoreEg[BLACK])* Data.pawnStruct ) / 100 );
+	  PawnTT[pawnHash].mgPassers = ( ( (passerScoreMg[WHITE] - passerScoreMg[BLACK])* Data.passedPawns ) / 100 );
+      PawnTT[pawnHash].egPassers = ( ( (passerScoreEg[WHITE] - passerScoreEg[BLACK])* Data.passedPawns ) / 100 );
   }
 }
 
@@ -99,13 +105,13 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 		
 	    // passed pawn (some more eval will be done in ScoreP() in eval_pieces.c)
 		if (!bbObstacles) {
-			if (flagIsDoubled) AddPawnProperty(CANDIDATE,side,sq); // back doubled passer is scored like candidate,
-			else               AddPawnProperty(PASSED,side,sq);    // only frontmost passer gets full credit
+			if (flagIsDoubled) AddPasserScore(CANDIDATE,side,sq); // back doubled passer is scored like candidate,
+			else               AddPasserScore(PASSED,side,sq);    // only frontmost passer gets full credit
 		}
 		
 	    // candidate passer
 		if (flagIsPhalanx) { // test lower bonus when !flagIsWeak
-		    if (PopCntSparse(bbObstacles) == 1) AddPawnProperty(CANDIDATE,side,sq);
+		    if (PopCntSparse(bbObstacles) == 1) AddPasserScore(CANDIDATE,side,sq);
 	    }
 	}
     
@@ -128,4 +134,10 @@ void sEvaluator::AddPawnProperty(int pawnProperty, int side, int sq)
 {
      pawnScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
 	 pawnScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
+}
+
+void sEvaluator::AddPasserScore(int pawnProperty, int side, int sq)
+{
+     passerScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
+	 passerScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
 }
