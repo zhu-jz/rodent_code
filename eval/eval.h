@@ -27,6 +27,8 @@ struct sPawnHashEntry {
   U64 pawnKey;
   int mgPawns;
   int egPawns;
+  int mgPassers;
+  int egPassers;
 };
 
 struct sEvalHashEntry {
@@ -46,6 +48,8 @@ private:
   int egMisc[2];           // miscelanneous endgame scores
   int pawnScoreMg[2];      // midgame pawn structure scores
   int pawnScoreEg[2];      // endgame pawn structure scores
+  int passerScoreMg[2];    // midgame passed pawn scores
+  int passerScoreEg[2];    // endgame passed pawn scores 
   U64 bbPawnTakes[2];    // squares controlled by pawns, used in mobility eval (pawn eval uses only occupancy masks)
   U64 bbPawnCanTake[2]; // squares that can be controlled by pawns as they advance, used in outpost eval
   U64 bbDiagChecks[2];
@@ -71,6 +75,7 @@ private:
   void AddMisc(int side, int mg, int eg);
   void AddKingAttack(int side, int pc, int cnt);
   void AddPawnProperty(int pawnProperty, int side, int sq);
+  void AddPasserScore(int pawnProperty, int side, int sq);
   int CheckmateHelper(sPosition *p);
   void InitStaticScore(void);            
   void InitDynamicScore(sPosition *p);            
