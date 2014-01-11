@@ -321,8 +321,8 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 
 	// additional evaluation of a passed pawn 
 	if (!bbObstacles) {
-		passUnitMg = Data.pawnProperty[PASSED][MG][side][sq] / 5;
-		passUnitEg = Data.pawnProperty[PASSED][EG][side][sq] / 5;
+		passUnitMg = ( Data.pawnProperty[PASSED][MG][side][sq] * Data.passedPawns ) / 500;
+		passUnitEg = ( Data.pawnProperty[PASSED][EG][side][sq] * Data.passedPawns ) / 500;
 
 		// enemy king distance to a passer (failed to find good value for a friendly king)
 		AddMisc(side, 0, (-Data.distance[sq] [p->kingSquare[Opp(side)]] * passUnitEg) / 6);
