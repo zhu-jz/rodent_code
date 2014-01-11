@@ -156,6 +156,8 @@ void sData::InitOptions(void) // init user-accessible stuff
 	 oppMobility     = 110; // WAS 110
 	 ownAttack       = 100; // WAS 100
 	 oppAttack       = 100; // WAS 100
+	 passedPawns     = 105; // 95 is worse, 100 is best
+	 pawnStruct      = 100;
 	 bishopPair      = 50; 
      verbose         = 0;       // no additional display
 	 elo             = MAX_ELO; // no weakening
