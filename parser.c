@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -184,9 +184,9 @@ void sParser::SetOption(char *ptr)
 	Data.contempt = atoi(value);
   } else if (strcmp(name, "UCI_Elo") == 0) {
 	Data.elo = atoi(value);
+	if (Data.panelStyle == PANEL_NORMAL) Data.useWeakening = 1;
   } else if (strcmp(name, "BookFilter") == 0) {
 	Data.bookFilter = atoi(value);
-	if (Data.panelStyle == PANEL_NORMAL) Data.useWeakening = 1;
   } else if (strcmp(name, "Hash") == 0) {
     TransTable.Alloc(atoi(value));
   } else if (strcmp(name, "Clear Hash") == 0) {
@@ -439,7 +439,5 @@ void sParser::PrintBoard(sPosition *p)
   printf("Recalculated hash: %016llX pawn: %016llX \n", TransTable.InitHashKey(p), TransTable.InitPawnKey(p));
   printf("Incremental  pst : mg %d eg %d\n", p->pstMg[WHITE]-p->pstMg[BLACK], p->pstEg[WHITE]-p->pstEg[BLACK]);
   Eval.DebugPst(p);
-  printf("\n");
-
-  printf("--------------------------------------------\n");
+  printf("\n--------------------------------------------\n");
 }
