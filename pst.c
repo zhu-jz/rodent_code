@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -43,7 +43,7 @@ const int pstKnightMg[64] =
    -35, -25, -15, -10, -10, -15, -25, -35,
    -20, -10,   0,   5,   5,   0, -10, -20, 
    -10,   0,  10,  15,  15,  10,   0, -10, 
-	-5,   5,  15,  20,  20,  15,   5,  -5,
+    -5,   5,  15,  20,  20,  15,   5,  -5,
     -5,   5,  15,  20,  20,  15,   5,  -5,
    -20, -10,   0,   5,   5,   0, -10, -20,
   -135, -25, -15, -10, -10, -15, -25, -135
@@ -61,9 +61,10 @@ const int pstBishopMg[64] =
     -2,  -5,  -5,  -5,  -5,  -5,  -5,  -2
 };
 
+
 const int pstKnightOutpost[64] = 
 {   
-	 0,   0,   0,   0,   0,   0,   0,   0,
+     0,   0,   0,   0,   0,   0,   0,   0,
      0,   0,   0,   0,   0,   0,   0,   0,
      0,   0,   0,   0,   0,   0,   0,   0,
      0,   2,   3,   6,   6,   3,   2,   0,
@@ -109,7 +110,7 @@ void sData::InitPstValues(void)
 	  pstMg[side][Q][REL_SQ(sq,side)] = -5 * (Rank(sq) == RANK_1); // 0 on remaining ranks
 	  pstMg[side][K][REL_SQ(sq,side)] = 10*(kingRank[Rank(sq)] + kingFile[File(sq)]);
 
-	  pstEg[side][P][REL_SQ(sq,side)] = 10 - neutral[File(sq)];
+	  pstEg[side][P][REL_SQ(sq,side)] = 10 - neutral[File(sq)] - kingRank[Rank(sq)];
 	  pstEg[side][N][REL_SQ(sq,side)] = 5 * ( knightEg[Rank(sq)] + knightEg[File(sq)] );
 	  pstEg[side][B][REL_SQ(sq,side)] = 5 * ( neutral[Rank(sq)] + neutral[File(sq)] );
 	  pstEg[side][R][REL_SQ(sq,side)] = 0;
@@ -155,7 +156,7 @@ int sData::GetRookMgPst(int sq)
 int sData::GetPhalanxPstMg(int sq)
 {
     if (sq == D4) return 15;             // D4/E4 pawns
-	if (sq == D3) return 10;             // D3/E3 pawns
-	if (sq == C4 || sq == E4) return 10; // C4/D4 or E4/F4 pawns
-	return 0;
+    if (sq == D3) return 10;             // D3/E3 pawns
+    if (sq == C4 || sq == E4) return 10; // C4/D4 or E4/F4 pawns
+    return 0;
 }
