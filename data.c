@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -156,10 +156,10 @@ void sData::InitOptions(void) // init user-accessible stuff
 	 oppMobility     = 110; // WAS 110
 	 ownAttack       = 100; // WAS 100
 	 oppAttack       = 100; // WAS 100
-	 passedPawns     = 105; // 95 is worse, 100 is best
+	 passedPawns     = 105; // 100 is worse, 110 might be marginally better
 	 pawnStruct      = 100;
 	 bishopPair      = 50; 
-     verbose         = 0;       // no additional display
+	 verbose         = 0;       // no additional display
 	 elo             = MAX_ELO; // no weakening
 	 contempt        = 12;
 	 isAnalyzing     = 0;
