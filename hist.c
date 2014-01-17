@@ -95,7 +95,7 @@ void sHistory::UpdateRefutation(int lastMove, int move)
 
 void sHistory::UpdateContinuation(int prevMove, int move)
 {
-	refutation [Fsq(prevMove)] [Tsq(prevMove)] = move;
+	continuation [Fsq(prevMove)] [Tsq(prevMove)] = move;
 }
 
 void sHistory::OnGoodMove(sPosition *p, int lastMove, int move, int depth, int ply)
