@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -24,6 +24,7 @@ private:
      int history[12][64];
 	 int cutoff[64][64];
 	 int refutation[64][64];
+	 int continuation[64][64];
 	 int killer[MAX_PLY][2];
 	 void ReducePeaks(void);
 	 void UpdateCutoff(int move);
@@ -39,10 +40,13 @@ public:
 	 void OnMoveReduced(int move);
 	 int MoveIsBad(int move);
 	 void UpdateRefutation(int lastMove, int move);
+	 void UpdateContinuation(int prevMove, int move);
 	 int GetMoveHistoryValue(int pc, int sq_to);
 	 int GetKiller(int ply, int slot);
 	 int Refutes(int lastMove, int move);
+	 int Continues(int prevMove, int move);
 	 int GetRefutation(int lastMove);
+	 int GetContinuation(int lastMove);
 };
 
 extern sHistory History;
