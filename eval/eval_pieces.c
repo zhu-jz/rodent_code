@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -26,7 +26,7 @@
 #include "../bitboard/gencache.h"
 #include "eval.h"
 #include <stdio.h>
-
+	  
   const int pawnDefendsMg     [7] = { 0,   2,   2,   2,   0,   0,  0 };
   const int pawnDefendsEg     [7] = { 0,   2,   2,   4,   0,   0,  0 };
   
@@ -66,9 +66,9 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	bbMob = bbKnightAttacks[sq];               // set control bitboard
 	bbAllAttacks[side] |= bbMob;               // update attack data
 	bbMob &= ~p->bbCl[side];                   // exclude squares occupied by own pieces
-	ScoreRelationToPawns(p, side, N, sq);         
+	ScoreRelationToPawns(p, side, N, sq);      // outpost, attacked or defended by a pawn
 
-	// attacks on pieces
+	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, nAttacks[P], nAttacks[P]);
 	if (bbMob & bbPc(p, oppo, B) ) AddMisc(side, nAttacks[B], nAttacks[B]);
 	if (bbMob & bbPc(p, oppo, R) ) AddMisc(side, nAttacks[R], nAttacks[R]);
@@ -89,7 +89,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	AddMobility(N, side, PopCnt15(bbMob) );    // evaluate mobility
 
     // check threats (excluding checks from squares controlled by enemy pawns)
-	if (bbMob & bbKnightChecks[oppo] )
+	if (bbMob & bbKnightChecks[oppo] ) 
 		checkCount[side] += canCheckWith[Data.safetyStyle][N]; 
   }
 }
@@ -118,7 +118,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	}
 	AddMisc(side,-3*ownPawnCnt-oppPawnCnt, -3*ownPawnCnt-oppPawnCnt);
 
-	// attacks on pieces
+	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, nAttacks[P], nAttacks[P]);
 	if (bbMob & bbPc(p, oppo, N) ) AddMisc(side, nAttacks[N], nAttacks[N]);
 	if (bbMob & bbPc(p, oppo, R) ) AddMisc(side, nAttacks[R], nAttacks[R]);
@@ -165,7 +165,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	bbAllAttacks[side] |= bbMob;                 // update attack data
 	ScoreRelationToPawns(p, side, R, sq);         
 
-	// attacks on pieces
+	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, rAttacks[P], rAttacks[P]);
 	if (bbMob & bbPc(p, oppo, N) ) AddMisc(side, rAttacks[N], rAttacks[N]);
 	if (bbMob & bbPc(p, oppo, B) ) AddMisc(side, rAttacks[B], rAttacks[B]);
@@ -238,7 +238,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	bbMob = GenCache.GetQueenMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbMob;                  // update attack data
 
-	// attacks on pieces
+	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, qAttacks[P], qAttacks[P]);
 	if (bbMob & bbPc(p, oppo, N) ) AddMisc(side, qAttacks[N], qAttacks[N]);
 	if (bbMob & bbPc(p, oppo, B) ) AddMisc(side, qAttacks[B], qAttacks[B]);
@@ -252,7 +252,6 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	}
 
 	if (bbMob & bbCanCheckFrom ) {
-
 		// queen check threats (unlike with other pieces, we *count the number* of possible checks here)
 		checkCount[side] += PopCntSparse( bbMob & bbCanCheckFrom ) * canCheckWith[Data.safetyStyle][Q];
 
@@ -271,7 +270,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
     if (bbQCanAttack[sq] [KingSq(p, oppo) ]
 	&& (attCount[side] > 0 || p->pcCount[side][Q] > 1) ) // otherwise queen attack won't change score
 	{
-	   // attacks through other pieces
+	   // factor in queen attacks through other pieces
 	   if (bbMob && bbTransparent)
 	      bbAttacks = QAttacks(bbOccupied ^ bbTransparent ^ SqBb(sq), sq);
 	   else 
@@ -296,7 +295,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
   int sq, passUnitMg, passUnitEg, flagIsWeak;
   U64 bbPieces = bbPc(p, side, P);
   U64 bbOccupied = OccBb(p);
-  U64 bbStop, bbBack, bbBackSpan, bbObstacles;
+  U64 bbStop, bbBack, bbObstacles;
 
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);
@@ -307,12 +306,9 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 	if ( !flagIsWeak                       // technically speaking, this pawn is not weak, 
 	&&   !(bbBack & bbPawnTakes[side]) )   // but it has lost contact  with the pawn mass,
 	AddMisc(side,-4,-8);                   // so it is at least slightly vulnerable.
-
-	// this pawn is mobile; bonus grows bigger when
-	// it is placed on a good square (as shown by midgame pst)
 	
-	if (bbStop &~bbOccupied) {           
-	   if (Data.pstMg[side][P][sq] > 0)
+	if (bbStop &~bbOccupied) {             // this pawn is mobile
+	   if (Data.pstMg[side][P][sq] > 0)    // bonus gets bigger for well positioned pawns
 		   AddMisc(side, Data.pstMg[side][P][sq] / 5, 2);
 	   else AddMisc(side, 2, 1);
 	}
@@ -333,8 +329,8 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 
 		// control of stop square
 		if (bbStop &~ bbAllAttacks[oppo] ) {
-           AddMisc(side,  passUnitMg,  passUnitEg);
-           if (bbStop & bbAllAttacks[side] ) AddMisc(side,  passUnitMg,  passUnitEg);
+                   AddMisc(side,  passUnitMg,  passUnitEg);
+                   if (bbStop & bbAllAttacks[side] ) AddMisc(side,  passUnitMg,  passUnitEg);
 		}
 	}
   }
