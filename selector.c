@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -31,12 +31,13 @@ and sorting of moves.
 #include "hist.h"
 
 // initializes data needed for move ordering
-void sSelector::InitMoveList(sPosition *p, int refMove, int transMove, int ply)
+void sSelector::InitMoveList(sPosition *p, int refMove, int contMove, int transMove, int ply)
 {
   m->p = p;
   m->phase = 0;
   m->transMove = transMove;
   m->refutation = refMove;
+  m->continuation = contMove;
   m->killer1 = History.GetKiller(ply, 0);
   m->killer2 = History.GetKiller(ply, 1);
 }
@@ -159,9 +160,10 @@ void sSelector::ScoreCaptures(int hashMove)
     *valuep++ = (MvvLva(m->p, *movep) + (1000 * (*movep == hashMove) ) );
 }
 
-// ScoreQuiet() sorts quiet moves by history heuristic. For to classes
+// ScoreQuiet() sorts quiet moves by history heuristic. For three classes
 // of moves, base score is increased. They are (1) escapes from a capture
-// that refuted null move in the same node and (2) moves from refutation table
+// that refuted null move in the same node, (2) moves from refutation table
+// and (3) moves from continuation table (with a smaller bonus).
 
 void sSelector::ScoreQuiet(int refutationSq)
 {
@@ -183,6 +185,14 @@ void sSelector::ScoreQuiet(int refutationSq)
 		     sortVal += 10000;
 	   }
     }
+	// there is a much lower bonus for continuation moves
+	else if (*movep == m->continuation) {
+		 if ( Swap(m->p, Fsq(*movep), Tsq(*movep) ) >= -100 ) {
+		     sortVal *= 3;
+			 sortVal /= 2;
+		     sortVal += 5000;
+		}
+	}
 
     *valuep++ = sortVal;
   }
@@ -292,7 +302,7 @@ void sFlatMoveList::Init(sPosition * p)
 	UNDO  undoData[1];       // data required to undo a move
 	int pv[MAX_PLY];
 
-	Selector.InitMoveList(p, 0, 0, 0); // prepare move selector
+	Selector.InitMoveList(p, 0, 0, 0, 0); // prepare move selector
 	nOfMoves = 0;
 	bestMove = 0;
 	bestVal = -INF;
