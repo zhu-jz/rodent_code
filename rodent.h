@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 36
-#define BENCH_8 1216352
+#define BUILD 42
+#define BENCH_8 1191156
 // #define FAST_TUNING 100000 // node limit for ultra-past tests
 
 #undef CDECL
@@ -167,6 +167,7 @@ typedef struct  // set of move lists subdivided into move classes
   int killer1;
   int killer2;
   int refutation;
+  int continuation;
   int *next;
   int *last;
   int move[MAX_MOVES];
@@ -186,7 +187,7 @@ private:
 public:
 	int CaptureIsBad(sPosition *p, int move);
 	void InitCaptureList(sPosition *p, int hashMove);
-	void InitMoveList(sPosition *p, int refMove, int transMove, int ply);
+	void InitMoveList(sPosition *p, int refMove, int contMove, int transMove, int ply);
 	int NextMove(int refutationSq, int *flag);
 	int NextCapture(void);
 };  // implemented in selector.c
