@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -19,8 +19,7 @@
 
 #pragma once
 
-// transposition table entry
-typedef struct {
+typedef struct {      // transposition table entry
   U64 key;
   short date;
   short move;
@@ -29,14 +28,12 @@ typedef struct {
   unsigned char depth;
 } ENTRY;
 
-// transposition table with access functions
-struct sTransTable {
+struct sTransTable {  // transposition table with access functions
 private:
   int tt_size;
   int tt_mask;
   int tt_date;
   ENTRY *tt;
-
 public:
   U64 InitHashKey(sPosition *p);
   U64 InitPawnKey(sPosition *p);
