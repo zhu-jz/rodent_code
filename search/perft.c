@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -80,7 +80,7 @@ int sSearcher::Perft(sPosition *p, int ply, int depth)
 	int refutationSq = 0;
 	int nOfMoves = 0;
 
-    Selector.InitMoveList(p, 0, move, ply);
+    Selector.InitMoveList(p, 0, 0, move, ply);
 
     while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
 
@@ -116,7 +116,7 @@ void sSearcher::Divide(sPosition *p, int ply, int depth)
 	int nOfMoves = 0;
 
 	Timer.SetStartTime();
-    Selector.InitMoveList(p, 0, move, ply);
+    Selector.InitMoveList(p, 0, 0, move, ply);
 
     while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
 	
