@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -44,9 +44,9 @@ void sSearcher::Init(void)
 	// set late move reduction depth using modified Stockfish formula
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
-           lmrSize[0][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // all node
-		   lmrSize[1][depth][moves] = 4* (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
-		   lmrSize[2][depth][moves] = 4*(0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25);  // cut node
+           lmrSize[0][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // all node
+		   lmrSize[1][depth][moves] = 4 * (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
+		   lmrSize[2][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // cut node
 
 		   for (int node = 0; node <= 2; node++) {
 			   if (lmrSize[node][depth][moves] > 2 * ONE_PLY)
@@ -204,7 +204,7 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
   if (!move && depth >= 4*ONE_PLY && !flagInCheck ) {
-	  Search(p, 0, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, newPv);
+	  Search(p, 0, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, 0, newPv);
 	  TransTable.RetrieveMove(p->hashKey, &move);
   }
 
@@ -230,11 +230,11 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 
 	 // PRINCIPAL VARIATION SEARCH
 	 if (best == -INF )
-       score =   -Search(p, 1, -beta,    -alpha, newDepth, NEW_NODE(PV_NODE), NO_NULL, move, newPv);
+       score =   -Search(p, 1, -beta,    -alpha, newDepth, NEW_NODE(PV_NODE), NO_NULL, move, 0, newPv);
      else {
-       score =   -Search(p, 1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, newPv);
+       score =   -Search(p, 1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, 0, newPv);
        if (!flagAbortSearch && score > alpha && score < beta)
-         score = -Search(p, 1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, newPv);
+         score = -Search(p, 1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, 0, newPv);
      }
 
      Manipulator.UndoMove(p, move, undoData);
@@ -282,7 +282,7 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
    return best;
 }
 
-int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv)
+int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv)
 {
   int best,                     // best value found at this node
 	  score,                    // score returned by a search started in this node
@@ -399,7 +399,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	  }
 		  
       Manipulator.DoNull(p, undoData);                            // NODE_ALL
-      nullScore = -Search(p, ply + 1, -beta, -beta + 1, newDepth, NEW_NODE(nodeType), WAS_NULL, 0, newPv);
+      nullScore = -Search(p, ply + 1, -beta, -beta + 1, newDepth, NEW_NODE(nodeType), WAS_NULL, 0, 0, newPv);
 
 	  // extract refutation of a null move from transposition table; usually 
 	  // it will be a capture and we will sort safe evasions above other quiet moves.
@@ -413,7 +413,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	  // verify null move in the endgame
 	  if (nullScore >= beta && p->pieceMat[p->side] < 1600 ) 
-          nullScore = Search(p, ply, alpha, beta, newDepth-ONE_PLY, CUT_NODE, NO_NULL, 0, newPv);
+          nullScore = Search(p, ply, alpha, beta, newDepth-ONE_PLY, CUT_NODE, NO_NULL, 0, 0, newPv); // BUG, should verify with lastMove
 
       if (nullScore >= beta) {
          // we don't want to overwrite real entries, as they are more useful for move ordering 
@@ -440,13 +440,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
   if (nodeType == PV_NODE && !move && depth >= 4*ONE_PLY && !flagInCheck ) {
-	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, newPv);
+	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, 0, newPv); // BUG, should use lastMove
 	  TransTable.RetrieveMove(p->hashKey, &move);
   } // end of internal iterative deepening code
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
-  Selector.InitMoveList(p, History.GetRefutation(lastMove), move, ply);
+  Selector.InitMoveList(p, History.GetRefutation(lastMove), History.GetContinuation(contMove), move, ply);
 
   // LOOP THROUGH THE MOVE LIST
   while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
@@ -518,6 +518,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      &&   depth <= minimalLmrDepth      // we are near the leaf	
 	 &&   movesTried > 12               // move is sufficiently down the list
 	 &&  !History.Refutes(lastMove, move)
+	 //&&  !History.Continues(contMove, move)
 	 // not pruning bad captures is worse - retested 2013-12-29
 	 ) {
 		 if (IsMoveOrdinary(flagMoveType) ) {
@@ -527,13 +528,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 		    { Manipulator.UndoMove(p, move, undoData); continue; }
 		 }
 
-	 	 // FUTILITY PRUNING OF PAWN CAPTURES
-	 if ( flagPawnCapt ) {
-		if (nodeEval < beta -500) { // TODO: test 300
-             Manipulator.UndoMove(p, move, undoData);
-             continue;
+	 	 // PSEUDO-FUTILITY PRUNING OF PAWN CAPTURES
+	     if ( flagPawnCapt ) {
+		    if (nodeEval < beta - 500) {
+                Manipulator.UndoMove(p, move, undoData);
+                continue;
 			}
-	 }
+	     }
 
 	 } // end of late move pruning code
 
@@ -545,6 +546,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 &&     movesTried > 3              // we're sufficiently down the move list
 	 &&     History.MoveIsBad(move)     // current move has bad history score
 	 &&    !History.Refutes(lastMove, move)
+	 //&&    !History.Continues(contMove, move)
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
@@ -563,11 +565,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // PRINCIPAL VARIATION SEARCH
 	 if (best == -INF )
-       score =   -Search(p, ply+1, -beta,    -alpha, newDepth, NEW_NODE(nodeType), NO_NULL, move, newPv);
+       score =   -Search(p, ply+1, -beta,    -alpha, newDepth, NEW_NODE(nodeType), NO_NULL, move, lastMove, newPv);
      else { 
-       score =   -Search(p, ply+1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, newPv);
+       score =   -Search(p, ply+1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, lastMove, newPv);
        if (!flagAbortSearch && score > alpha && score < beta)
-         score = -Search(p, ply+1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, newPv);
+         score = -Search(p, ply+1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, lastMove, newPv);
      }
 
      // FALLBACK TO NORMAL SEARCH IF REDUCED MOVE SEEMS GOOD
@@ -587,8 +589,10 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 		 IncStat(FAIL_HIGH);
 		 if (movesTried == 1) IncStat(FAIL_FIRST);
          History.OnGoodMove(p, lastMove, move, depth / ONE_PLY, ply);
-		 if (History.MoveChangesMaterialBalance(p, move) )
+		 if (History.MoveChangesMaterialBalance(p, move) ) {
 		    History.UpdateRefutation(lastMove, move);
+			History.UpdateContinuation(contMove, move);
+		 }		    
          TransTable.Store(p->hashKey, move, score, LOWER, depth, ply);
          return score;
      }
