@@ -32,6 +32,8 @@
 #include "search.h"
 #include "../eval/eval.h"
 
+static const int moveCountLimit[24] = {0, 0, 0, 0, 4, 4, 4, 4, 7, 7, 7, 7, 12, 12, 12, 12, 19, 19, 19, 19, 28, 28, 28, 28};
+
 void sSearcher::Init(void)
 {
 	aspiration       = 30;
@@ -513,40 +515,37 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
         continue;
 	 }
 
-	 // LATE MOVE PRUNING near the leaves (2012-04-02: two-tier approach)
-	 if ( flagCanReduce
-     &&   depth <= minimalLmrDepth      // we are near the leaf	
-	 &&   movesTried > 12               // move is sufficiently down the list
-	 &&  !History.Refutes(lastMove, move)
-	 //&&  !History.Continues(contMove, move)
-	 // not pruning bad captures is worse - retested 2013-12-29
-	 ) {
-		 if (IsMoveOrdinary(flagMoveType) ) {
- 		 if ( movesTried > 20 ) 
-		    { Manipulator.UndoMove(p, move, undoData); continue; }
-		 if ( History.MoveIsBad(move) ) 
-		    { Manipulator.UndoMove(p, move, undoData); continue; }
+     // LATE MOVE PRUNING near the leaves (2014-01-24: modelled after Toga II 3.0)
+     if ( flagCanReduce
+     &&   depth <= 5*ONE_PLY // we are near the leaf TODO: increase depth 
+     &&  !History.Refutes(lastMove, move) )
+     {
+         if (IsMoveOrdinary(flagMoveType) 
+         &&  normalMoveCnt > moveCountLimit[depth] ) { 
+		 if (normalMoveCnt > moveCountLimit[depth] / 2 )  
+			 { Manipulator.UndoMove(p, move, undoData); continue; }
+	 		 if (History.MoveIsBad(move) ) 
+			 { Manipulator.UndoMove(p, move, undoData); continue; }
 		 }
+         
+         // PSEUDO-FUTILITY PRUNING OF PAWN CAPTURES
+		 if ( flagPawnCapt ) {
+              if (nodeEval < beta - 500) {
+                   Manipulator.UndoMove(p, move, undoData);
+                   continue;
+              }
+		  }
 
-	 	 // PSEUDO-FUTILITY PRUNING OF PAWN CAPTURES
-	     if ( flagPawnCapt ) {
-		    if (nodeEval < beta - 500) {
-                Manipulator.UndoMove(p, move, undoData);
-                continue;
-			}
-	     }
-
-	 } // end of late move pruning code
+     } // end of late move pruning code
 
 	 // LATE MOVE REDUCTION
 	 if  ( !flagInCheck 
 	 &&    !depthChange 
 	 &&     AvoidReduction(move, flagMoveType)
-     &&     depth >= minimalLmrDepth    // we have some depth left
-	 &&     movesTried > 3              // we're sufficiently down the move list
-	 &&     History.MoveIsBad(move)     // current move has bad history score
-	 &&    !History.Refutes(lastMove, move)
-	 //&&    !History.Continues(contMove, move)
+     &&     depth >= minimalLmrDepth        // we have some depth left
+	 &&     movesTried > 3                  // we're sufficiently down the move list
+	 &&     History.MoveIsBad(move)         // current move has bad history score
+	 &&    !History.Refutes(lastMove, move) // move is not tactically important
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
