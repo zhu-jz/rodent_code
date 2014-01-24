@@ -43,7 +43,7 @@ const int pstKnightMg[64] =
    -35, -25, -15, -10, -10, -15, -25, -35,
    -20, -10,   0,   5,   5,   0, -10, -20, 
    -10,   0,  10,  15,  15,  10,   0, -10, 
-    -5,   5,  15,  20,  20,  15,   5,  -5,
+	-5,   5,  15,  20,  20,  15,   5,  -5,
     -5,   5,  15,  20,  20,  15,   5,  -5,
    -20, -10,   0,   5,   5,   0, -10, -20,
   -135, -25, -15, -10, -10, -15, -25, -135
@@ -64,7 +64,7 @@ const int pstBishopMg[64] =
 
 const int pstKnightOutpost[64] = 
 {   
-     0,   0,   0,   0,   0,   0,   0,   0,
+	 0,   0,   0,   0,   0,   0,   0,   0,
      0,   0,   0,   0,   0,   0,   0,   0,
      0,   0,   0,   0,   0,   0,   0,   0,
      0,   2,   3,   6,   6,   3,   2,   0,
@@ -128,6 +128,12 @@ void sData::InitPstValues(void)
 	  pawnProperty[BACKWARD] [MG] [side] [REL_SQ(sq,side)] = pawnBackwardMg[File(sq)];
 	  pawnProperty[BACKWARD] [EG] [side] [REL_SQ(sq,side)] = pawnBackwardEg[File(sq)];
 
+	  // special case code to fix common Rodent error of creating a backward pawn for no good reason
+	  if (SqBb(sq) & bbRelRank[WHITE][RANK_3]) {
+	     pawnProperty[BACKWARD] [MG] [side] [REL_SQ(sq,side)] += pawnBackwardMg[File(sq)];
+	     pawnProperty[BACKWARD] [EG] [side] [REL_SQ(sq,side)] += pawnBackwardEg[File(sq)];
+	  }
+
 	  outpost[side][N][REL_SQ(sq,side)] = pstKnightOutpost[sq];
 	  outpost[side][B][REL_SQ(sq,side)] = pstBishopOutpost[sq];
 	  outpost[side][R][REL_SQ(sq,side)]   = pstRookOutpost[sq];
@@ -156,7 +162,7 @@ int sData::GetRookMgPst(int sq)
 int sData::GetPhalanxPstMg(int sq)
 {
     if (sq == D4) return 15;             // D4/E4 pawns
-    if (sq == D3) return 10;             // D3/E3 pawns
-    if (sq == C4 || sq == E4) return 10; // C4/D4 or E4/F4 pawns
-    return 0;
+	if (sq == D3) return 10;             // D3/E3 pawns
+	if (sq == C4 || sq == E4) return 10; // C4/D4 or E4/F4 pawns
+	return 0;
 }
