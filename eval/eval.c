@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -61,6 +61,8 @@ void sEvaluator::InitStaticScore(void)
      mgScore            = 0;   egScore            = 0;  // clear midgame/endgame score component
      pawnScoreMg[WHITE] = 0;   pawnScoreMg[BLACK] = 0;  // clear midgame pawn scores
      pawnScoreEg[WHITE] = 0;   pawnScoreEg[BLACK] = 0;  // clear endgame pawn scores	 
+     passerScoreMg[WHITE] = 0;   passerScoreMg[BLACK] = 0;  // clear midgame pawn scores
+     passerScoreEg[WHITE] = 0;   passerScoreEg[BLACK] = 0;  // clear endgame pawn scores
 }
 
 void sEvaluator::InitDynamicScore(sPosition *p) 
@@ -70,6 +72,7 @@ void sEvaluator::InitDynamicScore(sPosition *p)
 	 attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
 	 checkCount[WHITE]       = 0;   checkCount[BLACK]  = 0;
 	 attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
+	 kingTropism[WHITE]      = 0;   kingTropism[BLACK] = 0;
 	 mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
 	 egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
 	 mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
@@ -291,6 +294,7 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  egScore += ( egMobility[WHITE] - egMobility[BLACK] );
 	  mgScore += ( mgMisc[WHITE]     - mgMisc[BLACK]     );
 	  egScore += ( egMisc[WHITE]     - egMisc[BLACK]     );
+	  mgScore += ( (kingTropism[WHITE] - kingTropism[BLACK]) * Data.tropismWeight ) / 100;
 	  score   += Interpolate();    // merge middlegame and endgame scores
 	  score   += ( attScore[WHITE]  - attScore[BLACK] );
 #ifdef LAZY_EVAL
@@ -335,8 +339,8 @@ int sEvaluator::ReturnFast(sPosition *p)
 
 int sEvaluator::Normalize(int val, int limit) 
 {
-    if (val > limit)       return limit;
-    else if (val < -limit) return -limit;
+	if (val > limit)       return limit;
+	else if (val < -limit) return -limit;
     return val;
 }
 
@@ -356,7 +360,7 @@ int sEvaluator::FinalizeScore(sPosition * p, int score)
 void sEvaluator::ScaleValue(int * value, int factor) 
 {
      *value *= factor;
-     *value /= 1000;
+	 *value /= 1000;
 }
 
 void sEvaluator::DebugPst(sPosition *p) 
@@ -370,9 +374,9 @@ void sEvaluator::DebugPst(sPosition *p)
 	 {
 	     bbPieces = bbPc(p, cl, pc);
 	     while (bbPieces) {
-               sq = PopFirstBit(&bbPieces);
+           sq = PopFirstBit(&bbPieces);
 	       mg += Data.pstMg[cl][pc][sq] * clMult[cl];
-	       eg += Data.pstEg[cl][pc][sq] * clMult[cl];
+		   eg += Data.pstEg[cl][pc][sq] * clMult[cl];
 	     }
 	 }
 	 printf("Recalculated pst : mg %d eg %d\n", mg, eg);
