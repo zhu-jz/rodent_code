@@ -36,6 +36,7 @@
   const int rAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
   const int qAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
 
+  const int tropism           [7] = { 0,   3,   2,   2,   2,   0,  0 };
   const int outpostBase       [7] = { 0,   4,   4,   0,   0,   0,  0 };
   const int rookOpenAttack    [2] = { 0,  2 };
   const int rookSemiOpenAttack[2] = { 0,  1 };
@@ -67,6 +68,8 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	bbAllAttacks[side] |= bbMob;               // update attack data
 	bbMob &= ~p->bbCl[side];                   // exclude squares occupied by own pieces
 	ScoreRelationToPawns(p, side, N, sq);      // outpost, attacked or defended by a pawn
+	if (Data.tropismWeight)
+	   ScoreKingTropism(p, side, N, sq);          // tropism to enemy king
 
 	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, nAttacks[P], nAttacks[P]);
@@ -106,7 +109,9 @@ void sEvaluator::ScoreB(sPosition *p, int side)
     sq = PopFirstBit(&bbPieces);                 // set piece location and clear it from bbPieces
 	bbMob = GenCache.GetBishMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbMob;                 // update attack data
-	ScoreRelationToPawns(p, side, B, sq);    
+	ScoreRelationToPawns(p, side, B, sq);        // outpost, attacked or defended by a pawn
+    if (Data.tropismWeight)
+	   ScoreKingTropism(p, side, B, sq);            // tropism to enemy king
 
 	// pawns on bishop color
 	if (bbWhiteSq & SqBb(sq) ) { 
@@ -163,7 +168,9 @@ void sEvaluator::ScoreR(sPosition *p, int side)
     sq = PopFirstBit(&bbPieces);                 // set piece location and clear it from bbPieces
 	bbMob = GenCache.GetRookMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbMob;                 // update attack data
-	ScoreRelationToPawns(p, side, R, sq);         
+	ScoreRelationToPawns(p, side, R, sq);        // outpost, attacked or defended by a pawn
+    if (Data.tropismWeight)
+	   ScoreKingTropism(p, side, R, sq);         // tropism to enemy king
 
 	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, rAttacks[P], rAttacks[P]);
@@ -237,6 +244,8 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
     sq = PopFirstBit(&bbPieces);                  // set piece location and clear it from bbPieces 
 	bbMob = GenCache.GetQueenMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbMob;                  // update attack data
+	if (Data.tropismWeight)
+	   ScoreKingTropism(p, side, Q, sq);          // tropism to enemy king
 
 	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, qAttacks[P], qAttacks[P]);
@@ -296,7 +305,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
   U64 bbPieces = bbPc(p, side, P);
   U64 bbOccupied = OccBb(p);
   U64 bbStop, bbBack, bbObstacles;
-
+  
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);
 	bbStop = ShiftFwd(SqBb(sq), side);
@@ -329,8 +338,8 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 
 		// control of stop square
 		if (bbStop &~ bbAllAttacks[oppo] ) {
-                   AddMisc(side,  passUnitMg,  passUnitEg);
-                   if (bbStop & bbAllAttacks[side] ) AddMisc(side,  passUnitMg,  passUnitEg);
+           AddMisc(side,  passUnitMg,  passUnitEg);
+           if (bbStop & bbAllAttacks[side] ) AddMisc(side,  passUnitMg,  passUnitEg);
 		}
 	}
   }
@@ -353,6 +362,18 @@ void sEvaluator::AddMisc(int side, int mg, int eg)
 {
 	mgMisc[side] += mg;
 	egMisc[side] += eg;
+}
+
+void sEvaluator::ScoreKingTropism(sPosition *p, int side, int piece, int sq) 
+{
+	const int oppo = Opp(side);
+
+	int king_file = File(p->kingSquare[oppo]);
+    int king_rank = Rank(p->kingSquare[oppo]);
+	int pc_file = File(sq);
+    int pc_rank = Rank(sq);
+	// tropism formula from GambitFruit
+	kingTropism[side] += tropism[piece] * 8 - (((Abs(king_file-pc_file) + Abs(king_rank-pc_rank)) * tropism[piece]));
 }
 
 void sEvaluator::ScoreRelationToPawns(sPosition *p, int side, int piece, int sq) 
