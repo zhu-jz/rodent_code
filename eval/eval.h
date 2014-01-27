@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -50,8 +50,8 @@ private:
   int pawnScoreEg[2];      // endgame pawn structure scores
   int passerScoreMg[2];    // midgame passed pawn scores
   int passerScoreEg[2];    // endgame passed pawn scores 
-  U64 bbPawnTakes[2];    // squares controlled by pawns, used in mobility eval (pawn eval uses only occupancy masks)
-  U64 bbPawnCanTake[2]; // squares that can be controlled by pawns as they advance, used in outpost eval
+  U64 bbPawnTakes[2];      // squares controlled by pawns, used in mobility eval (pawn eval uses only occupancy masks)
+  U64 bbPawnCanTake[2];    // squares that can be controlled by pawns as they advance, used in outpost eval
   U64 bbDiagChecks[2];
   U64 bbStraightChecks[2];
   U64 bbKnightChecks[2];
@@ -61,7 +61,8 @@ private:
   int attCount[2];         // attack counter based on square control
   int checkCount[2];       // check threat counter
   int attNumber[2];        // no. of pieces participating in the attack
-  int attWood[2];
+  int attWood[2];          // weight of material participating in the attack
+  int kingTropism[2];      // tropism to enemy king
   int mgFact,  egFact;     // material-driven scaling factors
   int mgScore, egScore;    // partial midgame and endgame scores (to be scaled)
 
@@ -94,6 +95,7 @@ private:
   void ScoreKingShield(sPosition *p, int side);
   void ScoreKingAttacks(sPosition *p, int side);
   void ScoreRelationToPawns(sPosition *p, int side, int piece, int sq);
+  void ScoreKingTropism(sPosition *p, int side, int piece, int sq);
   void ScoreHanging(sPosition *p, int side);
   int  EvalKingFile(sPosition * p, int side, U64 bbFile);
   int  EvalFileShelter(U64 bbOwnPawns, int side);
