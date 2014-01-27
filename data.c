@@ -159,7 +159,7 @@ void sData::InitOptions(void) // init user-accessible stuff
 	 passedPawns     = 105; // 100 is worse, 110 might be marginally better
 	 pawnStruct      = 100;
 	 bishopPair      = 50; 
-	 verbose         = 0;       // no additional display
+     verbose         = 0;       // no additional display
 	 elo             = MAX_ELO; // no weakening
 	 contempt        = 12;
 	 isAnalyzing     = 0;
@@ -168,6 +168,8 @@ void sData::InitOptions(void) // init user-accessible stuff
 	 useLearning     = 0;
 	 bookFilter      = 10;
 	 lazyMargin      = 180;     // WAS 180
+	 tropismWeight   = 0;
+	 timeDivisor     = 36;      // WAS 40
 }
 
 // used at the beginning of search to set scaling factors for eval components
