@@ -233,7 +233,6 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	}
 #endif
 
-  int fullEval = 0;
   int score = GetMaterialScore(p) + CheckmateHelper(p);
   p->side == WHITE ? score+=5 : score-=5;
 
@@ -248,16 +247,6 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
   mgScore += (p->pstMg[WHITE] - p->pstMg[BLACK]);
   egScore += (p->pstEg[WHITE] - p->pstEg[BLACK]);
   
-#ifdef LAZY_EVAL
-  int tempScore = score + Interpolate();
-
-  // lazy evaluation - avoids costly calculations
-  // if score seems already very high/very low
-  if (tempScore > alpha - Data.lazyMargin 
-  &&  tempScore < beta  + Data.lazyMargin
-  ) {
-#endif
-	  fullEval = 1;
 	  InitDynamicScore(p);
 
       ScoreN(p, WHITE);
@@ -297,19 +286,14 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  mgScore += ( (kingTropism[WHITE] - kingTropism[BLACK]) * Data.tropismWeight ) / 100;
 	  score   += Interpolate();    // merge middlegame and endgame scores
 	  score   += ( attScore[WHITE]  - attScore[BLACK] );
-#ifdef LAZY_EVAL
-  }
-  else score = tempScore; 
-#endif
+
 
   score = PullToDraw(p, score);    // decrease score in drawish endgames
   score = FinalizeScore(p, score); // bounds, granulatity and weakening
 
 #ifdef HASH_EVAL
-  if (fullEval) {
   EvalTT[addr].key = p->hashKey;
   EvalTT[addr].score = score;
-  }
 #endif
 
   // return score relative to the side to move
@@ -380,4 +364,25 @@ void sEvaluator::DebugPst(sPosition *p)
 	     }
 	 }
 	 printf("Recalculated pst : mg %d eg %d\n", mg, eg);
+}
+
+void sEvaluator::PrintEval(sPosition *p) 
+{
+    Data.InitAsymmetric(p->side);
+	int result = ReturnFull(p, -INF, INF);
+	if (p->side == BLACK) result *= -1;
+	printf("Total      : %d\n", result);
+	printf("Phase      : %2d of 24 \n", mgFact);
+	printf("Material   : %d\n", GetMaterialScore(p) );
+	printf("Pst        : "); PrintEvalFactor( p->pstMg[WHITE], p->pstMg[BLACK], p->pstEg[WHITE], p->pstEg[BLACK]);
+	printf("Mobility   : "); PrintEvalFactor( mgMobility[WHITE], mgMobility[BLACK], egMobility[WHITE], egMobility[BLACK]);
+	printf("King attack: "); PrintEvalFactor( attScore[WHITE], attScore[BLACK], attScore[WHITE], attScore[BLACK]);
+	printf("Others     : "); PrintEvalFactor( mgMisc[WHITE], mgMisc[BLACK], egMisc[WHITE], egMisc[BLACK]);
+}
+ 
+void sEvaluator::PrintEvalFactor(int mgW, int mgB, int egW, int egB)
+{
+	int mg = mgW - mgB;
+	int eg = egW - egB;
+	printf("mg: %4d, eg:%3d, scaled: %3d\n", mg, eg,  (mgFact * mg ) / 24 + (egFact * eg ) / 24   );
 }
