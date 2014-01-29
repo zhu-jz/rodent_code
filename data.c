@@ -167,7 +167,6 @@ void sData::InitOptions(void) // init user-accessible stuff
 	 useWeakening    = 0;
 	 useLearning     = 0;
 	 bookFilter      = 10;
-	 lazyMargin      = 180;     // WAS 180
 	 tropismWeight   = 0;
 	 timeDivisor     = 36;      // WAS 40
 }
