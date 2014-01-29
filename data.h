@@ -58,7 +58,6 @@ public:
  int lmrHistLimit;     // what value of history counter prevents lmr?
  int deltaMargin;      // margin for a delta pruning in quiescence search 
  int goodCaptMargin;   // margin of a loss that can be incurred without classifying capture as "bad"
- int lazyMargin;       // margin for lazy evaluation cutoff
  int verbose;          // shall we output more information about search than bare minimum?
  int useLearning;      // shall we use position learning?
  int isAnalyzing;
