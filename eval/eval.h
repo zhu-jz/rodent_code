@@ -111,7 +111,7 @@ public:
   void DebugPst(sPosition *p);
   void PrintEval(sPosition *p);
   int ReturnFast(sPosition *p);
-  int ReturnFull(sPosition *p, int alpha, int beta);
+  int ReturnFull(sPosition *p);
 };
 
 extern struct sEvaluator Eval;
