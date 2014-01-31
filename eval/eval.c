@@ -88,7 +88,6 @@ void sEvaluator::InitDynamicScore(sPosition *p)
  	 bbRookCoorAttacks[WHITE]   = 0ULL;
 	 bbRookCoorAttacks[BLACK]   = 0ULL;
 
-
 	 // set squares from which king can be checked 
 	 U64 bbOccupied = OccBb(p);
 	 bbStraightChecks[WHITE] = RAttacks(bbOccupied, KingSq(p, WHITE) );  
@@ -223,7 +222,7 @@ void sEvaluator::ScorePatterns(sPosition *p, int side)
 		AddMisc(side, mgTwoOnSeventh,egTwoOnSeventh);
 }
 
-int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
+int sEvaluator::ReturnFull(sPosition *p)
 {
 #ifdef HASH_EVAL
 	int addr = p->hashKey % EVAL_HASH_SIZE;
@@ -369,7 +368,7 @@ void sEvaluator::DebugPst(sPosition *p)
 void sEvaluator::PrintEval(sPosition *p) 
 {
     Data.InitAsymmetric(p->side);
-	int result = ReturnFull(p, -INF, INF);
+	int result = ReturnFull(p);
 	if (p->side == BLACK) result *= -1;
 	printf("Total      : %d\n", result);
 	printf("Phase      : %2d of 24 \n", mgFact);
