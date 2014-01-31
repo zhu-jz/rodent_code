@@ -198,7 +198,7 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
 
   if (flagInCheck) {
 
-	Selector.InitMoveList(p, move, 0);
+	Selector.InitMoveList(p, 0, 0, move, 0);
 
 	while ( move = Selector.NextMove(0, &unusedFlag) ) {      // on finding next move
 	  
