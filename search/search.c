@@ -352,7 +352,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   }
   
   // SAFEGUARD AGAINST HITTING MAX PLY LIMIT
-  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
+  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p);
 
   // DETERMINE IF WE CAN APPLY PRUNING
   int flagCanPrune 
@@ -391,7 +391,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   &&  !wasNull
   &&   p->pieceMat[p->side] > Data.matValue[N]) 
   {
-    if ( beta <= Eval.ReturnFull(p, alpha, beta) ) {
+    if ( beta <= Eval.ReturnFull(p) ) {
 
       newDepth = SetNullDepth(depth);
 
@@ -434,7 +434,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
    &&   depth <= 3*ONE_PLY) {
       int threshold = beta - 300 - (depth-ONE_PLY) * 15;
 
-      if (Eval.ReturnFull(p, alpha, beta) < threshold) {
+      if (Eval.ReturnFull(p) < threshold) {
 		 score = Quiesce(p, ply, 0, alpha, beta, 0, pv); 
          if (score < threshold) return score;
       }
