@@ -118,18 +118,19 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
 	bbHanging &= ~bbPc(p, Opp(side), P);  // currently we don't evaluate threats against pawns
 
 	U64 bbSpace = UnoccBb(p) & bbAllAttacks[side];
-	bbSpace &= ~bbRelRank[side][RANK_1];    // controlling home ground is not space advantage
+	bbSpace &= ~bbRelRank[side][RANK_1];  // controlling home ground is not space advantage
 	bbSpace &= ~bbRelRank[side][RANK_2];
 	bbSpace &= ~bbRelRank[side][RANK_3];
-	bbSpace &= ~bbPawnTakes[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
-	AddMisc(side, PopCnt(bbSpace), 0);
+	bbSpace &= ~bbPawnTakes[Opp(side)];   // squares attacked by enemy pawns aren't effectively controlled
+	AddMisc(side, 2*PopCnt(bbSpace), 0);  // actually bonus is for control of squares within enemy camp
+	
 	int pc, sq, val;
-
+	
     while (bbHanging) {
        sq  = FirstOne(bbHanging);
 	   pc  = TpOnSq(p, sq);
 	   val = Data.matValue[pc] / 64;
-	   AddMisc(side, 10+val, 18+val);
+	   AddMisc(side, 10+val, 18+val);     // values from DiscoCheck by Lucas Braesch
 	   bbHanging &= bbHanging - 1;
 	}
 }
