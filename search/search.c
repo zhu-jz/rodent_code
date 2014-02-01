@@ -67,6 +67,7 @@ void sSearcher::Think(sPosition *p, int *pv)
   isReporting         = 1;
   nodes               = 0;
   flagAbortSearch     = 0;
+  Eval.printing       = 0;
   History.OnNewSearch();
   TransTable.ChangeDate();
   Timer.SetStartTime();
