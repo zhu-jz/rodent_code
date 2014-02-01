@@ -170,9 +170,9 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 {
   int result = 0;
   if (bbFile & bbCentralFile) result += (EvalFileShelter( bbFile & bbPc(p, side, P), side ) / 2);
-  else                        result +=  EvalFileShelter( bbFile & bbPc(p, side, P), side );
+  else result += EvalFileShelter( bbFile & bbPc(p, side, P), side );
 
-  return result + EvalFileStorm  ( bbFile & bbPc(p, Opp(side), P), side );
+  return result + EvalFileStorm ( bbFile & bbPc(p, Opp(side), P), side );
 }
 
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
@@ -369,20 +369,29 @@ void sEvaluator::DebugPst(sPosition *p)
 void sEvaluator::PrintEval(sPosition *p) 
 {
     Data.InitAsymmetric(p->side);
+	printing = 1;
 	int result = ReturnFull(p);
+	printing = 0;
 	if (p->side == BLACK) result *= -1;
 	printf("Total      : %d\n", result);
 	printf("Phase      : %2d of 24 \n", mgFact);
 	printf("Material   : %d\n", GetMaterialScore(p) );
-	printf("Pst        : "); PrintEvalFactor( p->pstMg[WHITE], p->pstMg[BLACK], p->pstEg[WHITE], p->pstEg[BLACK]);
-	printf("Mobility   : "); PrintEvalFactor( mgMobility[WHITE], mgMobility[BLACK], egMobility[WHITE], egMobility[BLACK]);
-	printf("King attack: "); PrintEvalFactor( attScore[WHITE], attScore[BLACK], attScore[WHITE], attScore[BLACK]);
-	printf("Others     : "); PrintEvalFactor( mgMisc[WHITE], mgMisc[BLACK], egMisc[WHITE], egMisc[BLACK]);
+	printf("------------------------------------------------\n");
+	printf("              |  mgW , mgB |  egW , egB | scaled:\n");
+	printf("------------------------------------------------\n");
+	printf("Pst         : "); PrintEvalFactor( p->pstMg[WHITE], p->pstMg[BLACK], p->pstEg[WHITE], p->pstEg[BLACK]);
+	printf("Mobility    : "); PrintEvalFactor( mgMobility[WHITE], mgMobility[BLACK], egMobility[WHITE], egMobility[BLACK]);
+	printf("Passers     : "); PrintEvalFactor( passerScoreMg[WHITE], passerScoreMg[BLACK], passerScoreEg[WHITE], passerScoreEg[BLACK]);
+	printf("Pawn struct : "); PrintEvalFactor( pawnScoreMg[WHITE], pawnScoreMg[BLACK], pawnScoreEg[WHITE], pawnScoreEg[BLACK]);
+	printf("King tropism: "); PrintEvalFactor( kingTropism[WHITE], kingTropism[BLACK], 0, 0);
+	printf("King attack : "); PrintEvalFactor( attScore[WHITE], attScore[BLACK], attScore[WHITE], attScore[BLACK]);
+	printf("Others      : "); PrintEvalFactor( mgMisc[WHITE], mgMisc[BLACK], egMisc[WHITE], egMisc[BLACK]);
+	printf("------------------------------------------------\n");
 }
  
 void sEvaluator::PrintEvalFactor(int mgW, int mgB, int egW, int egB)
 {
 	int mg = mgW - mgB;
 	int eg = egW - egB;
-	printf("mg: %4d, eg:%3d, scaled: %3d\n", mg, eg,  (mgFact * mg ) / 24 + (egFact * eg ) / 24   );
+	printf("| %4d, %4d | %4d, %4d | %3d\n", mgW, mgB, egW, egB,  (mgFact * mg ) / 24 + (egFact * eg ) / 24   );
 }
