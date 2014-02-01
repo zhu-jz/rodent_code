@@ -98,6 +98,7 @@ private:
   void ScoreHanging(sPosition *p, int side);
   int  EvalKingFile(sPosition * p, int side, U64 bbFile);
   int  EvalFileShelter(U64 bbOwnPawns, int side);
+  int  EvalKingFileShelter(U64 bbOwnPawns, int side);
   int  EvalFileStorm(U64 bbOppPawns, int side);
   int  EvalTrappedKnight(sPosition *p);
   int  EvalTrappedBishop(sPosition *p, int side);
@@ -106,6 +107,7 @@ private:
   int  FinalizeScore(sPosition *p, int score);
   void PrintEvalFactor(int mgW, int mgB, int egW, int egB);
 public:
+  int printing;
   int Normalize(int val, int limit);
   void ScaleValue(int * value, int factor);
   void DebugPst(sPosition *p);
