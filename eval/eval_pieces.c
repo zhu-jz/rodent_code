@@ -382,15 +382,17 @@ void sEvaluator::ScoreRelationToPawns(sPosition *p, int side, int piece, int sq)
 
 	if ( SqBb(sq) & bbPawnTakes[oppo] )  
 		AddMisc(side, -pAttacks[piece], -pAttacks[piece]); // piece attacked by a pawn
-	else if ( SqBb(sq) & bbPawnTakes[side] )  
+	else {
+		if ( SqBb(sq) & bbPawnTakes[side] )  
 		AddMisc(side, pawnDefendsMg[piece], pawnDefendsEg[piece]); // piece defended by a pawn
 
-	// constant bonus if piece occupies hole of enemy pawn structure
-	if ( SqBb(sq) & ~bbPawnCanTake[oppo] ) {
-		AddMisc(side, outpostBase[piece], outpostBase[piece] );
+	    // constant bonus if piece occupies hole of enemy pawn structure
+	    if ( SqBb(sq) & ~bbPawnCanTake[oppo] ) {
+		   AddMisc(side, outpostBase[piece], outpostBase[piece] );
 
-	   // additional pst bonus if piece occupying a hole is defended by a pawn
-	   if ( SqBb(sq) & bbPawnTakes[side] ) 
+	    // additional pst bonus if piece occupying a hole is defended by a pawn
+	    if ( SqBb(sq) & bbPawnTakes[side] ) 
 		   AddMisc(side, Data.outpost[side][piece][sq], Data.outpost[side][piece][sq] );
+		}
 	}
 }
