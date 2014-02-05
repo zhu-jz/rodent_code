@@ -113,6 +113,11 @@ void sEvaluator::ScoreB(sPosition *p, int side)
     if (Data.tropismWeight)
 	   ScoreKingTropism(p, side, B, sq);            // tropism to enemy king
 
+	// bishop on the rim needs escape route
+	if ( (SqBb(sq) & bbFILE_A) || (SqBb(sq) & bbFILE_H) ) {
+		if (bbPawnTakes[side] & SqBb(sq) ) AddMisc(side,-4,-4);
+	}
+
 	// pawns on bishop color
 	if (bbWhiteSq & SqBb(sq) ) { 
 		ownPawnCnt = PopCntSparse( bbWhiteSq & bbPc(p, side, P) ) - 4;
