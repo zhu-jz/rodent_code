@@ -355,6 +355,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   // SAFEGUARD AGAINST HITTING MAX PLY LIMIT
   if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p);
 
+   int flagPromotingPawns = 0;
+  if (bbPc(p,p->side,P) & bbRelRank[p->side][RANK_7] ) flagPromotingPawns = 1;
+
   // DETERMINE IF WE CAN APPLY PRUNING
   int flagCanPrune 
   =  (nodeType != PV_NODE) 
@@ -431,6 +434,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
    // RAZORING based on Toga II 4.0
    if ( nodeType != PV_NODE 
    &&  !flagInCheck 
+   &&  !flagPromotingPawns
    &&  !move
    &&   depth <= 3*ONE_PLY) {
       int threshold = beta - 300 - (depth-ONE_PLY) * 15;
@@ -517,8 +521,10 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 }
 
      // LATE MOVE PRUNING near the leaves (2014-01-24: modelled after Toga II 3.0)
+	 // the most important change is that for earlier moves we need confirmation 
+	 // by history heuristic
      if ( flagCanReduce
-     &&   depth <= 5*ONE_PLY // we are near the leaf TODO: increase depth 
+     &&   depth <= 5*ONE_PLY // we are near the leaf
      &&  !History.Refutes(lastMove, move) )
      {
          if (IsMoveOrdinary(flagMoveType) 
