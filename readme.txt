@@ -72,16 +72,10 @@ IV. The most important changes (comparing with Sungorus 1.4) include:
 - enabling fractional extensions and reductions
 - rewriting piece/square code, so that we can use asymmetric pst tables 
   and interpolate between midgame and endgame scores
-- adding futility pruning
-- adding "sliding LMR" (see section on search)
-- adding eval pruning (inspired by DiscoCheck)  
-- adding many evaluation features and weights from Toga LOG user manual  
-- adding logarithmic king safety function  
 - some speed optimizations, including pawn hash table and specialized
   PopCnt functions (thanks to Dann Corbit)
-- opening book in a silly proprietary format
+- Polyglot opening book
 - position learning
-- weaker levels of play
 
 V. SEARCH
 
@@ -92,14 +86,9 @@ V. SEARCH
 - futility pruning (added)
 - late move reduction from Stockfish / Toga II 3.0 (added)
 - late move pruning (added)
-- eval pruning (a.k.a. static null move)
+- eval pruning (a.k.a. static null move, inspired by DiscoCheck)
 - internal iterative deepening in pv nodes
-
-Rodent uses PVS search with null move and transposition table inherited 
-from Sungorus. It has been enhanced in several standard ways - by adding 
-futility pruning, internal iterative deepening in pv nodes, check extension,
-Stockfish-like null move pruning and using capture threats uncovered by 
-null move for better move sorting.
+- move sorting using null move threat, refutation and continuation moves
 
 VI. EVALUATION
 
@@ -124,13 +113,9 @@ certain blockages. However, this solution passed the tests.
 
 VII. OPENING BOOK
 
-Since version 0.14 Rodent uses its own opening book, encoded in a rather
-inefficient manner. At startup, it reads two files: one of guide books 
-written in a human readable format, stored in books folder, and bigbook.wtf 
-using Rodent's own ugly format (hence the file extension). 
-
-Rodent first looks for moves from the guide book, and if none is found, 
-it falls back to big main book.
+Rodent uses two opening books: small guide books supplied in text format
+and main .bin books (polyglot format). It first looks for moves from 
+the guide book, and if none is found, it falls back to big main book.
 
 Guide books encode one opening in each line, and its format looks like that:
 
@@ -139,36 +124,15 @@ e2e4 d7d5!! e4d5 d8d5 b1c3 d8d6!
 
 It allows users to express their preferences. If they for example want
 to practice Ruy Lopez or Pirc Defense or force Rodent to play unusual lines.
-Moves may be followed by punctuation marks: ? (frequency -= 100), 
+Moves may be followed by punctuation marks: ? (frequency -= 100)
 ! (frequency += 100), ?? (frequency -= 5000), !! (frequency += 5000). 
-A move with "xx" appended will be deleted from the main book permanently.
 
-A really desperate user might even create main opening book. All he needs
-is any of files called feed.txt, feedwhite.txt and feedblack.txt placed 
-in the program directory, Rodent opened in the console mode and manually 
-typed command "feedbook". Program first reads bigbook.wtf (if found), then 
-supplements it with the lines froom feed files, then chokes itself on shaker 
-sort algorithm while displaying number of its iterations, and finally saves 
-a file called newbook.wtf. At this stage user MUST RENAME newbook.wtf 
-to bigbook.wtf. This is a precaution allowing to save old book in case that
-user considers feed files corrupt.
+Because I'm not confident about my book making skills, move picking algorithm 
+tries to replace manual tuning by discarding moves with weight lesser than 10% 
+of best move's weight.
 
-Calling "feedbook" with a number causes Rodent to verify new book moves 
-with a search to the desired depth. It takes insanely long, though.
-
-Rodent contains small utility reformatting book files from something like:
-
-e2e4e7e6d2d4d7d5b1c3f8b4
-
-to version with spaces between the moves. In order to do this, one needs
-to copy "dense" opening book into the file "dense.txt", open Rodent in the
-console mode and type command "split". Result will be saved in "loose.txt".
-
-Another additional command is "bookdoctor". This command causes Rodent
-to investigate its main book file and stop at first point where it finds
-an infrequent move or missing transposition into book line. In both cases 
-it would be prudent to decide whether a move should be upgraded or marked 
-as unplayable. "bookdoctor" command needs a depth parameter.
+For now Rodent 1.3 reads only a book file called rodent.bin placed directly 
+in its folder, so if You want to use different, better book, You must rename it.
 
 VIII. WEAKENING
 
