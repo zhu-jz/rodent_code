@@ -355,9 +355,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   // SAFEGUARD AGAINST HITTING MAX PLY LIMIT
   if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p);
 
-   int flagPromotingPawns = 0;
-  if (bbPc(p,p->side,P) & bbRelRank[p->side][RANK_7] ) flagPromotingPawns = 1;
-
   // DETERMINE IF WE CAN APPLY PRUNING
   int flagCanPrune 
   =  (nodeType != PV_NODE) 
@@ -378,6 +375,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   &&   flagCanPrune
   &&   depth <= minimalNullDepth
   &&  !wasNull
+  &&  !move
   &&   p->pieceMat[p->side] > Data.matValue[N]) {
      Manipulator.DoNull(p, undoData);
      score = -Quiesce(p, ply, 0, -beta, -beta+1, 0, pv);
@@ -434,7 +432,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
    // RAZORING based on Toga II 4.0
    if ( nodeType != PV_NODE 
    &&  !flagInCheck 
-   &&  !flagPromotingPawns
+   &&  !(bbPc(p,p->side,P) & bbRelRank[p->side][RANK_7] ) // no pawns to promote in one move
    &&  !move
    &&   depth <= 3*ONE_PLY) {
       int threshold = beta - 300 - (depth-ONE_PLY) * 15;
@@ -464,7 +462,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	     if (++normalMoveCnt == 1) {   
             if ( depth < futilityDepth * ONE_PLY  // we are sufficiently close to the leaf
             && flagCanPrune
-            && alpha > -MAX_EVAL ) {
+			&& alpha > -MAX_EVAL ) {
                if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
                nodeEval = TransTable.RefineScore( p->hashKey, nodeEval );
 
