@@ -322,9 +322,8 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 	AddMisc(side,-4,-8);                   // so it is at least slightly vulnerable.
 	
 	if (bbStop &~bbOccupied) {             // this pawn is mobile
-	   if (Data.pstMg[side][P][sq] > 0)    // bonus gets bigger for well positioned pawns
-		   AddMisc(side, Data.pstMg[side][P][sq] / 5, 2);
-	   else AddMisc(side, 2, 1);
+	   if (Data.pstMg[side][P][sq] > 0) AddMisc(side, 5, 2);
+	   else                             AddMisc(side, 2, 1);
 	}
 	   
 	bbObstacles = bbPassedMask[side][sq] & bbPc(p, oppo, P);
