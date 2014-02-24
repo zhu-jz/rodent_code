@@ -67,22 +67,22 @@ void sEvaluator::InitStaticScore(void)
 
 void sEvaluator::InitDynamicScore(sPosition *p) 
 {
-     attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
-	 attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
-	 attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
-	 checkCount[WHITE]       = 0;   checkCount[BLACK]  = 0;
-	 attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
-	 kingTropism[WHITE]      = 0;   kingTropism[BLACK] = 0;
-	 mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
-	 egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
-	 mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
-	 egMobility[WHITE]       = 0;   egMobility[BLACK]  = 0;  // clear endgame mobility	 
-	 bbPawnTakes[WHITE]    = GetWPControl( bbPc(p, WHITE, P) );
-	 bbPawnTakes[BLACK]    = GetBPControl( bbPc(p, BLACK, P) );
+     attScore[WHITE]      = 0;   attScore[BLACK]    = 0;  // clear attack scores
+	 attNumber[WHITE]     = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
+	 attCount[WHITE]      = 0;   attCount[BLACK]    = 0;
+	 checkCount[WHITE]    = 0;   checkCount[BLACK]  = 0;
+	 attWood[WHITE]       = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
+	 kingTropism[WHITE]   = 0;   kingTropism[BLACK] = 0;
+	 mgMisc[WHITE]        = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
+	 egMisc[WHITE]        = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
+	 mgMobility[WHITE]    = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
+	 egMobility[WHITE]    = 0;   egMobility[BLACK]  = 0;  // clear endgame mobility	 
+	 bbPawnTakes[WHITE]   = GetWPControl( bbPc(p, WHITE, P) );
+	 bbPawnTakes[BLACK]   = GetBPControl( bbPc(p, BLACK, P) );
 	 bbPawnCanTake[WHITE] = FillNorth( bbPawnTakes[WHITE] );
 	 bbPawnCanTake[BLACK] = FillSouth( bbPawnTakes[BLACK] );
-	 bbAllAttacks[WHITE]     = bbPawnTakes[WHITE];
-	 bbAllAttacks[BLACK]     = bbPawnTakes[BLACK];
+	 bbAllAttacks[WHITE]  = bbPawnTakes[WHITE];
+	 bbAllAttacks[BLACK]  = bbPawnTakes[BLACK];
 	 bbMinorCoorAttacks[WHITE]  = 0ULL;
 	 bbMinorCoorAttacks[BLACK]  = 0ULL;
  	 bbRookCoorAttacks[WHITE]   = 0ULL;
@@ -184,8 +184,6 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
 		attUnit += checkCount[side];     // check and contact check threats
 		attUnit += (attWood[side] / 2);  // material involved in the attack
 		if (attUnit > 99) attUnit = 99;  // bounds checking
-		if (attNumber[side] < 2) attScore[side] = 0;
-		//TODO: find some way to include attacks with less than two pieces
 		attScore[side] = Data.kingDanger[attUnit] * 10;
 	}
 	if (Data.safetyStyle == KS_HANDMADE) {
