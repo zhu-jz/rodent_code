@@ -230,71 +230,70 @@ int sEvaluator::ReturnFull(sPosition *p)
 	}
 #endif
 
-  int score = GetMaterialScore(p) + CheckmateHelper(p);
-  p->side == WHITE ? score+=5 : score-=5;
+   int score = GetMaterialScore(p) + CheckmateHelper(p);
+   p->side == WHITE ? score+=5 : score-=5; // tempo
 
-  InitStaticScore();
-  SetScaleFactor(p);
-  EvalPawns(p);
+   InitStaticScore();
+   SetScaleFactor(p);
+   EvalPawns(p);
   
-  score += EvalTrappedKnight(p);                 
-  score += (EvalTrappedBishop(p,WHITE) - EvalTrappedBishop(p,BLACK) );                 
-  score += (EvalTrappedRook(p,WHITE)   - EvalTrappedRook(p,BLACK) );  
+   score += EvalTrappedKnight(p);                 
+   score += (EvalTrappedBishop(p,WHITE) - EvalTrappedBishop(p,BLACK) );                 
+   score += (EvalTrappedRook(p,WHITE)   - EvalTrappedRook(p,BLACK) );  
 
-  mgScore += (p->pstMg[WHITE] - p->pstMg[BLACK]);
-  egScore += (p->pstEg[WHITE] - p->pstEg[BLACK]);
+   mgScore += (p->pstMg[WHITE] - p->pstMg[BLACK]);
+   egScore += (p->pstEg[WHITE] - p->pstEg[BLACK]);
   
-	  InitDynamicScore(p);
+   InitDynamicScore(p);
 
-      ScoreN(p, WHITE);
-      ScoreN(p, BLACK);
-	  ScoreB(p, WHITE);
-      ScoreB(p, BLACK);
-      ScoreR(p, WHITE);
-	  ScoreR(p, BLACK);
-      ScoreQ(p, WHITE);
-      ScoreQ(p, BLACK);
-	  ScoreKingShield(p, WHITE);
-	  ScoreKingShield(p, BLACK);  
-	  ScoreKingAttacks(p, WHITE);
-	  ScoreKingAttacks(p, BLACK);
-	  ScoreHanging(p, WHITE);
-	  ScoreHanging(p, BLACK);
+   ScoreN(p, WHITE);
+   ScoreN(p, BLACK);
+   ScoreB(p, WHITE);
+   ScoreB(p, BLACK);
+   ScoreR(p, WHITE);
+   ScoreR(p, BLACK);
+   ScoreQ(p, WHITE);
+   ScoreQ(p, BLACK);
+   ScoreKingShield(p, WHITE);
+   ScoreKingShield(p, BLACK);  
+   ScoreKingAttacks(p, WHITE);
+   ScoreKingAttacks(p, BLACK);
+   ScoreHanging(p, WHITE);
+   ScoreHanging(p, BLACK);
 
-	  // ADDITIONAL PAWN EVAL
-	  ScoreP(p, WHITE);
-	  ScoreP(p, BLACK);
+   // ADDITIONAL PAWN EVAL
+   ScoreP(p, WHITE);
+   ScoreP(p, BLACK);
 
-	  // PATTERNS
-	  ScorePatterns(p, WHITE);
-	  ScorePatterns(p, BLACK);
+   // PATTERNS
+   ScorePatterns(p, WHITE);
+   ScorePatterns(p, BLACK);
       
-	  // ASYMMETRIC MOBILITY SCALING
-	  ScaleValue(&mgMobility[WHITE], Data.mobSidePercentage[WHITE]);
-	  ScaleValue(&mgMobility[BLACK], Data.mobSidePercentage[BLACK]);
-  	  ScaleValue(&egMobility[WHITE], Data.mobSidePercentage[WHITE]);
-	  ScaleValue(&egMobility[BLACK], Data.mobSidePercentage[BLACK]);
+   // ASYMMETRIC MOBILITY SCALING
+   ScaleValue(&mgMobility[WHITE], Data.mobSidePercentage[WHITE]);
+   ScaleValue(&mgMobility[BLACK], Data.mobSidePercentage[BLACK]);
+   ScaleValue(&egMobility[WHITE], Data.mobSidePercentage[WHITE]);
+   ScaleValue(&egMobility[BLACK], Data.mobSidePercentage[BLACK]);
 
-	  // MERGING SCORE
-	  mgScore += ( mgMobility[WHITE] - mgMobility[BLACK] );
-	  egScore += ( egMobility[WHITE] - egMobility[BLACK] );
-	  mgScore += ( mgMisc[WHITE]     - mgMisc[BLACK]     );
-	  egScore += ( egMisc[WHITE]     - egMisc[BLACK]     );
-	  mgScore += ( (kingTropism[WHITE] - kingTropism[BLACK]) * Data.tropismWeight ) / 100;
-	  score   += Interpolate();    // merge middlegame and endgame scores
-	  score   += ( attScore[WHITE]  - attScore[BLACK] );
+   // MERGING SCORE
+   mgScore += ( mgMobility[WHITE] - mgMobility[BLACK] );
+   egScore += ( egMobility[WHITE] - egMobility[BLACK] );
+   mgScore += ( mgMisc[WHITE]     - mgMisc[BLACK]     );
+   egScore += ( egMisc[WHITE]     - egMisc[BLACK]     );
+   mgScore += ( (kingTropism[WHITE] - kingTropism[BLACK]) * Data.tropismWeight ) / 100;
+   score   += Interpolate();    // merge middlegame and endgame scores
+   score   += ( attScore[WHITE]  - attScore[BLACK] );
 
-
-  score = PullToDraw(p, score);    // decrease score in drawish endgames
-  score = FinalizeScore(p, score); // bounds, granulatity and weakening
+   score = PullToDraw(p, score);    // decrease score in drawish endgames
+   score = FinalizeScore(p, score); // bounds, granulatity and weakening
 
 #ifdef HASH_EVAL
-  EvalTT[addr].key = p->hashKey;
-  EvalTT[addr].score = score;
+   EvalTT[addr].key = p->hashKey;
+   EvalTT[addr].score = score;
 #endif
 
-  // return score relative to the side to move
-  return p->side == WHITE ? score : -score;
+   // return score relative to the side to move
+   return p->side == WHITE ? score : -score;
 }
 
 // fast evaluation function (material, pst, pawn structure)
@@ -348,12 +347,11 @@ void sEvaluator::DebugPst(sPosition *p)
 {
 	 int sq, mg = 0, eg = 0;
 	 const int clMult[2] = {1, -1};
-	 U64 bbPieces;
 
 	 for (int cl = 0; cl <= 1; cl++)
 	 for (int pc = 0; pc <= 5; pc++)  
 	 {
-	     bbPieces = bbPc(p, cl, pc);
+	     U64 bbPieces = bbPc(p, cl, pc);
 	     while (bbPieces) {
            sq = PopFirstBit(&bbPieces);
 	       mg += Data.pstMg[cl][pc][sq] * clMult[cl];
