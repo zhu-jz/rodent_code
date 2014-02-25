@@ -168,11 +168,10 @@ void sEvaluator::ScoreKingShield(sPosition *p, int side)
 
 int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 {
-  int result = 0;
-  if (bbFile & bbCentralFile) result += (EvalFileShelter( bbFile & bbPc(p, side, P), side ) / 2);
-  else result += EvalFileShelter( bbFile & bbPc(p, side, P), side );
-
-  return result + EvalFileStorm ( bbFile & bbPc(p, Opp(side), P), side );
+  int shelter = EvalFileShelter( bbFile & bbPc(p, side, P), side );
+  int storm   = EvalFileStorm ( bbFile & bbPc(p, Opp(side), P), side );
+  if (bbFile & bbCentralFile) return (shelter / 2) + storm;
+  else                        return shelter + storm;
 }
 
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
