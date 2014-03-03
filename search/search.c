@@ -32,7 +32,7 @@
 #include "search.h"
 #include "../eval/eval.h"
 
-static const int moveCountLimit[24] = {0, 0, 0, 0, 4, 4, 4, 4, 7, 7, 7, 7, 12, 12, 12, 12, 19, 19, 19, 19, 28, 28, 28, 28};
+static const int moveCountLimit[24] = {0, 0, 0, 0, 4, 4, 4, 4, 7, 7, 7,  7, 12, 12, 12, 12, 19, 19, 19, 19, 28, 28, 28, 28};
 
 void sSearcher::Init(void)
 {
@@ -447,7 +447,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   if (nodeType == PV_NODE && !move && depth >= 4*ONE_PLY && !flagInCheck ) {
 	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, 0, newPv); // BUG, should use lastMove
 	  TransTable.RetrieveMove(p->hashKey, &move);
+  }
+
+  if (nodeType == CUT_NODE && !move && depth >= 6*ONE_PLY && !flagInCheck ) {
+	  Search(p, ply, alpha, beta, depth-4*ONE_PLY, PV_NODE, NO_NULL, 0, 0, newPv); // BUG, should use lastMove
+	  TransTable.RetrieveMove(p->hashKey, &move);
   } // end of internal iterative deepening code
+
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
