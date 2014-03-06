@@ -31,6 +31,7 @@ public:
  int deltaValue[7];
  int phaseValue[7];
  int distance[64][64];
+ int straightDistance[64][64];
  int pstMg[2][6][64];
  int pstEg[2][6][64];
  int outpost[2][6][64];
