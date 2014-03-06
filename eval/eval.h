@@ -94,7 +94,6 @@ private:
   void ScoreKingShield(sPosition *p, int side);
   void ScoreKingAttacks(sPosition *p, int side);
   void ScoreRelationToPawns(sPosition *p, int side, int piece, int sq);
-  void ScoreKingTropism(sPosition *p, int side, int piece, int sq);
   void ScoreHanging(sPosition *p, int side);
   int  EvalKingFile(sPosition * p, int side, U64 bbFile);
   int  EvalFileShelter(U64 bbOwnPawns, int side);
