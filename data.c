@@ -145,6 +145,7 @@ void sData::InitDistanceBonus(void)
     for (int i = 0; i < 64; ++i) {
          for (int j = 0; j < 64; ++j) {
          distance[i][j] = 14 - ( Abs( Rank(i) - Rank(j) ) + Abs( File(i) - File(j) ) );
+		 straightDistance[i][j] = 8 - (((Abs(Rank(i) - Rank(j)) + Abs(File(i) - File(j)))));
          }
      }
 }
