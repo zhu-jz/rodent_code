@@ -69,7 +69,7 @@ void sEvaluator::ScoreN(sPosition *p, int side)
 	bbMob &= ~p->bbCl[side];                   // exclude squares occupied by own pieces
 	ScoreRelationToPawns(p, side, N, sq);      // outpost, attacked or defended by a pawn
 	if (Data.tropismWeight)
-	   ScoreKingTropism(p, side, N, sq);          // tropism to enemy king
+	   kingTropism[side] += tropism[N] * Data.straightDistance[sq][p->kingSquare[oppo]]; // tropism to enemy king
 
 	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, nAttacks[P], nAttacks[P]);
@@ -111,7 +111,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	bbAllAttacks[side] |= bbMob;                 // update attack data
 	ScoreRelationToPawns(p, side, B, sq);        // outpost, attacked or defended by a pawn
     if (Data.tropismWeight)
-	   ScoreKingTropism(p, side, B, sq);            // tropism to enemy king
+	   kingTropism[side] += tropism[B] * Data.straightDistance[sq][p->kingSquare[oppo]]; // tropism to enemy king
 
 	// bishop on the rim needs escape route
 	if ( (SqBb(sq) & bbFILE_A) || (SqBb(sq) & bbFILE_H) ) {
@@ -175,7 +175,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	bbAllAttacks[side] |= bbMob;                 // update attack data
 	ScoreRelationToPawns(p, side, R, sq);        // outpost, attacked or defended by a pawn
     if (Data.tropismWeight)
-	   ScoreKingTropism(p, side, R, sq);         // tropism to enemy king
+	   kingTropism[side] += tropism[R] * Data.straightDistance[sq][p->kingSquare[oppo]]; // tropism to enemy king
 
 	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, rAttacks[P], rAttacks[P]);
@@ -250,7 +250,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	bbMob = GenCache.GetQueenMob(bbOccupied, sq); // set control/mobility bitboard
 	bbAllAttacks[side] |= bbMob;                  // update attack data
 	if (Data.tropismWeight)
-	   ScoreKingTropism(p, side, Q, sq);          // tropism to enemy king
+	   kingTropism[side] += tropism[Q] * Data.straightDistance[sq][p->kingSquare[oppo]]; // tropism to enemy king
 
 	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, qAttacks[P], qAttacks[P]);
@@ -356,7 +356,7 @@ void sEvaluator::AddKingAttack(int side, int pc, int cnt)
 	attWood  [side] += woodPerPc[pc];
 }
 
-void sEvaluator::AddMobility( int pc, int side, int cnt)
+void sEvaluator::AddMobility(int pc, int side, int cnt)
 {
 	mgMobility[side] += Data.mobBonusMg [pc] [cnt];
 	egMobility[side] += Data.mobBonusEg [pc] [cnt];
@@ -366,18 +366,6 @@ void sEvaluator::AddMisc(int side, int mg, int eg)
 {
 	mgMisc[side] += mg;
 	egMisc[side] += eg;
-}
-
-void sEvaluator::ScoreKingTropism(sPosition *p, int side, int piece, int sq) 
-{
-	const int oppo = Opp(side);
-
-	int king_file = File(p->kingSquare[oppo]);
-    int king_rank = Rank(p->kingSquare[oppo]);
-	int pc_file = File(sq);
-    int pc_rank = Rank(sq);
-	// tropism formula from GambitFruit
-	kingTropism[side] += tropism[piece] * 8 - (((Abs(king_file-pc_file) + Abs(king_rank-pc_rank)) * tropism[piece]));
 }
 
 void sEvaluator::ScoreRelationToPawns(sPosition *p, int side, int piece, int sq) 
