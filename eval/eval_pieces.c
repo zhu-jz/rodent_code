@@ -38,8 +38,6 @@
 
   const int tropism           [7] = { 0,   3,   2,   2,   2,   0,  0 };
   const int outpostBase       [7] = { 0,   4,   4,   0,   0,   0,  0 };
-  const int rookOpenAttack    [2] = { 0,  2 };
-  const int rookSemiOpenAttack[2] = { 0,  1 };
   const int queenContactCheck [2] = { 6, 10 };
   const int rookContactCheck  [2] = { 4,  5 };
   const int rookSeventhMg   = 20;
@@ -51,7 +49,7 @@
 
   // data for attack evaluation:        for Stockfish-like curve      for old Glass curve
   //                                    P   N   B   R   Q   K         P   N   B   R   Q   K
-  const int attPerPc     [2]  [7] = { { 0,  2,  2,  3,  5,  0,  0}, { 0,  1,  1,  2,  3,  0,  0} };
+  const int attPerPc     [2]  [7] = { { 0,  2,  2,  3,  5,  0,  0}, { 0,  1,  1,  2,  4,  0,  0} };
   const int canCheckWith [2]  [7] = { { 0,  1,  1,  3,  4,  0,  0}, { 0,  1,  1,  2,  3,  0,  0} };
   const int woodPerPc         [7] =   { 0,  1,  1,  2,  4,  0,  0};
 
@@ -188,13 +186,8 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
 	// rook on an open file (ignoring pawns behind a rook)
 	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {                // no own pawns in front of the rook
-	   if ( !(bbFrontSpan & bbPc(p, oppo, P) ) ) {            // no enemy pawns - open file
-		  AddMisc(side, rookOpenMg, rookOpenEg);
-		  if (bbFrontSpan & bbKingZone[side][KingSq(p, oppo)] ) attCount[side] += rookOpenAttack[Data.safetyStyle];
-	   } else {                                               // enemy pawns present - semi-open file
-		  AddMisc(side, rookSemiOpenMg, rookSemiOpenEg);
-		  if (bbFrontSpan & bbKingZone[side][KingSq(p, oppo)] ) attCount[side] += rookSemiOpenAttack[Data.safetyStyle];
-	   }
+	   if ( !(bbFrontSpan & bbPc(p, oppo, P) ) ) AddMisc(side, rookOpenMg, rookOpenEg);
+	   else                                      AddMisc(side, rookSemiOpenMg, rookSemiOpenEg);
 	}
 
 	// rook on 7th rank attacking pawns or cutting off enemy king
