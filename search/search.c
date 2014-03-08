@@ -540,8 +540,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 		 }
          
          // PSEUDO-FUTILITY PRUNING OF PAWN CAPTURES
-		 if ( flagPawnCapt ) {
-              if (nodeEval < beta - 500) {
+		 if ( flagPawnCapt && flagFutility) {
+              if (nodeEval < beta - 700) {
                    Manipulator.UndoMove(p, move, undoData);
                    continue;
               }
@@ -550,8 +550,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      } // end of late move pruning code
 
 	 // LATE MOVE REDUCTION
-	 if  ( !flagInCheck 
-	 &&    !depthChange 
+	 if  ( !flagInCheck
+	 &&    !depthChange
 	 &&     AvoidReduction(move, flagMoveType)
      &&     depth >= minimalLmrDepth        // we have some depth left
 	 &&     movesTried > 3                  // we're sufficiently down the move list
