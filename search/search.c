@@ -296,7 +296,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
       flagMoveType;             // move type flag, supplied by NextMove()
   sSelector Selector;           // an object responsible for maintaining move list and picking moves 
     UNDO  undoData[1];          // data required to undo a move
-	int flagPawnCapt = 0;
+	int captureVictim = NO_TP;
 
   // NODE INITIALIZATION
   int nullScore      = 0;       // result of a null move search
@@ -479,10 +479,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	     }
 	 }
 
-	 // FLAG A MOVE
-	 if (TpOnSq(p, Tsq(move) ) == P) flagPawnCapt = 1; else flagPawnCapt = 0;
-
 	 // MAKE A MOVE
+	 captureVictim = TpOnSq(p, Tsq(move) );
 	 Manipulator.DoMove(p, move, undoData);    
 	
 	 // UNDO ILLEGAL MOVES
@@ -540,7 +538,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 		 }
          
          // PSEUDO-FUTILITY PRUNING OF PAWN CAPTURES
-		 if ( flagPawnCapt && flagFutility) {
+		 if ( flagFutility             // means, among other things, that capture is bad
+		 &&   captureVictim == P) {
               if (nodeEval < beta - 700) {
                    Manipulator.UndoMove(p, move, undoData);
                    continue;
