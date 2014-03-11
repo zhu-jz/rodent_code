@@ -29,12 +29,11 @@
 	  
   const int pawnDefendsMg     [7] = { 0,   2,   2,   2,   0,   0,  0 };
   const int pawnDefendsEg     [7] = { 0,   2,   2,   4,   0,   0,  0 };
-  
-  // (NOTE: we don't evaluate N attacks N, B attacks B and R attacks R)
-  const int pAttacks          [7] = { 0,  10,  10,  15,   0,   0,  0 };
+  const int pAttacks          [7] = { 0,  10,  10,  15,  15    0,  0 };
   const int nAttacks          [7] = { 1,   5,   5,  10,  10,   0,  0 };  // N/B
   const int rAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
   const int qAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
+  // (NOTE: we don't evaluate N attacks N, B attacks B and R attacks R)
 
   const int tropism           [7] = { 0,   3,   2,   2,   2,   0,  0 };
   const int outpostBase       [7] = { 0,   4,   4,   0,   0,   0,  0 };
@@ -244,6 +243,9 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	bbAllAttacks[side] |= bbMob;                  // update attack data
 	if (Data.tropismWeight)
 	   kingTropism[side] += tropism[Q] * Data.straightDistance[sq][p->kingSquare[oppo]]; // tropism to enemy king
+
+    if ( SqBb(sq) & bbPawnTakes[oppo] )  
+		AddMisc(side, -pAttacks[Q], -pAttacks[Q]); // piece attacked by a pawn
 
 	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, qAttacks[P], qAttacks[P]);
