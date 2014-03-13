@@ -140,7 +140,9 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
   if (best >= beta) return best;
   if (best > alpha) alpha = best;
 
-  //if (!flagInCheck) {
+#ifdef QS_SMART
+  if (!flagInCheck) {
+#endif
 
   Selector.InitCaptureList(p, move);
 
@@ -148,7 +150,7 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
 
     // DELTA PRUNING 
 	if (!flagInCheck) {
-	   // 1) (cheap) gain promised by this move is unlikely to raise score
+	   // 1) (cheap) gain promised by this capture is unlikely to raise score
 	   if ( best + Data.deltaValue[ TpOnSq(p, Tsq(move) ) ] < alpha) continue;
 
 	   // 2) (expensive) this capture appears to lose material
@@ -184,12 +186,14 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
     }
   }
 
-  //}
+#ifdef QS_SMART
+  }
+#endif
 
+#ifdef QS_SMART
+  if (flagInCheck) {
 
-  /**  if (flagInCheck) {
-
-  Selector.InitMoveList(p, move, 0);
+  Selector.InitMoveList(p, move, 0, 0, 0);
 
   while ( move = Selector.NextMove(0, &unusedFlag) ) {      // on finding next move
 	  
@@ -223,8 +227,8 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
     }
   }
 
-  }/**/
-
+  }
+#endif
 
   // SAVE SEARCH RESULT IN TRANSPOSITION TABLE
   if (*pv) TransTable.Store(p->hashKey, *pv, best, EXACT, 1, ply);
