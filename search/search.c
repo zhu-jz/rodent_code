@@ -37,12 +37,13 @@ static const int moveCountLimit[24] = {0, 0, 0, 0, 4, 4, 4, 4, 7, 7, 7,  7, 12, 
 void sSearcher::Init(void)
 {
 	aspiration       = 30;
-	futilityDepth    = 4;   // 5 is worse
+	futilityDepth    = 5;  
 	minimalLmrDepth  = 2 * ONE_PLY; // 3 is worse
     minimalNullDepth = 2 * ONE_PLY; // 3 is worse
 
-	for(int depth = 0; depth < 10 * ONE_PLY; depth ++)
-		futilityMargin[depth] = 100 + depth * 20;
+	for(int depth = 0; depth < 10 * ONE_PLY; depth ++) {
+		futilityMargin[depth] = (56 * int(log(double(depth * depth) / 2) / log(2.0) + 1.001));
+	}
 
 	// set late move reduction depth using modified Stockfish formula
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
