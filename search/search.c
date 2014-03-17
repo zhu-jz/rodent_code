@@ -37,11 +37,12 @@ static const int moveCountLimit[24] = {0, 0, 0, 0, 4, 4, 4, 4, 7, 7, 7,  7, 12, 
 void sSearcher::Init(void)
 {
 	aspiration       = 30;
-	futilityBase     = 100; // 80 and 120 are worse
-	futilityStep     = 20;  // by this much futility margin increases each quarter ply
 	futilityDepth    = 4;   // 5 is worse
 	minimalLmrDepth  = 2 * ONE_PLY; // 3 is worse
     minimalNullDepth = 2 * ONE_PLY; // 3 is worse
+
+	for(int depth = 0; depth < 10 * ONE_PLY; depth ++)
+		futilityMargin[depth] = 100 + depth * 20;
 
 	// set late move reduction depth using modified Stockfish formula
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
@@ -473,7 +474,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
                nodeEval = TransTable.RefineScore( p->hashKey, nodeEval );
 
                // this node looks bad enough, so we may apply futility pruning
-               if ( (nodeEval + SetFutilityMargin(depth) ) < beta ) flagFutility = 1;
+               if ( (nodeEval + futilityMargin[depth] ) < beta ) flagFutility = 1;
 			   // TODO: smaller margin for later moves (requires restructuring)
             }
 	     }
@@ -522,30 +523,27 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
         continue;
 	 }
 
-     // LATE MOVE PRUNING near the leaves (2014-01-24: modelled after Toga II 3.0)
-	 // the most important change is that for earlier moves we need confirmation 
-	 // by history heuristic
+     // LATE MOVE PRUNING modelled after Toga II 3.0; the most important change 
+	 // is that for earlier moves we need confirmation by history heuristic
      if ( flagCanReduce
      &&   depth <= 5*ONE_PLY // we are near the leaf
      &&  !History.Refutes(lastMove, move) )
      {
          if (IsMoveOrdinary(flagMoveType) 
          &&  normalMoveCnt > moveCountLimit[depth] ) { 
-		 if (normalMoveCnt > moveCountLimit[depth] / 2 )  
+		 if (normalMoveCnt > moveCountLimit[depth] / 2 ) // unconditional reduction of later moves
 			 { Manipulator.UndoMove(p, move, undoData); continue; }
-	 		 if (History.MoveIsBad(move) ) 
+	 		 if (History.MoveIsBad(move) )               // history-based reduction of earlier moves
 			 { Manipulator.UndoMove(p, move, undoData); continue; }
 		 }
          
          // PSEUDO-FUTILITY PRUNING OF PAWN CAPTURES
-		 if ( flagFutility             // means, among other things, that capture is bad
-		 &&   captureVictim == P) {
-              if (nodeEval < beta - 700) {
-                   Manipulator.UndoMove(p, move, undoData);
-                   continue;
-              }
-		  }
-
+		 if ( flagFutility           // means, among other things, that capture is bad
+		 &&   captureVictim == P
+         &&   nodeEval < beta - 700) {
+              Manipulator.UndoMove(p, move, undoData);
+              continue;
+         }
      } // end of late move pruning code
 
 	 // LATE MOVE REDUCTION
@@ -634,11 +632,6 @@ int sSearcher::SetNullDepth(int depth)
     int newDepth = depth - 3*ONE_PLY;
     newDepth -= (newDepth / 4);  // newDepth -= newDepth / 3 is comparable
     return newDepth;
-}
-
-int sSearcher::SetFutilityMargin(int depth) 
-{
-	return futilityBase + depth * futilityStep;
 }
 
 int sSearcher::IsRepetition(sPosition *p)
