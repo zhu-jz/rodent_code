@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -36,8 +36,6 @@ private:
 	void CheckInput(void);
 	int isReporting;
 	int aspiration;       // initial size of aspiration window
-    int futilityBase;     // initial value of futility margin
-    int futilityStep;     // margin is incremented by this value for every 1/4 ply
     int futilityDepth;
 	U64 stat[END_OF_STATS];
 
@@ -66,8 +64,7 @@ private:
 	int AvoidReduction(int move, int flagMoveType);
 	int Perft(sPosition *p, int ply, int depth);
 	int SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv);
-	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv);
-	int SetFutilityMargin(int depth);
+	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv);
 	int SetNullDepth(int depth);
 	
 	int RecognizeDraw(sPosition *p);
@@ -76,6 +73,7 @@ private:
 	int minimalLmrDepth;
     int minimalNullDepth;
 	double lmrSize[3][MAX_PLY * ONE_PLY][MAX_MOVES];
+	int futilityMargin[10 * ONE_PLY];
 	sFlatMoveList rootList;
 public:
 	void Init(void);
