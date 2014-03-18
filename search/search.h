@@ -65,8 +65,7 @@ private:
 	int Perft(sPosition *p, int ply, int depth);
 	int SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv);
 	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv);
-	int SetNullDepth(int depth);
-	
+
 	int RecognizeDraw(sPosition *p);
 	int nodes;
 	int rootDepth; 
@@ -74,6 +73,7 @@ private:
     int minimalNullDepth;
 	double lmrSize[3][MAX_PLY * ONE_PLY][MAX_MOVES];
 	int futilityMargin[10 * ONE_PLY];
+	int nullDepth[MAX_PLY * ONE_PLY];
 	sFlatMoveList rootList;
 public:
 	void Init(void);
