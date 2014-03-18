@@ -45,6 +45,10 @@ void sSearcher::Init(void)
 		futilityMargin[depth] = (56 * int(log(double(depth * depth) / 2) / log(2.0) + 1.001));
 	}
 
+	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++) {
+		nullDepth[depth] = depth - 3*ONE_PLY - (depth - 3*ONE_PLY) / 4;
+	}
+
 	// set late move reduction depth using modified Stockfish formula
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
@@ -397,7 +401,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   {
     if ( beta <= Eval.ReturnFull(p) ) {
 
-      newDepth = SetNullDepth(depth);
+      newDepth = nullDepth[depth];
 
 	  // normal search would fail low, so null move search shouldn't fail high
       if (TransTable.Retrieve(p->hashKey, &nullRefutation, &nullScore, alpha, beta, newDepth, ply) ) {
@@ -626,13 +630,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      TransTable.Store(p->hashKey, 0, best, UPPER, depth, ply);
 
    return best;
-}
-
-int sSearcher::SetNullDepth(int depth) 
-{
-    int newDepth = depth - 3*ONE_PLY;
-    newDepth -= (newDepth / 4);  // newDepth -= newDepth / 3 is comparable
-    return newDepth;
 }
 
 int sSearcher::IsRepetition(sPosition *p)
