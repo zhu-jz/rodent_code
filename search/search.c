@@ -53,16 +53,16 @@ void sSearcher::Init(void)
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
            lmrSize[0][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // all node
-		   lmrSize[1][depth][moves] = 4 * (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
-		   lmrSize[2][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // cut node
+           lmrSize[1][depth][moves] = 4 * (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
+           lmrSize[2][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // cut node
 
-		   for (int node = 0; node <= 2; node++) {
-			   if (lmrSize[node][depth][moves] > 2 * ONE_PLY)
+           for (int node = 0; node <= 2; node++) {
+              if (lmrSize[node][depth][moves] > 2 * ONE_PLY)
                   lmrSize[node][depth][moves] += ONE_PLY / 2;
-               else if (lmrSize[node][depth][moves] > 1 * ONE_PLY)
+              else if (lmrSize[node][depth][moves] > 1 * ONE_PLY)
                   lmrSize[node][depth][moves] += ONE_PLY / 4;
-		   }
-		}
+           }
+        }
 }
 
 void sSearcher::Think(sPosition *p, int *pv)
@@ -438,6 +438,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
    // RAZORING based on Toga II 4.0
    if ( nodeType != PV_NODE 
    &&  !flagInCheck 
+   &&  !wasNull // optimization from Fruit Reloaded
    &&  !(bbPc(p,p->side,P) & bbRelRank[p->side][RANK_7] ) // no pawns to promote in one move
    &&  !move
    &&   depth <= 3*ONE_PLY) {
@@ -689,9 +690,9 @@ void sSearcher::CheckInput(void)
 
 int sSearcher::DrawScore(sPosition *p)
 {
-	int scale = Min(24, p->phase);
-	int score = (-Data.contempt * scale) / 24;
+    int scale = Min(24, p->phase);
+    int score = (-Data.contempt * scale) / 24;
 
     if ( p->side == rootSide ) return score;
-	else                       return -score;
+    else                       return -score;
 }
