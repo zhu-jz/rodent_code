@@ -29,7 +29,7 @@
 	  
   const int pawnDefendsMg     [7] = { 0,   2,   2,   2,   0,   0,  0 };
   const int pawnDefendsEg     [7] = { 0,   2,   2,   4,   0,   0,  0 };
-  const int pAttacks          [7] = { 0,  10,  10,  15,  15    0,  0 };
+  const int pAttacks          [7] = { 0,  10,  10,  15,  15,   0,  0 };
   const int nAttacks          [7] = { 1,   5,   5,  10,  10,   0,  0 };  // N/B
   const int rAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
   const int qAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
@@ -110,7 +110,7 @@ void sEvaluator::ScoreB(sPosition *p, int side)
     if (Data.tropismWeight)
 	   kingTropism[side] += tropism[B] * Data.straightDistance[sq][p->kingSquare[oppo]]; // tropism to enemy king
 
-	// bishop on the rim needs escape route
+	// don't block backward movement of a bishop on the rim
 	if ( (SqBb(sq) & bbFILE_A) || (SqBb(sq) & bbFILE_H) ) {
 		if (bbPawnTakes[side] & SqBb(sq) ) AddMisc(side,-4,-4);
 	}
@@ -206,7 +206,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
 	       if ( Swap(p, sq, contactSq) >= 0 ) {
 			  checkCount[side] += rookContactCheck[Data.safetyStyle]; 
-		      break;
+		      break; // TODO: test w/o break
 	       }
 	    }
 	}
@@ -271,7 +271,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 
 	       if ( Swap(p, sq, contactSq) >= 0 ) {
 			  checkCount[side] += queenContactCheck[Data.safetyStyle]; 
-		      break;
+		      break; // TODO: test w/o break
 	       }
 	    }
 	}
@@ -290,7 +290,7 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	   if (bbAtt) {
 		   AddKingAttack(side, Q, PopCntSparse(bbAtt) );	   
 		   attCount[side] += PopCntSparse( bbAtt & bbMinorCoorAttacks[side] ); // coordinated Queen - minor attacks
-		   attCount[side] += PopCntSparse( bbAtt & bbRookCoorAttacks[side] ); // coordinated Queen - rook attacks
+		   attCount[side] += PopCntSparse( bbAtt & bbRookCoorAttacks[side] );  // coordinated Queen - rook attacks
 	   }
 	}
 	
@@ -319,6 +319,29 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 	if (bbStop &~bbOccupied) {             // this pawn is mobile
 	   if (Data.pstMg[side][P][sq] > 0) AddMisc(side, 5, 2);
 	   else                             AddMisc(side, 2, 1);
+	}
+
+	// hidden passer
+	if (bbStop & bbPc(p, oppo,P)
+	&& SqBb(sq) & bbRelRank[side][RANK_6] 
+	&& (bbPawnTakes[side] & sq) ) {
+       int flagHiddenPasser = 0;
+
+	   U64 bbDefender = ShiftWest(bbBack);
+	   if ( bbDefender && bbPc(p, side, P) ) {
+	      if ( !(ShiftFwd(SqBb(bbDefender), side) & bbPc(p, oppo, P) ) 
+	      && ( !(ShiftWest(ShiftWest(bbStop)) & bbPc(p, oppo, P) ) )
+	      ) flagHiddenPasser = 1;
+	   }
+	    
+	   bbDefender = ShiftEast(bbBack);
+	   if ( bbDefender && bbPc(p, side, P) ) {
+	      if ( !(ShiftFwd(SqBb(bbDefender), side) & bbPc(p, oppo, P) ) 
+          && ( !(ShiftEast(ShiftEast(bbStop)) & bbPc(p, oppo, P) ) ) )
+	      flagHiddenPasser = 1;
+	   }
+
+	   if (flagHiddenPasser) AddMisc(side, 0, 40);
 	}
 	   
 	bbObstacles = bbPassedMask[side][sq] & bbPc(p, oppo, P);
