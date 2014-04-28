@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -179,29 +179,29 @@ int NotOnBishColor(sPosition * p, int bishSide, int sq)
 }
 
 int MaterialKnight(sPosition *p, int side) {
-	return ( p->pieceMat[side] == Data.matValue[N] );
+   return ( p->pieceMat[side] == Data.matValue[N] );
 }
 
 int MaterialBishop(sPosition *p, int side) {
-	return ( p->pieceMat[side] == Data.matValue[B] );
+   return ( p->pieceMat[side] == Data.matValue[B] );
 }
 
 int MaterialMinor(sPosition *p, int side) {
-   return (    (p->pieceMat[side] ==  Data.matValue[B]) 
-	        || (p->pieceMat[side] ==  Data.matValue[N]) );
+   return ( (p->pieceMat[side] ==  Data.matValue[B]) 
+	 || (p->pieceMat[side] ==  Data.matValue[N]) );
 }
 
 int MaterialRook(sPosition *p, int side) {
-	return ( p->pieceMat[side] == Data.matValue[R] );
+   return ( p->pieceMat[side] == Data.matValue[R] );
 }
 
 int MaterialRookMinor(sPosition *p, int side) {
-    return (    (p->pieceMat[side] == Data.matValue[R] + Data.matValue[B]) 
-	         || (p->pieceMat[side] == Data.matValue[R] + Data.matValue[N]) );
+   return (    (p->pieceMat[side] == Data.matValue[R] + Data.matValue[B]) 
+   || (p->pieceMat[side] == Data.matValue[R] + Data.matValue[N]) );
 }
 
 int MaterialQueen(sPosition *p, int side) {
-	return ( p->pieceMat[side] == Data.matValue[Q] );
+   return ( p->pieceMat[side] == Data.matValue[Q] );
 }
 
 int MaterialQueenMinor(sPosition *p, int side) {
