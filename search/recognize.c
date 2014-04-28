@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -53,7 +53,7 @@ int sSearcher::RecognizeDraw(sPosition *p)
 
 int KPKdraw(sPosition *p, int stronger)
 {
-	int weaker = Opp(stronger);
+    int weaker = Opp(stronger);
     U64 bbPawn = bbPc(p, stronger, P);
 		  
     // opposition through a pawn
