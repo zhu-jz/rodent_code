@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -49,7 +49,7 @@ void Init(void)
   Data.InitOptions();
   //                 name,  val, delta, phase
   Data.InitSinglePiece( P,  0,     150,  0);  // pawn material is evaluated in eval.c, so no value set here
-  Data.InitSinglePiece( N,  325,   475,  1);
+  Data.InitSinglePiece( N,  325,   475,  1);  // 330 is worse
   Data.InitSinglePiece( B,  335,   485,  1);
   Data.InitSinglePiece( R,  500,   650,  2);  // 510 is worse
   Data.InitSinglePiece( Q,  975,  1125,  4);
