@@ -51,93 +51,106 @@ int pondering;
 char ponder_str[6];
 
 // mobility values
-static const int n_mob_mg[28] = { -160-40, -120-20,  -60,  00,  40,  80,  120, 160, 160};
-static const int n_mob_eg[28] = { -160-40, -120-20,  -60,  00,  40,  80,  120, 160, 160};
-static const int b_mob_mg[28] = { -160-40, -120-20,  -80, -40, -20,  00,  20,  40,  60,  80, 100, 120, 140, 140, 160                                 };
-static const int b_mob_eg[28] = { -160-40, -120-20,  -80, -40, -20,  00,  20,  40,  60,  80, 100, 120, 140, 140, 160                                 };
-static const int r_mob_mg[28] = { -100-40,  -80-20,  -60,  40,  20,  00,  20,  40,  60,  80, 100, 100, 110, 120, 130,                                };
-static const int r_mob_eg[28] = { -200-40, -160-20, -120,  80,  40,  00,  40,  80, 120, 160, 200, 200, 220, 240, 260,                                };
-static const int q_mob_mg[28] = {  -60-40,  -40-20,  -20,  00,  00,  10,  10,  10,  20,  20,  20,  30,  30,  30,  30,  40,  40,  40,  40,  50,  50,  50,  50 };
-static const int q_mob_eg[28] = { -120-40,  -80-20,  -40, -20,  00,  10,  20,  30,  40,  50,  60,  60,  70,  70,  80,  80,  80,  90,  90,  90, 100, 100, 100 };
+/*
+static const int n_mob_mg[28] = { -16-4, -12-2,  -8,  0,  4,  8,  12, 16, 16};
+static const int n_mob_eg[28] = { -16-4, -12-2,  -8,  0,  4,  8,  12, 16, 16};
+static const int b_mob_mg[28] = { -16-4, -12-2,  -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
+static const int b_mob_eg[28] = { -16-4, -12-2,  -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
+static const int r_mob_mg[28] = { -10-4,  -8-2,  -6,  4,  2,  0,  2,  4,  6,  8, 10, 10, 11, 12, 13,                                };
+static const int r_mob_eg[28] = { -20-4, -16-2, -12,  8,  4,  0,  4,  8, 12, 16, 20, 20, 22, 24, 26,                                };
+static const int q_mob_mg[28] = {  -6-4,  -4-2,  -2,  0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,  5 };
+static const int q_mob_eg[28] = { -12-4,  -8-2,  -4, -2,  0,  1,  2,  3,  4,  5,  6,  6,  7,  7,  8,  8,  8,  9,  9,  9, 10, 10, 10 };
+*/
+
+static const int n_mob_mg[28] = {-16-4, -8-2, -4, +0, +4, +8,+11,+13,+14,+14,+14,+14,+14,+14,+14,+14 };
+static const int n_mob_eg[28] = {-14-4, -7-2, -3, +0, +3, +6, +8, +9,+10,+10,+10,+14,+14,+14,+14,+14 };
+static const int b_mob_mg[28] = {-20,-15,-10, -5, +0, +5, +9,+12,+14,+15,+16,+17,+18,+19,+19,+19 };
+static const int b_mob_eg[28] = {-22,-17,-12, -7, -2, +3, +7,+10,+12,+13,+14,+15,+16,+17,+18,+19 };
+static const int r_mob_mg[28] = {-10, -8, -6, -4, -2, +0, +2, +4, +5, +6, +7, +7, +7, +7, +7, +7 };
+static const int r_mob_eg[28] = {-20,-16,-12, -8, -4, +0, +4, +8,+12,+15,+17,+18,+19,+20,+21,+22 };
+static const int q_mob_mg[32] = { -6, -5, -4, -3, -2, -1, +0, +1, +2, +3, +4, +4, +5, +5, +6, +6,
+                                  +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7 };
+static const int q_mob_eg[32] = {-12, -10, -8 -6, -4, -2, +0, +2, +4, +6, +7, +8, +9,+10,+11,+11,
+                                 +12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12 };
 
 void sData::InitBadBishop(void)
 {
-   // first clear bad bishop masks
-   for (int side = 0; side < 2; side++) {
-      for (int sq = 0; sq < 64; sq++) {  
-         bbBadBishopMasks [side][sq] = 0ULL;
-         badBishopPenalty[side][sq] = 0;
-      }
-   }
+	 // first clear bad bishop masks
+	 for (int side = 0; side < 2; side++) {
+	    for (int sq = 0; sq < 64; sq++) {  
+			 bbBadBishopMasks [side][sq] = 0ULL;
+			 badBishopPenalty[side][sq] = 0;
+		 }
+	 }
 
-   SetBadBishopMask(F1, E2, -20);
-   SetBadBishopMask(C1, D2, -20);
-   SetBadBishopMask(A2, B3, -10); SetBadBishopMask(A2, C4, -10);
-   SetBadBishopMask(B2, C3, -5);
-   SetBadBishopMask(C2, D3, -5);  SetBadBishopMask(C2, E4, -5);
-   SetBadBishopMask(D2, E3, -5);
-   SetBadBishopMask(E2, D3, -5);
-   SetBadBishopMask(F2, E3, -5);  SetBadBishopMask(F2, D4, -5);
-   SetBadBishopMask(G2, F3, -5);
-   SetBadBishopMask(H2, G3, -10); SetBadBishopMask(H2, F4, -10);
-   SetBadBishopMask(A3, B4, -5);  SetBadBishopMask(A3, C5, -5);
-   SetBadBishopMask(B3, C4, -10); SetBadBishopMask(B3, D5, -10);
-   SetBadBishopMask(C3, D4, -5);
-   SetBadBishopMask(D3, E4, -5);
-   SetBadBishopMask(E3, D4, -5);
-   SetBadBishopMask(F3, E4, -5);
-   SetBadBishopMask(G3, F4, -10); SetBadBishopMask(G3, E5, -10);
-   SetBadBishopMask(H3, G4, -5);  SetBadBishopMask(H3, F5, -5);
-   SetBadBishopMask(C4, D5, -3);
-   SetBadBishopMask(F4, E5, -3);
+	 SetBadBishopMask(F1, E2, -20);
+	 SetBadBishopMask(C1, D2, -20);
+	 SetBadBishopMask(A2, B3, -10); SetBadBishopMask(A2, C4, -10);
+	 SetBadBishopMask(B2, C3, -5);
+	 SetBadBishopMask(C2, D3, -5);  SetBadBishopMask(C2, E4, -5);
+	 SetBadBishopMask(D2, E3, -5);
+	 SetBadBishopMask(E2, D3, -5);
+	 SetBadBishopMask(F2, E3, -5);  SetBadBishopMask(F2, D4, -5);
+	 SetBadBishopMask(G2, F3, -5);
+	 SetBadBishopMask(H2, G3, -10); SetBadBishopMask(H2, F4, -10);
+	 SetBadBishopMask(A3, B4, -5);  SetBadBishopMask(A3, C5, -5);
+	 SetBadBishopMask(B3, C4, -10); SetBadBishopMask(B3, D5, -10);
+	 SetBadBishopMask(C3, D4, -5);
+	 SetBadBishopMask(D3, E4, -5);
+	 SetBadBishopMask(E3, D4, -5);
+	 SetBadBishopMask(F3, E4, -5);
+	 SetBadBishopMask(G3, F4, -10); SetBadBishopMask(G3, E5, -10);
+	 SetBadBishopMask(H3, G4, -5);  SetBadBishopMask(H3, F5, -5);
+	 SetBadBishopMask(C4, D5, -3);
+	 SetBadBishopMask(F4, E5, -3);
 }
 
 void sData::SetBadBishopMask(int bishSq, int pawnSq, int val)
 {
-   bbBadBishopMasks[WHITE][bishSq] ^= SqBb(pawnSq);
-   bbBadBishopMasks[BLACK][ REL_SQ(bishSq,BLACK) ] ^= RelSqBb(pawnSq, BLACK);
-   badBishopPenalty[WHITE][bishSq] = val;
-   badBishopPenalty[BLACK][REL_SQ(bishSq,BLACK)] = val;
+     bbBadBishopMasks[WHITE][bishSq] ^= SqBb(pawnSq);
+	 bbBadBishopMasks[BLACK][ REL_SQ(bishSq,BLACK) ] ^= RelSqBb(pawnSq, BLACK);
+	 badBishopPenalty[WHITE][bishSq] = val;
+	 badBishopPenalty[BLACK][REL_SQ(bishSq,BLACK)] = val;
 }
 
 void sData::InitSinglePiece(int pc, int mat, int del, int phase) 
 {
-   matValue[pc]      = mat;   
-   deltaValue[pc]    = del;
-   phaseValue[pc]    = phase;         
+     matValue[pc]      = mat;   
+	 deltaValue[pc]    = del;
+	 phaseValue[pc]    = phase;         
 }
 
 void sData::InitMobBonus(void) 
 {
-   for (int i = 0; i < 28; i++) {
-      mobBonusMg[N][i] = n_mob_mg[i];
-      mobBonusEg[N][i] = n_mob_eg[i];
-      mobBonusMg[B][i] = b_mob_mg[i];
-      mobBonusEg[B][i] = b_mob_eg[i];
-      mobBonusMg[R][i] = r_mob_mg[i];
-      mobBonusEg[R][i] = r_mob_eg[i];
-      mobBonusMg[Q][i] = q_mob_mg[i];
-      mobBonusEg[Q][i] = q_mob_eg[i];
-   }
+	 for (int i = 0; i < 28; i++) {
+		 mobBonusMg[N][i] = n_mob_mg[i];
+		 mobBonusEg[N][i] = n_mob_eg[i];
+		 mobBonusMg[B][i] = b_mob_mg[i];
+		 mobBonusEg[B][i] = b_mob_eg[i];
+		 mobBonusMg[R][i] = r_mob_mg[i];
+		 mobBonusEg[R][i] = r_mob_eg[i];
+		 mobBonusMg[Q][i] = q_mob_mg[i];
+		 mobBonusEg[Q][i] = q_mob_eg[i];
+	 }
 }
 
 void sData::InitCastleMask(void) 
 {
-   for (int sq = 0; sq < 64; sq++) castleMask[sq] = 15;
-   castleMask[A1] = 13;
-   castleMask[E1] = 12;
-   castleMask[H1] = 14;
-   castleMask[A8] = 7;
-   castleMask[E8] = 3;
-   castleMask[H8] = 11;
+  for (int sq = 0; sq < 64; sq++) castleMask[sq] = 15;
+  castleMask[A1] = 13;
+  castleMask[E1] = 12;
+  castleMask[H1] = 14;
+  castleMask[A8] = 7;
+  castleMask[E8] = 3;
+  castleMask[H8] = 11;
 }
 
 void sData::InitSearchData(void) 
 {
-   useNull          = 1;
-   lmrHistLimit     = 60;      // 70 is better in very fast games (10s per game)
-   deltaMargin      = 150;
-   goodCaptMargin   = 30;      // BxN is OK, RxB isn't
+	 useNull          = 1;
+	 lmrHistLimit     = 60;      // 70 is better in very fast games (10s per game)
+	 deltaMargin      = 150;
+	 goodCaptMargin   = 30;      // BxN is OK, RxB isn't
 }
 
 void sData::InitDistanceBonus(void) 
@@ -145,38 +158,36 @@ void sData::InitDistanceBonus(void)
     for (int i = 0; i < 64; ++i) {
          for (int j = 0; j < 64; ++j) {
          distance[i][j] = 14 - ( Abs( Rank(i) - Rank(j) ) + Abs( File(i) - File(j) ) );
-		 straightDistance[i][j] = 8 - (((Abs(Rank(i) - Rank(j)) + Abs(File(i) - File(j)))));
          }
      }
 }
 
 void sData::InitOptions(void) // init user-accessible stuff
 {
-   safetyStyle     = KS_QUADRATIC;
-   ownAttack       = 100; // WAS 100
-   oppAttack       = 100; // WAS 100
-   ownMobility     = 100;
-   oppMobility     = 110; // WAS 100
-   passedPawns     = 105; // 100 is worse, 110 might be marginally better
-   pawnStruct      = 100; // WAS 100
-   bishopPair      = 50; 
-   verbose         = 0;       // no additional display
-   elo             = MAX_ELO; // no weakening
-   contempt        = 12;
-   isAnalyzing     = 0;
-   useBook         = 1;
-   useWeakening    = 0;
-   useLearning     = 0;
-   bookFilter      = 10;
-   tropismWeight   = 0;
-   timeDivisor     = 36;      // WAS 40
+	 safetyStyle     = KS_QUADRATIC;
+	 ownMobility     = 110; // WAS 110
+	 oppMobility     = 110; // WAS 110
+	 ownAttack       = 100; // WAS 100
+	 oppAttack       = 100; // WAS 100
+	 passedPawns     = 105; // 100 is worse, 110 might be marginally better
+	 pawnStruct      = 100;
+	 bishopPair      = 50; 
+     verbose         = 0;       // no additional display
+	 elo             = MAX_ELO; // no weakening
+	 contempt        = 12;
+	 isAnalyzing     = 0;
+	 useBook         = 1;
+	 useWeakening    = 0;
+	 useLearning     = 0;
+	 bookFilter      = 10;
+	 lazyMargin      = 180+30;  // WAS 180
 }
 
 // used at the beginning of search to set scaling factors for eval components
 void sData::InitAsymmetric(int side) 
 {
-   mobSidePercentage[side]      = ownMobility;
-   mobSidePercentage[Opp(side)] = oppMobility;
-   attSidePercentage[side]      = ownAttack;
-   attSidePercentage[Opp(side)] = oppAttack;
+     mobSidePercentage[side]      = ownMobility;
+     mobSidePercentage[Opp(side)] = oppMobility;
+     attSidePercentage[side]      = ownAttack;
+     attSidePercentage[Opp(side)] = oppAttack;
 }
