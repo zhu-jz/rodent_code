@@ -19,6 +19,7 @@
 
 #pragma once
 
+#define LAZY_EVAL
 //#define HASH_EVAL
 #define GRAIN_SIZE 4
 
@@ -49,8 +50,8 @@ private:
   int pawnScoreEg[2];      // endgame pawn structure scores
   int passerScoreMg[2];    // midgame passed pawn scores
   int passerScoreEg[2];    // endgame passed pawn scores 
-  U64 bbPawnTakes[2];      // squares controlled by pawns, used in mobility eval (pawn eval uses only occupancy masks)
-  U64 bbPawnCanTake[2];    // squares that can be controlled by pawns as they advance, used in outpost eval
+  U64 bbPawnTakes[2];    // squares controlled by pawns, used in mobility eval (pawn eval uses only occupancy masks)
+  U64 bbPawnCanTake[2]; // squares that can be controlled by pawns as they advance, used in outpost eval
   U64 bbDiagChecks[2];
   U64 bbStraightChecks[2];
   U64 bbKnightChecks[2];
@@ -60,8 +61,7 @@ private:
   int attCount[2];         // attack counter based on square control
   int checkCount[2];       // check threat counter
   int attNumber[2];        // no. of pieces participating in the attack
-  int attWood[2];          // weight of material participating in the attack
-  int kingTropism[2];      // tropism to enemy king
+  int attWood[2];
   int mgFact,  egFact;     // material-driven scaling factors
   int mgScore, egScore;    // partial midgame and endgame scores (to be scaled)
 
@@ -97,22 +97,18 @@ private:
   void ScoreHanging(sPosition *p, int side);
   int  EvalKingFile(sPosition * p, int side, U64 bbFile);
   int  EvalFileShelter(U64 bbOwnPawns, int side);
-  int  EvalKingFileShelter(U64 bbOwnPawns, int side);
   int  EvalFileStorm(U64 bbOppPawns, int side);
   int  EvalTrappedKnight(sPosition *p);
   int  EvalTrappedBishop(sPosition *p, int side);
   int  EvalTrappedRook(sPosition *p, int side);
   int  PullToDraw(sPosition *p, int score);
   int  FinalizeScore(sPosition *p, int score);
-  void PrintEvalFactor(int mgW, int mgB, int egW, int egB);
 public:
-  int printing;
   int Normalize(int val, int limit);
   void ScaleValue(int * value, int factor);
   void DebugPst(sPosition *p);
-  void PrintEval(sPosition *p);
   int ReturnFast(sPosition *p);
-  int ReturnFull(sPosition *p);
+  int ReturnFull(sPosition *p, int alpha, int beta);
 };
 
 extern struct sEvaluator Eval;
