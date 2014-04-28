@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -24,24 +24,24 @@
 / http://chessprogramming.wikispaces.com/Kogge-Stone+Algorithm#Fillonanemptyboard */
 
 U64 FillKing(U64 bb) {
-    bb |= ShiftWest(bb);
-	bb |= ShiftEast(bb);
-	bb |= ( ShiftNorth(bb) | ShiftSouth(bb) );
-	return bb;
+   bb |= ShiftWest(bb);
+   bb |= ShiftEast(bb);
+   bb |= ( ShiftNorth(bb) | ShiftSouth(bb) );
+   return bb;
 }
 
 U64 FillNorth(U64 bb) {
-    bb |= bb << 8;
-	bb |= bb << 16;
-	bb |= bb << 32;
-	return bb;
+   bb |= bb << 8;
+   bb |= bb << 16;
+   bb |= bb << 32;
+   return bb;
 }
 
 U64 FillSouth(U64 bb) {
-    bb |= bb >> 8;
-	bb |= bb >> 16;
-	bb |= bb >> 32;
-	return bb;
+   bb |= bb >> 8;
+   bb |= bb >> 16;
+   bb |= bb >> 32;
+   return bb;
 }
 
 U64 FillWest(U64 bb) {
@@ -107,33 +107,33 @@ U64 FillSE(U64 bb) {
 // fill routines excluding initial square
 
 U64 FillNorthExcl(U64 bb) {
-	return FillNorth( ShiftNorth(bb) );
+   return FillNorth( ShiftNorth(bb) );
 }
 
 U64 FillSouthExcl(U64 bb) {
-  return FillSouth( ShiftSouth(bb) );
+   return FillSouth( ShiftSouth(bb) );
 }
 
 U64 FillWestExcl(U64 bb) {
-	return FillWest( ShiftWest(bb) );
+   return FillWest( ShiftWest(bb) );
 }
 
 U64 FillEastExcl(U64 bb) {
-	return FillEast( ShiftEast(bb) );
+   return FillEast( ShiftEast(bb) );
 }
 
 U64 FillNEExcl(U64 bb) {
-	return FillNE( ShiftNE(bb) );
+   return FillNE( ShiftNE(bb) );
 }
 
 U64 FillNWExcl(U64 bb) {
-	return FillNW( ShiftNW(bb) );
+   return FillNW( ShiftNW(bb) );
 }
 
 U64 FillSEExcl(U64 bb) {
-	return FillSE( ShiftSE(bb) );
+   return FillSE( ShiftSE(bb) );
 }
 
 U64 FillSWExcl(U64 bb) {
-	return FillSW( ShiftSW(bb) );
+   return FillSW( ShiftSW(bb) );
 }
