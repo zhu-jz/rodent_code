@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -81,17 +81,35 @@
 extern const U64 bbFile [8];
 extern const U64 bbRelRank [2] [8];
 
+#ifdef _WIN32
+#define FORCEINLINE __forceinline
+#else
+#define FORCEINLINE __inline
+#endif
+
 // Compiler and architecture dependent versions of FirstOne() function, 
 // triggered by defines at the top of this file.
 #ifdef USE_FIRST_ONE_INTRINSICS
+#ifdef _WIN32
 #include <intrin.h>
 #pragma intrinsic(_BitScanForward64)
 
-static int __forceinline FirstOne(U64 x) {
+static int FORCEINLINE FirstOne(U64 x) {
     unsigned long index = -1;
     _BitScanForward64(&index, x);
     return index;
 }
+
+#elif defined(__GNUC__)
+
+static int FORCEINLINE FirstOne(U64 x) {
+    int tmp = __builtin_ffsll(x);
+    if (tmp == 0) return -1;
+    else return tmp-1;
+}
+
+#endif
+
 #else
 	#ifdef USE_FIRST_ONE_ASM
 		#define FirstOne(x) FirstOneAsm(x)
