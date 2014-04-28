@@ -80,7 +80,6 @@ void sHistory::UpdateKillers(int move, int ply)
 void sHistory::UpdateHistory(sPosition *p, int move, int depth)
 {
      history[p->pc[Fsq(move)]][Tsq(move)] += depth * depth;
-	 if ( history[p->pc[Fsq(move)]][Tsq(move)] > (1 << 15) ) History.ReducePeaks();
 }
 
 void sHistory::UpdateCutoff(int move)
@@ -116,7 +115,9 @@ void sHistory::UpdateSortOnly(sPosition *p, int move, int depth, int ply)
 
 int sHistory::GetMoveHistoryValue(int pc, int sq_to) 
 {
-    return history[pc][sq_to];
+    int val = history[pc][sq_to];
+	if ( val > (1 << 15) ) History.ReducePeaks();
+	return val;
 }
 
 int sHistory::GetKiller(int ply, int slot) 
@@ -141,7 +142,7 @@ int sHistory::MoveIsBad(int move)
 
 int sHistory::Refutes(int lastMove, int move)
 {
-    return (refutation [Fsq(lastMove)] [Tsq(lastMove)] == move);
+	return (refutation [Fsq(lastMove)] [Tsq(lastMove)] == move);
 }
 
 int sHistory::Continues(int prevMove, int move)
