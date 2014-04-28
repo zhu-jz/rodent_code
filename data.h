@@ -31,7 +31,6 @@ public:
  int deltaValue[7];
  int phaseValue[7];
  int distance[64][64];
- int straightDistance[64][64];
  int pstMg[2][6][64];
  int pstEg[2][6][64];
  int outpost[2][6][64];
@@ -51,14 +50,13 @@ public:
  int kingDanger[100];
  int safetyStyle;
  int contempt;
- int tropismWeight;
- int timeDivisor;
 
  // search data
  int useNull;          // shall we use null move?
  int lmrHistLimit;     // what value of history counter prevents lmr?
  int deltaMargin;      // margin for a delta pruning in quiescence search 
  int goodCaptMargin;   // margin of a loss that can be incurred without classifying capture as "bad"
+ int lazyMargin;       // margin for lazy evaluation cutoff
  int verbose;          // shall we output more information about search than bare minimum?
  int useLearning;      // shall we use position learning?
  int isAnalyzing;
