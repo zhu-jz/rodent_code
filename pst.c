@@ -128,12 +128,6 @@ void sData::InitPstValues(void)
 	  pawnProperty[BACKWARD] [MG] [side] [REL_SQ(sq,side)] = pawnBackwardMg[File(sq)];
 	  pawnProperty[BACKWARD] [EG] [side] [REL_SQ(sq,side)] = pawnBackwardEg[File(sq)];
 
-	  // special case code to fix common Rodent error of creating a backward pawn for no good reason
-	  if (SqBb(sq) & bbRelRank[WHITE][RANK_3]) {
-	     pawnProperty[BACKWARD] [MG] [side] [REL_SQ(sq,side)] += pawnBackwardMg[File(sq)];
-	     pawnProperty[BACKWARD] [EG] [side] [REL_SQ(sq,side)] += pawnBackwardEg[File(sq)];
-	  }
-
 	  outpost[side][N][REL_SQ(sq,side)] = pstKnightOutpost[sq];
 	  outpost[side][B][REL_SQ(sq,side)] = pstBishopOutpost[sq];
 	  outpost[side][R][REL_SQ(sq,side)]   = pstRookOutpost[sq];
