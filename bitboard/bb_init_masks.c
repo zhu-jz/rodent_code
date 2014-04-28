@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -61,9 +61,9 @@ void InitPawnSupport() // pawn is supported if we find friendly pawns on masked 
 {
   for (int sq = 0; sq < 64; sq++) {
       bbPawnSupport[WHITE][sq] = ShiftWest(SqBb(sq)) | ShiftEast(SqBb(sq));
-	  bbPawnSupport[WHITE][sq] |= FillNorth(bbPawnSupport [WHITE][sq] );
+	  bbPawnSupport[WHITE][sq] |= FillSouth(bbPawnSupport [WHITE][sq] );
 
 	  bbPawnSupport[BLACK][sq] = ShiftWest(SqBb(sq)) | ShiftEast(SqBb(sq));
-	  bbPawnSupport[BLACK][sq] |= FillSouth(bbPawnSupport [BLACK][sq] );
+	  bbPawnSupport[BLACK][sq] |= FillNorth(bbPawnSupport [BLACK][sq] );
   }
 }
