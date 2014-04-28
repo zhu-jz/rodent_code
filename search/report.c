@@ -24,110 +24,110 @@
 #include "search.h"
 
 void sSearcher::ClearStats(void) {
-   for (int i=0; i < END_OF_STATS; i++) stat[i] = 0;
-   nodes = 0;
+	for (int i=0; i < END_OF_STATS; i++) stat[i] = 0;
+	nodes = 0;
 }
 
 void sSearcher::IncStat(int slot) {
-   stat[slot]++;
+	stat[slot]++;
 }
 
 void sSearcher::DisplayStats(void) 
 {
-   printf("Fail high ratio : %d percent \n", (stat[FAIL_FIRST] * 100) / Max( 1, stat[FAIL_HIGH]) );
-   printf("Quiescence ratio: %d percent \n", (stat[Q_NODES   ] * 100) / Max(1, nodes) );
+	 printf("Fail high ratio : %d percent \n", (stat[FAIL_FIRST] * 100) / Max( 1, stat[FAIL_HIGH]) );
+	 printf("Quiescence ratio: %d percent \n", (stat[Q_NODES   ] * 100) / Max(1, nodes) );
 }
 
 void sSearcher::DisplayRootInfo(void) 
 {
    if (Data.verbose) {
-      DisplayDepth();
-      DisplaySpeed();
-   }
+       DisplayDepth();
+	   DisplaySpeed();
+	}
 }
 
 void sSearcher::DisplayCurrmove(int move, int movesTried) 
 {
-   printf("info currmove ");
-   PrintMove(move);
-   printf(" currmovenumber %d \n", movesTried);
-   DisplaySpeed();
+	printf("info currmove ");
+    PrintMove(move);
+	printf(" currmovenumber %d \n", movesTried);
+	DisplaySpeed();
 }
 
 void sSearcher::DisplayDepth(void) {
-   printf("info depth %d \n", rootDepth / ONE_PLY);
+     printf("info depth %d \n", rootDepth / ONE_PLY);
 }
 
 void sSearcher::DisplaySettings(void)
 {
-   printf("info string Searched by Rodent, level %s", Data.currLevel);
-   printf(", style %s\n", Data.currStyle);
+     printf("info string Searched by Rodent, level %s", Data.currLevel);
+	 printf(", style %s\n", Data.currStyle);
 }
 
 void sSearcher::DisplayPv(int score, int *pv)
 {
-   // slowdown on weak levels
-   if (Data.elo < MAX_ELO && Data.useWeakening) 
-      Timer.WasteTime( (MAX_ELO - Data.elo) / 10 );
+  // slowdown on weak levels
+  if (Data.elo < MAX_ELO && Data.useWeakening) 
+     Timer.WasteTime( (MAX_ELO - Data.elo) / 10 );
 
-   char *type, pv_str[512];
-   int time = Timer.GetElapsedTime();
-   U32 nps  = GetNps(nodes, time);
+  char *type, pv_str[512];
+  int time = Timer.GetElapsedTime();
+  U32 nps  = GetNps(nodes, time);
 
-   type = "mate";
-   if (score < -MAX_EVAL)
-   score = (-MATE - score) / 2;
-   else if (score > MAX_EVAL)
-      score = (MATE - score + 1) / 2;
-   else
-      type = "cp";
+  type = "mate";
+  if (score < -MAX_EVAL)
+    score = (-MATE - score) / 2;
+  else if (score > MAX_EVAL)
+    score = (MATE - score + 1) / 2;
+  else
+    type = "cp";
   
-   PvToStr(pv, pv_str);
+  PvToStr(pv, pv_str);
 
-   if (flagProtocol == PROTO_UCI)
-   printf("info depth %d time %d nodes %u nps %d score %s %d pv %s\n",
+  if (flagProtocol == PROTO_UCI)
+  printf("info depth %d time %d nodes %u nps %d score %s %d pv %s\n",
           rootDepth/ONE_PLY, time,   nodes,   nps,   type, score, pv_str);
 
-   if (flagProtocol == PROTO_TXT)
-   printf("%2d. %3d.%1d %10u %4d %4d %s\n",
+  if (flagProtocol == PROTO_TXT)
+  printf("%2d. %3d.%1d %10u %4d %4d %s\n",
           rootDepth/ONE_PLY, time/1000, (time/100)%10, nodes, nodes / (time+1),  score, pv_str);
 }
 
 void sSearcher::DisplaySavedIterationTime(void) {
-   printf(" info string saving %d ms \n", Timer.GetSavedIterationTime() );
+     printf(" info string saving %d ms \n", Timer.GetSavedIterationTime() );
 }
 
 void sSearcher::DisplaySpeed(void) 
 {
-   int time = Timer.GetElapsedTime();
-   U32 nps  = GetNps(nodes, time);
+    int time = Timer.GetElapsedTime();
+    U32 nps  = GetNps(nodes, time);
 
-   printf("info time %d nodes %u nps %d \n",
-                time,   nodes,   nps );
+    printf("info time %d nodes %u nps %d \n",
+                 time,   nodes,   nps );
 }
 
 U32 sSearcher::GetNps(int nodes, int time) 
 {
-   U64 uTime  = (U64)time;
-   U64 uNodes = (U64)nodes;
+    U64 uTime  = (U64)time;
+	U64 uNodes = (U64)nodes;
 
-   if (uTime == 0) return 0;
+    if (uTime == 0) return 0;
 
-   if (nodes > 100000000) {
+	if (nodes > 100000000) {
 	   uNodes *= 10;
-       uNodes /= (uTime / 100);
-   }
-   else {
+	   uNodes /= (uTime / 100);
+	}
+	else {
       uNodes *= 1000;
 	  uNodes /= uTime;
-   }
+	}
 
-   return (U32)uNodes;
+    return (U32)uNodes;
 }
 
 void sSearcher::PrintTxtHeader(void)
 {
-   printf("---------------------------------------------------------------\n");
-   printf("ply  time      nodes knps  score pv\n");
-   printf("---------------------------------------------------------------\n");
+	 printf("---------------------------------------------------------------\n");
+	 printf("ply  time      nodes knps  score pv\n");
+	 printf("---------------------------------------------------------------\n");
 }
