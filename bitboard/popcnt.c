@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -20,7 +20,7 @@
 #include "../rodent.h"
 #include "bitboard.h"
 
-#if defined(GCC_POPCOUNT)
+#if defined(__GNUC__)
 
 int PopCnt(U64 bb) {
     return __builtin_popcountll(bb);
@@ -34,15 +34,15 @@ int PopCntSparse(U64 bb) {
    return __builtin_popcountll(bb);
 }
 
-#elif defined  USE_MM_POPCNT  // 64 bit windows
+#elif defined(USE_MM_POPCNT) && defined(_M_AMD64)  // 64 bit windows
 #include <nmmintrin.h>
-__forceinline int PopCnt(U64 bb) {
+FORCEINLINE int PopCnt(U64 bb) {
     return (int) _mm_popcnt_u64(bb);
 }
-__forceinline int PopCnt15(U64 bb) {
+FORCEINLINE int PopCnt15(U64 bb) {
     return (int) _mm_popcnt_u64(bb);
 }
-__forceinline int PopCntSparse(U64 bb) {
+FORCEINLINE int PopCntSparse(U64 bb) {
     return (int) _mm_popcnt_u64(bb);
 }
 
