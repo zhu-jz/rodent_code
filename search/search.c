@@ -32,19 +32,18 @@
 #include "search.h"
 #include "../eval/eval.h"
 
-static const int moveCountLimit[24] = {0, 0, 0, 0, 4, 4, 4, 4, 7, 7, 7,  7, 12, 12, 12, 12, 19, 19, 19, 19, 28, 28, 28, 28};
+static const int moveCountLimit[24] = {0, 0, 0, 0, 4, 4, 4, 4, 7, 7, 7, 7, 12, 12, 12, 12, 19, 19, 19, 19, 28, 28, 28, 28};
 
 void sSearcher::Init(void)
 {
 	aspiration       = 30;
-	futilityDepth    = 5;  
+	futilityBase     = 100; // 80 and 120 are worse
+	futilityStep     = 20;  // by this much futility margin increases each quarter ply
+	futilityDepth    = 4;   // 5 is worse
 	minimalLmrDepth  = 2 * ONE_PLY; // 3 is worse
     minimalNullDepth = 2 * ONE_PLY; // 3 is worse
 
-	for(int depth = 0; depth < 10 * ONE_PLY; depth ++) {
-		futilityMargin[depth] = (56 * int(log(double(depth * depth) / 2) / log(2.0) + 1.001));
-	}
-
+	// set null move reduction depth
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++) {
 		nullDepth[depth] = depth - 3*ONE_PLY - (depth - 3*ONE_PLY) / 4;
 	}
@@ -53,16 +52,16 @@ void sSearcher::Init(void)
 	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
 		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
            lmrSize[0][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // all node
-           lmrSize[1][depth][moves] = 4 * (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
-           lmrSize[2][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // cut node
+		   lmrSize[1][depth][moves] = 4 * (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
+		   lmrSize[2][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // cut node
 
-           for (int node = 0; node <= 2; node++) {
-              if (lmrSize[node][depth][moves] > 2 * ONE_PLY)
+		   for (int node = 0; node <= 2; node++) {
+			   if (lmrSize[node][depth][moves] > 2 * ONE_PLY)
                   lmrSize[node][depth][moves] += ONE_PLY / 2;
-              else if (lmrSize[node][depth][moves] > 1 * ONE_PLY)
+               else if (lmrSize[node][depth][moves] > 1 * ONE_PLY)
                   lmrSize[node][depth][moves] += ONE_PLY / 4;
-           }
-        }
+		   }
+		}
 }
 
 void sSearcher::Think(sPosition *p, int *pv)
@@ -73,7 +72,6 @@ void sSearcher::Think(sPosition *p, int *pv)
   isReporting         = 1;
   nodes               = 0;
   flagAbortSearch     = 0;
-  Eval.printing       = 0;
   History.OnNewSearch();
   TransTable.ChangeDate();
   Timer.SetStartTime();
@@ -302,7 +300,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
       flagMoveType;             // move type flag, supplied by NextMove()
   sSelector Selector;           // an object responsible for maintaining move list and picking moves 
     UNDO  undoData[1];          // data required to undo a move
-	int captureVictim = NO_TP;
 
   // NODE INITIALIZATION
   int nullScore      = 0;       // result of a null move search
@@ -359,7 +356,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   }
   
   // SAFEGUARD AGAINST HITTING MAX PLY LIMIT
-  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p);
+  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
 
   // DETERMINE IF WE CAN APPLY PRUNING
   int flagCanPrune 
@@ -381,7 +378,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   &&   flagCanPrune
   &&   depth <= minimalNullDepth
   &&  !wasNull
-  &&  !move
   &&   p->pieceMat[p->side] > Data.matValue[N]) {
      Manipulator.DoNull(p, undoData);
      score = -Quiesce(p, ply, 0, -beta, -beta+1, 0, pv);
@@ -399,7 +395,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   &&  !wasNull
   &&   p->pieceMat[p->side] > Data.matValue[N]) 
   {
-    if ( beta <= Eval.ReturnFull(p) ) {
+    if ( beta <= Eval.ReturnFull(p, alpha, beta) ) {
 
       newDepth = nullDepth[depth];
 
@@ -421,10 +417,10 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
       if (flagAbortSearch) return 0; // timeout, "stop" command or mispredicted ponder move
 
-	  // verify null move in the endgame
+	  // verify null move in the endgame or at sufficient depth
 	  if (nullScore >= beta && p->pieceMat[p->side] < 1600 ) 
           nullScore = Search(p, ply, alpha, beta, newDepth-ONE_PLY, CUT_NODE, NO_NULL, 0, 0, newPv); // BUG, should verify with lastMove
-
+	                                             
       if (nullScore >= beta) {
          // we don't want to overwrite real entries, as they are more useful for move ordering 
          if (!move) TransTable.Store(p->hashKey, 0, nullScore, LOWER, depth, ply);
@@ -438,13 +434,13 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
    // RAZORING based on Toga II 4.0
    if ( nodeType != PV_NODE 
    &&  !flagInCheck 
-   &&  !wasNull // optimization from Fruit Reloaded
-   &&  !(bbPc(p,p->side,P) & bbRelRank[p->side][RANK_7] ) // no pawns to promote in one move
    &&  !move
+   &&  !wasNull
+   &&  !(bbPc(p,p->side,P) & bbRelRank[p->side][RANK_7] ) // no pawns to promote in one move
    &&   depth <= 3*ONE_PLY) {
       int threshold = beta - 300 - (depth-ONE_PLY) * 15;
 
-      if (Eval.ReturnFull(p) < threshold) {
+      if (Eval.ReturnFull(p, alpha, beta) < threshold) {
 		 score = Quiesce(p, ply, 0, alpha, beta, 0, pv); 
          if (score < threshold) return score;
       }
@@ -461,7 +457,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	  TransTable.RetrieveMove(p->hashKey, &move);
   } // end of internal iterative deepening code
 
-
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
   Selector.InitMoveList(p, History.GetRefutation(lastMove), History.GetContinuation(contMove), move, ply);
@@ -475,19 +470,18 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	     if (++normalMoveCnt == 1) {   
             if ( depth < futilityDepth * ONE_PLY  // we are sufficiently close to the leaf
             && flagCanPrune
-			&& alpha > -MAX_EVAL ) {
+            && alpha > -MAX_EVAL ) {
                if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
                nodeEval = TransTable.RefineScore( p->hashKey, nodeEval );
 
                // this node looks bad enough, so we may apply futility pruning
-               if ( (nodeEval + futilityMargin[depth] ) < beta ) flagFutility = 1;
+               if ( (nodeEval + SetFutilityMargin(depth) ) < beta ) flagFutility = 1;
 			   // TODO: smaller margin for later moves (requires restructuring)
             }
 	     }
 	 }
 
 	 // MAKE A MOVE
-	 captureVictim = TpOnSq(p, Tsq(move) );
 	 Manipulator.DoMove(p, move, undoData);    
 	
 	 // UNDO ILLEGAL MOVES
@@ -529,37 +523,31 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
         continue;
 	 }
 
-     // LATE MOVE PRUNING modelled after Toga II 3.0; the most important change 
-	 // is that for earlier moves we need confirmation by history heuristic
+     // LATE MOVE PRUNING near the leaves (2014-01-24: modelled after Toga II 3.0)
+
      if ( flagCanReduce
-     &&   depth <= 5*ONE_PLY // we are near the leaf
+     &&   depth <= 5*ONE_PLY // we are near the leaf TODO: increase depth 
      &&  !History.Refutes(lastMove, move) )
      {
          if (IsMoveOrdinary(flagMoveType) 
          &&  normalMoveCnt > moveCountLimit[depth] ) { 
-		 if (normalMoveCnt > moveCountLimit[depth] / 2 ) // unconditional reduction of later moves
+		 if (normalMoveCnt > moveCountLimit[depth] / 2 )  
 			 { Manipulator.UndoMove(p, move, undoData); continue; }
-	 		 if (History.MoveIsBad(move) )               // history-based reduction of earlier moves
+	 		 if (History.MoveIsBad(move) ) 
 			 { Manipulator.UndoMove(p, move, undoData); continue; }
-		 }
-         
-         // PSEUDO-FUTILITY PRUNING OF PAWN CAPTURES
-		 if ( flagFutility           // means, among other things, that capture is bad
-		 &&   captureVictim == P
-         &&   nodeEval < beta - 700) {
-              Manipulator.UndoMove(p, move, undoData);
-              continue;
-         }
-     } // end of late move pruning code
+
+ 		 }
+	 }
 
 	 // LATE MOVE REDUCTION
-	 if  ( !flagInCheck
-	 &&    !depthChange
+	 if  ( !flagInCheck 
+	 &&    !depthChange 
 	 &&     AvoidReduction(move, flagMoveType)
-     &&     depth >= minimalLmrDepth        // we have some depth left
-	 &&     movesTried > 3                  // we're sufficiently down the move list
-	 &&     History.MoveIsBad(move)         // current move has bad history score
-	 &&    !History.Refutes(lastMove, move) // move is not tactically important
+     &&     depth >= minimalLmrDepth    // we have some depth left
+	 &&     movesTried > 3              // we're sufficiently down the move list
+	 &&     History.MoveIsBad(move)     // current move has bad history score
+	 &&    !History.Refutes(lastMove, move)
+	 //&&    !History.Continues(contMove, move)
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
@@ -633,6 +621,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
    return best;
 }
 
+int sSearcher::SetFutilityMargin(int depth) 
+{
+	return futilityBase + depth * futilityStep;
+}
+
 int sSearcher::IsRepetition(sPosition *p)
 {
     for (int i = 4; i <= p->reversibleMoves; i += 2)
@@ -670,11 +663,6 @@ void sSearcher::CheckInput(void)
        else if (strcmp(command, "ponderhit") == 0)
           pondering = 0;
     }
-  
-#ifdef FAST_TUNING
-	if (nodes > FAST_TUNING) 
-	   flagAbortSearch = 1;
-#endif
 
 	// node limit exceeded
 	if ( Timer.GetData(MAX_NODES) 
@@ -690,9 +678,9 @@ void sSearcher::CheckInput(void)
 
 int sSearcher::DrawScore(sPosition *p)
 {
-    int scale = Min(24, p->phase);
-    int score = (-Data.contempt * scale) / 24;
+   int scale = Min(24, p->phase);
+   int score = (-Data.contempt * scale) / 24;
 
-    if ( p->side == rootSide ) return score;
-    else                       return -score;
+   if ( p->side == rootSide ) return score;
+   else                       return -score;
 }
