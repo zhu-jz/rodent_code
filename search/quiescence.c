@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -49,11 +49,17 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
   *pv = 0;
 
   // safeguard against hitting max ply limit
-  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p);
+  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
 
-  // GET STAND PAT SCORE
-  best = Eval.ReturnFull(p);
-  if (best >= beta) return best;
+  best = Eval.ReturnFull(p, alpha, beta);
+
+  if (best >= beta) { 
+  // CAUSES DIFFERENT NODE COUNTS BETWEEN DEBUG AND RELEASE COMPILE 
+  // - probably there's an uninitialized variable in sEvaluator or setboard
+  //  TransTable.Store(p->hashKey, 0, score, LOWER, 1, ply);
+	  return best;
+  }
+
   if (best > alpha) alpha = best;
 
   Selector.InitCaptureList(p, move);
@@ -66,8 +72,8 @@ int sSearcher::Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, i
 	if ( best + Data.deltaValue[ TpOnSq(p, Tsq(move) ) ] < alpha) continue;
 
 	// 2) (expensive) this capture appears to lose material
-	if (Selector.CaptureIsBad(p, move)) continue;  
-	  
+	if (Selector.CaptureIsBad(p, move)) continue;
+	 
     Manipulator.DoMove(p, move, undoData);
     
 	// don't process illegal moves
@@ -131,18 +137,21 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
   *pv = 0;
 
   // safeguard against hitting max ply limit
-  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p);
+  if (ply >= MAX_PLY - 1) return Eval.ReturnFull(p, alpha, beta);
 
-  // GET STAND PAT SCORE IF NOT IN CHECK
   if (flagInCheck) best = -INF;
-  else             best = Eval.ReturnFull(p);
+  else             best = Eval.ReturnFull(p, alpha, beta);
 
-  if (best >= beta) return best;
+  if (best >= beta) { 
+  // CAUSES DIFFERENT NODE COUNTS BETWEEN DEBUG AND RELEASE COMPILE 
+  // - probably there's an uninitialized variable in sEvaluator or setboard
+  //  TransTable.Store(p->hashKey, 0, score, LOWER, 1, ply);
+	  return best;
+  }
+
   if (best > alpha) alpha = best;
 
-#ifdef QS_SMART
-  if (!flagInCheck) {
-#endif
+  //if (!flagInCheck) {
 
   Selector.InitCaptureList(p, move);
 
@@ -150,7 +159,7 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
 
     // DELTA PRUNING 
 	if (!flagInCheck) {
-	   // 1) (cheap) gain promised by this capture is unlikely to raise score
+	   // 1) (cheap) gain promised by this move is unlikely to raise score
 	   if ( best + Data.deltaValue[ TpOnSq(p, Tsq(move) ) ] < alpha) continue;
 
 	   // 2) (expensive) this capture appears to lose material
@@ -186,14 +195,12 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
     }
   }
 
-#ifdef QS_SMART
-  }
-#endif
+  //}
 
-#ifdef QS_SMART
-  if (flagInCheck) {
 
-  Selector.InitMoveList(p, move, 0, 0, 0);
+  /**  if (flagInCheck) {
+
+  Selector.InitMoveList(p, move, 0);
 
   while ( move = Selector.NextMove(0, &unusedFlag) ) {      // on finding next move
 	  
@@ -227,8 +234,8 @@ int sSearcher::QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int be
     }
   }
 
-  }
-#endif
+  }/**/
+
 
   // SAVE SEARCH RESULT IN TRANSPOSITION TABLE
   if (*pv) TransTable.Store(p->hashKey, *pv, best, EXACT, 1, ply);
