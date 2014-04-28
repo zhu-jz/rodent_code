@@ -106,7 +106,7 @@ void sParser::UciLoop(void)
     } else if (strcmp(token, "print") == 0) {
       PrintBoard(p);
     } else if (strcmp(token, "eval") == 0) {
-      Eval.PrintEval(p);
+      printf(" %d \n", Eval.ReturnFull(p, -32000,32000) );
     } else if (strcmp(token, "signature") == 0) {
       printf(" Command \"bench 8\" should search %d nodes \n", BENCH_8 );
     } else if (strcmp(token, "bench") == 0) {
@@ -174,16 +174,14 @@ void sParser::SetOption(char *ptr)
 	Data.ownAttack = atoi(value);
   } else if (strcmp(name, "OppAttack") == 0) {
 	Data.oppAttack = atoi(value);
-  } else if (strcmp(name, "KingTropism") == 0) {
-	Data.tropismWeight = atoi(value);
   } else if (strcmp(name, "PawnStructure") == 0) {
-	Data.pawnStruct = atoi(value);
+	  Data.pawnStruct = atoi(value);
   } else if (strcmp(name, "PassedPawns") == 0) {
-	Data.passedPawns = atoi(value);
+	  Data.passedPawns = atoi(value);
+  } else if (strcmp(name, "LazyMargin") == 0) {
+	Data.lazyMargin = atoi(value);
   } else if (strcmp(name, "Contempt") == 0) {
 	Data.contempt = atoi(value);
-  } else if (strcmp(name, "TimeDivisor") == 0) {
-	Data.timeDivisor = atoi(value);
   } else if (strcmp(name, "UCI_Elo") == 0) {
 	Data.elo = atoi(value);
 	if (Data.panelStyle == PANEL_NORMAL) Data.useWeakening = 1;
@@ -227,12 +225,11 @@ void sParser::PrintUciOptions()
 	printf("option name OppMobility type spin default %d min 0 max 500\n", Data.oppMobility);
 	printf("option name OwnAttack type spin default %d min 0 max 500\n", Data.ownAttack);
 	printf("option name OppAttack type spin default %d min 0 max 500\n", Data.oppAttack);
-	printf("option name KingTropism type spin default %d min 0 max 500\n", Data.tropismWeight);
 	printf("option name PawnStructure type spin default %d min 0 max 500\n", Data.pawnStruct);
 	printf("option name PassedPawns type spin default %d min 0 max 500\n", Data.passedPawns);
 	printf("option name BookFilter type spin default %d min 0 max 100\n", Data.bookFilter);
+	printf("option name LazyMargin type spin default %d min -500 max 500\n", Data.lazyMargin);
 	printf("option name Contempt type spin default %d min -300 max 300\n", Data.contempt);
-	printf("option name TimeDivisor type spin default %d min 20 max 60\n", Data.timeDivisor);
 	printf("option name UCI_Elo type spin default %d min 600 max 2600\n", Data.elo);
 	printf("option name UCI_LimitStrength type check default false\n", Data.useWeakening);
 	}
