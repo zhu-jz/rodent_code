@@ -46,7 +46,7 @@ void sTimer::Clear(void)
   SetData(B_INC, 0);
   SetData(MOVE_TIME, 0);
   SetData(MAX_NODES, 0);
-  SetData(MOVES_TO_GO, Data.timeDivisor);
+  SetData(MOVES_TO_GO, 40);
 }
 
 void sTimer::SetStartTime(void) {
