@@ -1,7 +1,7 @@
 /*
   Rodent, a UCI chess playing engine derived from Sungorus 1.4
   Copyright (C) 2009-2011 Pablo Vazquez (Sungorus author)
-  Copyright (C) 2011-2013 Pawel Koziol
+  Copyright (C) 2011-2014 Pawel Koziol
 
   Rodent is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published 
@@ -23,31 +23,31 @@
 
 U64 sGenCache::GetRookMob(U64 bbOccupied, int sq) 
 {
-	// generate mobility bitboard or read it from a table
-	U64 bbRelevantOcc = bbOccupied & bbRAttacksOnEmpty[sq];
-	if (bbRelevantOcc == bbROcc[sq])
-		return bbRMob[sq];
-	else {
-	  U64 bbControl  = RAttacks(bbOccupied, sq);  
-	  bbRMob[sq] = bbControl;
-	  bbROcc[sq] = bbRelevantOcc;
-	  return bbControl;
+   // generate mobility bitboard or read it from a table
+   U64 bbRelevantOcc = bbOccupied & bbRAttacksOnEmpty[sq];
+   if (bbRelevantOcc == bbROcc[sq])
+      return bbRMob[sq];
+   else {
+      U64 bbControl  = RAttacks(bbOccupied, sq);  
+      bbRMob[sq] = bbControl;
+      bbROcc[sq] = bbRelevantOcc;
+      return bbControl;
 	}	
 }
 
 U64 sGenCache::GetBishMob(U64 bbOccupied, int sq) 
 {
-	U64 bbRelevantOcc = bbOccupied & bbBAttacksOnEmpty[sq];
-	if (bbRelevantOcc == bbBOcc[sq])
-		return bbBMob[sq];
-	else {
-	  U64 bbControl  = BAttacks(bbOccupied, sq);  
-	  bbBMob[sq] = bbControl;
-	  bbBOcc[sq] = bbRelevantOcc;
-	  return bbControl;
-	}	
+   U64 bbRelevantOcc = bbOccupied & bbBAttacksOnEmpty[sq];
+   if (bbRelevantOcc == bbBOcc[sq])
+      return bbBMob[sq];
+   else {
+      U64 bbControl  = BAttacks(bbOccupied, sq);  
+      bbBMob[sq] = bbControl;
+      bbBOcc[sq] = bbRelevantOcc;
+      return bbControl;
+   }	
 }
 
 U64 sGenCache::GetQueenMob(U64 bbOccupied, int sq) {
-    return ( GetBishMob(bbOccupied, sq) | GetRookMob(bbOccupied, sq) );
+   return ( GetBishMob(bbOccupied, sq) | GetRookMob(bbOccupied, sq) );
 }
