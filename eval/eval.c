@@ -67,26 +67,26 @@ void sEvaluator::InitStaticScore(void)
 
 void sEvaluator::InitDynamicScore(sPosition *p) 
 {
-     attScore[WHITE]      = 0;   attScore[BLACK]    = 0;  // clear attack scores
-	 attNumber[WHITE]     = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
-	 attCount[WHITE]      = 0;   attCount[BLACK]    = 0;
-	 checkCount[WHITE]    = 0;   checkCount[BLACK]  = 0;
-	 attWood[WHITE]       = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
-	 kingTropism[WHITE]   = 0;   kingTropism[BLACK] = 0;
-	 mgMisc[WHITE]        = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
-	 egMisc[WHITE]        = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
-	 mgMobility[WHITE]    = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
-	 egMobility[WHITE]    = 0;   egMobility[BLACK]  = 0;  // clear endgame mobility	 
-	 bbPawnTakes[WHITE]   = GetWPControl( bbPc(p, WHITE, P) );
-	 bbPawnTakes[BLACK]   = GetBPControl( bbPc(p, BLACK, P) );
+     attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
+	 attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
+	 attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
+	 checkCount[WHITE]       = 0;   checkCount[BLACK]  = 0;
+	 attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
+	 mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
+	 egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
+	 mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
+	 egMobility[WHITE]       = 0;   egMobility[BLACK]  = 0;  // clear endgame mobility	 
+	 bbPawnTakes[WHITE]    = GetWPControl( bbPc(p, WHITE, P) );
+	 bbPawnTakes[BLACK]    = GetBPControl( bbPc(p, BLACK, P) );
 	 bbPawnCanTake[WHITE] = FillNorth( bbPawnTakes[WHITE] );
 	 bbPawnCanTake[BLACK] = FillSouth( bbPawnTakes[BLACK] );
-	 bbAllAttacks[WHITE]  = bbPawnTakes[WHITE];
-	 bbAllAttacks[BLACK]  = bbPawnTakes[BLACK];
+	 bbAllAttacks[WHITE]     = bbPawnTakes[WHITE];
+	 bbAllAttacks[BLACK]     = bbPawnTakes[BLACK];
 	 bbMinorCoorAttacks[WHITE]  = 0ULL;
 	 bbMinorCoorAttacks[BLACK]  = 0ULL;
  	 bbRookCoorAttacks[WHITE]   = 0ULL;
 	 bbRookCoorAttacks[BLACK]   = 0ULL;
+
 
 	 // set squares from which king can be checked 
 	 U64 bbOccupied = OccBb(p);
@@ -118,19 +118,18 @@ void sEvaluator::ScoreHanging(sPosition *p, int side)
 	bbHanging &= ~bbPc(p, Opp(side), P);  // currently we don't evaluate threats against pawns
 
 	U64 bbSpace = UnoccBb(p) & bbAllAttacks[side];
-	bbSpace &= ~bbRelRank[side][RANK_1];  // controlling home ground is not space advantage
+	bbSpace &= ~bbRelRank[side][RANK_1];    // controlling home ground is not space advantage
 	bbSpace &= ~bbRelRank[side][RANK_2];
 	bbSpace &= ~bbRelRank[side][RANK_3];
-	bbSpace &= ~bbPawnTakes[Opp(side)];   // squares attacked by enemy pawns aren't effectively controlled
-	AddMisc(side, 2*PopCnt(bbSpace), 0);  // actually bonus is for control of squares within enemy camp
-	
+	bbSpace &= ~bbPawnTakes[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
+	AddMisc(side, PopCnt(bbSpace), 0);
 	int pc, sq, val;
-	
+
     while (bbHanging) {
        sq  = FirstOne(bbHanging);
 	   pc  = TpOnSq(p, sq);
 	   val = Data.matValue[pc] / 64;
-	   AddMisc(side, 10+val, 18+val);     // values from DiscoCheck by Lucas Braesch
+	   AddMisc(side, 10+val, 18+val);
 	   bbHanging &= bbHanging - 1;
 	}
 }
@@ -168,10 +167,10 @@ void sEvaluator::ScoreKingShield(sPosition *p, int side)
 
 int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 {
-  int shelter = EvalFileShelter( bbFile & bbPc(p, side, P), side );
-  int storm   = EvalFileStorm ( bbFile & bbPc(p, Opp(side), P), side );
-  if (bbFile & bbCentralFile) return (shelter / 2) + storm;
-  else                        return shelter + storm;
+   int shelter = EvalFileShelter( bbFile & bbPc(p, side, P), side );
+   int storm   = EvalFileStorm ( bbFile & bbPc(p, Opp(side), P), side );
+   if (bbFile & bbCentralFile) return (shelter / 2) + storm;
+   else                        return shelter + storm;
 }
 
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
@@ -183,11 +182,11 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
 		attUnit += checkCount[side];     // check and contact check threats
 		attUnit += (attWood[side] / 2);  // material involved in the attack
 		if (attUnit > 99) attUnit = 99;  // bounds checking
-		attScore[side] = Data.kingDanger[attUnit] * 10;
+		attScore[side] = Data.kingDanger[attUnit];
 	}
 	if (Data.safetyStyle == KS_HANDMADE) {
 		int attUnit = attCount[side] + checkCount[side];
-		attScore[side] = safety[ attUnit + n_of_att[attNumber[side]] ] * 10;
+		attScore[side] = safety[ attUnit + n_of_att[attNumber[side]] ];
 	}
 	ScaleValue(&attScore[side], Data.attSidePercentage[side]);
 }
@@ -220,7 +219,7 @@ void sEvaluator::ScorePatterns(sPosition *p, int side)
 		AddMisc(side, mgTwoOnSeventh,egTwoOnSeventh);
 }
 
-int sEvaluator::ReturnFull(sPosition *p)
+int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 {
 #ifdef HASH_EVAL
 	int addr = p->hashKey % EVAL_HASH_SIZE;
@@ -230,70 +229,86 @@ int sEvaluator::ReturnFull(sPosition *p)
 	}
 #endif
 
-   int score = GetMaterialScore(p) + CheckmateHelper(p);
-   p->side == WHITE ? score+=5 : score-=5; // tempo
+  int fullEval = 0;
+  int score = GetMaterialScore(p) + CheckmateHelper(p);
+  p->side == WHITE ? score+=5 : score-=5;
 
-   InitStaticScore();
-   SetScaleFactor(p);
-   EvalPawns(p);
+  InitStaticScore();
+  SetScaleFactor(p);
+  EvalPawns(p);
   
-   score += EvalTrappedKnight(p);                 
-   score += (EvalTrappedBishop(p,WHITE) - EvalTrappedBishop(p,BLACK) );                 
-   score += (EvalTrappedRook(p,WHITE)   - EvalTrappedRook(p,BLACK) );  
+  score += EvalTrappedKnight(p);                 
+  score += (EvalTrappedBishop(p,WHITE) - EvalTrappedBishop(p,BLACK) );                 
+  score += (EvalTrappedRook(p,WHITE)   - EvalTrappedRook(p,BLACK) );  
 
-   mgScore += (p->pstMg[WHITE] - p->pstMg[BLACK]);
-   egScore += (p->pstEg[WHITE] - p->pstEg[BLACK]);
+  mgScore += (p->pstMg[WHITE] - p->pstMg[BLACK]);
+  egScore += (p->pstEg[WHITE] - p->pstEg[BLACK]);
   
-   InitDynamicScore(p);
+#ifdef LAZY_EVAL
+  int tempScore = score + Interpolate();
 
-   ScoreN(p, WHITE);
-   ScoreN(p, BLACK);
-   ScoreB(p, WHITE);
-   ScoreB(p, BLACK);
-   ScoreR(p, WHITE);
-   ScoreR(p, BLACK);
-   ScoreQ(p, WHITE);
-   ScoreQ(p, BLACK);
-   ScoreKingShield(p, WHITE);
-   ScoreKingShield(p, BLACK);  
-   ScoreKingAttacks(p, WHITE);
-   ScoreKingAttacks(p, BLACK);
-   ScoreHanging(p, WHITE);
-   ScoreHanging(p, BLACK);
+  // lazy evaluation - avoids costly calculations
+  // if score seems already very high/very low
+  if (tempScore > alpha - Data.lazyMargin 
+  &&  tempScore < beta  + Data.lazyMargin
+  ) {
+#endif
+	  fullEval = 1;
+	  InitDynamicScore(p);
 
-   // ADDITIONAL PAWN EVAL
-   ScoreP(p, WHITE);
-   ScoreP(p, BLACK);
+      ScoreN(p, WHITE);
+      ScoreN(p, BLACK);
+	  ScoreB(p, WHITE);
+      ScoreB(p, BLACK);
+      ScoreR(p, WHITE);
+	  ScoreR(p, BLACK);
+      ScoreQ(p, WHITE);
+      ScoreQ(p, BLACK);
+	  ScoreKingShield(p, WHITE);
+	  ScoreKingShield(p, BLACK);  
+	  ScoreKingAttacks(p, WHITE);
+	  ScoreKingAttacks(p, BLACK);
+	  ScoreHanging(p, WHITE);
+	  ScoreHanging(p, BLACK);
 
-   // PATTERNS
-   ScorePatterns(p, WHITE);
-   ScorePatterns(p, BLACK);
+	  // ADDITIONAL PAWN EVAL
+	  ScoreP(p, WHITE);
+	  ScoreP(p, BLACK);
+
+	  // PATTERNS
+	  ScorePatterns(p, WHITE);
+	  ScorePatterns(p, BLACK);
       
-   // ASYMMETRIC MOBILITY SCALING
-   ScaleValue(&mgMobility[WHITE], Data.mobSidePercentage[WHITE]);
-   ScaleValue(&mgMobility[BLACK], Data.mobSidePercentage[BLACK]);
-   ScaleValue(&egMobility[WHITE], Data.mobSidePercentage[WHITE]);
-   ScaleValue(&egMobility[BLACK], Data.mobSidePercentage[BLACK]);
+	  // ASYMMETRIC MOBILITY SCALING
+	  ScaleValue(&mgMobility[WHITE], Data.mobSidePercentage[WHITE]);
+	  ScaleValue(&mgMobility[BLACK], Data.mobSidePercentage[BLACK]);
+  	  ScaleValue(&egMobility[WHITE], Data.mobSidePercentage[WHITE]);
+	  ScaleValue(&egMobility[BLACK], Data.mobSidePercentage[BLACK]);
 
-   // MERGING SCORE
-   mgScore += ( mgMobility[WHITE] - mgMobility[BLACK] );
-   egScore += ( egMobility[WHITE] - egMobility[BLACK] );
-   mgScore += ( mgMisc[WHITE]     - mgMisc[BLACK]     );
-   egScore += ( egMisc[WHITE]     - egMisc[BLACK]     );
-   mgScore += ( (kingTropism[WHITE] - kingTropism[BLACK]) * Data.tropismWeight ) / 100;
-   score   += Interpolate();    // merge middlegame and endgame scores
-   score   += ( attScore[WHITE]  - attScore[BLACK] );
-
-   score = PullToDraw(p, score);    // decrease score in drawish endgames
-   score = FinalizeScore(p, score); // bounds, granulatity and weakening
-
-#ifdef HASH_EVAL
-   EvalTT[addr].key = p->hashKey;
-   EvalTT[addr].score = score;
+	  // MERGING SCORE
+	  mgScore += ( mgMobility[WHITE] - mgMobility[BLACK] );
+	  egScore += ( egMobility[WHITE] - egMobility[BLACK] );
+	  mgScore += ( mgMisc[WHITE]     - mgMisc[BLACK]     );
+	  egScore += ( egMisc[WHITE]     - egMisc[BLACK]     );
+	  score   += Interpolate();    // merge middlegame and endgame scores
+	  score   += ( attScore[WHITE]  - attScore[BLACK] );
+#ifdef LAZY_EVAL
+  }
+  else score = tempScore; 
 #endif
 
-   // return score relative to the side to move
-   return p->side == WHITE ? score : -score;
+  score = PullToDraw(p, score);    // decrease score in drawish endgames
+  score = FinalizeScore(p, score); // bounds, granulatity and weakening
+
+#ifdef HASH_EVAL
+  if (fullEval) {
+  EvalTT[addr].key = p->hashKey;
+  EvalTT[addr].score = score;
+  }
+#endif
+
+  // return score relative to the side to move
+  return p->side == WHITE ? score : -score;
 }
 
 // fast evaluation function (material, pst, pawn structure)
@@ -340,18 +355,19 @@ int sEvaluator::FinalizeScore(sPosition * p, int score)
 void sEvaluator::ScaleValue(int * value, int factor) 
 {
      *value *= factor;
-	 *value /= 1000;
+	 *value /= 100;
 }
 
 void sEvaluator::DebugPst(sPosition *p) 
 {
 	 int sq, mg = 0, eg = 0;
 	 const int clMult[2] = {1, -1};
+	 U64 bbPieces;
 
 	 for (int cl = 0; cl <= 1; cl++)
 	 for (int pc = 0; pc <= 5; pc++)  
 	 {
-	     U64 bbPieces = bbPc(p, cl, pc);
+	     bbPieces = bbPc(p, cl, pc);
 	     while (bbPieces) {
            sq = PopFirstBit(&bbPieces);
 	       mg += Data.pstMg[cl][pc][sq] * clMult[cl];
@@ -359,34 +375,4 @@ void sEvaluator::DebugPst(sPosition *p)
 	     }
 	 }
 	 printf("Recalculated pst : mg %d eg %d\n", mg, eg);
-}
-
-void sEvaluator::PrintEval(sPosition *p) 
-{
-    Data.InitAsymmetric(p->side);
-	printing = 1;
-	int result = ReturnFull(p);
-	printing = 0;
-	if (p->side == BLACK) result *= -1;
-	printf("Total      : %d\n", result);
-	printf("Phase      : %2d of 24 \n", mgFact);
-	printf("Material   : %d\n", GetMaterialScore(p) );
-	printf("------------------------------------------------\n");
-	printf("              |  mgW , mgB |  egW , egB | scaled:\n");
-	printf("------------------------------------------------\n");
-	printf("Pst         : "); PrintEvalFactor( p->pstMg[WHITE], p->pstMg[BLACK], p->pstEg[WHITE], p->pstEg[BLACK]);
-	printf("Mobility    : "); PrintEvalFactor( mgMobility[WHITE], mgMobility[BLACK], egMobility[WHITE], egMobility[BLACK]);
-	printf("Passers     : "); PrintEvalFactor( passerScoreMg[WHITE], passerScoreMg[BLACK], passerScoreEg[WHITE], passerScoreEg[BLACK]);
-	printf("Pawn struct : "); PrintEvalFactor( pawnScoreMg[WHITE], pawnScoreMg[BLACK], pawnScoreEg[WHITE], pawnScoreEg[BLACK]);
-	printf("King tropism: "); PrintEvalFactor( kingTropism[WHITE], kingTropism[BLACK], 0, 0);
-	printf("King attack : "); PrintEvalFactor( attScore[WHITE], attScore[BLACK], attScore[WHITE], attScore[BLACK]);
-	printf("Others      : "); PrintEvalFactor( mgMisc[WHITE], mgMisc[BLACK], egMisc[WHITE], egMisc[BLACK]);
-	printf("------------------------------------------------\n");
-}
- 
-void sEvaluator::PrintEvalFactor(int mgW, int mgB, int egW, int egB)
-{
-	int mg = mgW - mgB;
-	int eg = egW - egB;
-	printf("| %4d, %4d | %4d, %4d | %3d\n", mgW, mgB, egW, egB,  (mgFact * mg ) / 24 + (egFact * eg ) / 24   );
 }
