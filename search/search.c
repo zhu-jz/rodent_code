@@ -142,7 +142,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 		// the second window
 		if (curVal >= beta || curVal <= alpha) 
             curVal = SearchRoot(p, -INF, INF, rootDepth, pv);
-		    bestMove = pv[0];
+		bestMove = pv[0];
         if (flagAbortSearch) break;
 	}
 
@@ -308,6 +308,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   int movesTried     = 0;       // count of moves that initiated new searches
   int blunderCount   = 0;       // forces the engine to try one of the top moves in weakening mode
   int nodeEval       = INVALID; // we have not called evaluation function at this node yet 
+  int fullNodeEval   = INVALID;
   int flagIsReduced  = 0;       // are we in a reduced search? (guides re-searches)
   int flagFutility   = 0;       // can we apply futility pruning in this node
   int flagInCheck    = InCheck(p); // are we in check at the beginning of the search?
@@ -395,7 +396,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   &&  !wasNull
   &&   p->pieceMat[p->side] > Data.matValue[N]) 
   {
-    if ( beta <= Eval.ReturnFull(p, alpha, beta) ) {
+    fullNodeEval = Eval.ReturnFull(p, alpha, beta);
+    if ( beta <= fullNodeEval ) {
 
       newDepth = nullDepth[depth];
 
@@ -439,8 +441,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
    &&  !(bbPc(p,p->side,P) & bbRelRank[p->side][RANK_7] ) // no pawns to promote in one move
    &&   depth <= 3*ONE_PLY) {
       int threshold = beta - 300 - (depth-ONE_PLY) * 15;
+	  if (fullNodeEval == INVALID) fullNodeEval = Eval.ReturnFull(p, alpha, beta);
 
-      if (Eval.ReturnFull(p, alpha, beta) < threshold) {
+      if (fullNodeEval < threshold) {
 		 score = Quiesce(p, ply, 0, alpha, beta, 0, pv); 
          if (score < threshold) return score;
       }
@@ -523,10 +526,10 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
         continue;
 	 }
 
-     // LATE MOVE PRUNING near the leaves (2014-01-24: modelled after Toga II 3.0)
+     // LATE MOVE PRUNING (2014-01-24: modelled after Toga II 4.0)
 
      if ( flagCanReduce
-     &&   depth <= 5*ONE_PLY // we are near the leaf TODO: increase depth 
+     &&   depth <= 5*ONE_PLY 
      &&  !History.Refutes(lastMove, move) )
      {
          if (IsMoveOrdinary(flagMoveType) 
