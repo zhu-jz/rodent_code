@@ -38,8 +38,6 @@
   const int qAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
 
   const int outpostBase       [7] = { 0,   4,   4,   0,   0,   0,  0 };
-  const int rookOpenAttack    [2] = { 0,  2 };
-  const int rookSemiOpenAttack[2] = { 0,  1 };
   const int queenContactCheck [2] = { 6, 10 };
   const int rookContactCheck  [2] = { 4,  5 };
   const int rookSeventhMg   = 20;
@@ -51,7 +49,7 @@
 
   // data for attack evaluation:        for Stockfish-like curve      for old Glass curve
   //                                    P   N   B   R   Q   K         P   N   B   R   Q   K
-  const int attPerPc     [2]  [7] = { { 0,  2,  2,  3,  5,  0,  0}, { 0,  1,  1,  2,  3,  0,  0} };
+  const int attPerPc     [2]  [7] = { { 0,  2,  2,  3,  5,  0,  0}, { 0,  1,  1,  2,  4,  0,  0} };
   const int canCheckWith [2]  [7] = { { 0,  1,  1,  3,  4,  0,  0}, { 0,  1,  1,  2,  3,  0,  0} };
   const int woodPerPc         [7] =   { 0,  1,  1,  2,  4,  0,  0};
 
@@ -177,13 +175,10 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 
 	// rook on an open file (ignoring pawns behind a rook)
 	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {                // no own pawns in front of the rook
-	   if ( !(bbFrontSpan & bbPc(p, oppo, P) ) ) {            // no enemy pawns - open file
+	   if ( !(bbFrontSpan & bbPc(p, oppo, P) ) )              // no enemy pawns - open file
 		  AddMisc(side, rookOpenMg, rookOpenEg);
-		  if (bbFrontSpan & bbKingZone[side][KingSq(p, oppo)] ) attCount[side] += rookOpenAttack[Data.safetyStyle];
-	   } else {                                               // enemy pawns present - semi-open file
+	    else                                                  // enemy pawns present - semi-open file
 		  AddMisc(side, rookSemiOpenMg, rookSemiOpenEg);
-		  if (bbFrontSpan & bbKingZone[side][KingSq(p, oppo)] ) attCount[side] += rookSemiOpenAttack[Data.safetyStyle];
-	   }
 	}
 
 	// rook on 7th rank attacking pawns or cutting off enemy king
@@ -293,7 +288,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
   const int oppo = Opp(side);
   int sq, passUnitMg, passUnitEg, flagIsWeak;
   U64 bbPieces = bbPc(p, side, P);
-  U64 bbOccupied = OccBb(p);
+  U64 bbOcc = OccBb(p);
   U64 bbStop, bbBack, bbObstacles;
   
   while (bbPieces) {
@@ -306,7 +301,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 	&&   !(bbBack & bbPawnTakes[side]) )   // but it has lost contact  with the pawn mass,
 	AddMisc(side,-4,-8);                   // so it is at least slightly vulnerable.
 	
-	if (bbStop &~bbOccupied) {             // this pawn is mobile
+	if (bbStop &~bbOcc) {                  // this pawn is mobile
 	   if (Data.pstMg[side][P][sq] > 0)    // bonus gets bigger for well positioned pawns
 		   AddMisc(side, Data.pstMg[side][P][sq] / 5, 2);
 	   else AddMisc(side, 2, 1);
@@ -346,8 +341,8 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 		AddMisc(side, 0, (-Data.distance[sq] [p->kingSquare[Opp(side)]] * passUnitEg) / 6);
 
 		// blocked and unblocked passers
-		if (bbStop &~bbOccupied) AddMisc(side,  passUnitMg,  passUnitEg);
-		else                     AddMisc(side, -passUnitMg, -passUnitEg);
+		if (bbStop &~bbOcc) AddMisc(side,  passUnitMg,  passUnitEg);
+		else                AddMisc(side, -passUnitMg, -passUnitEg);
 
 		// control of stop square
 		if (bbStop &~ bbAllAttacks[oppo] ) {
