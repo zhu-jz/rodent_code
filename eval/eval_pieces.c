@@ -31,6 +31,7 @@
   const int pawnDefendsEg     [7] = { 0,   2,   2,   4,   0,   0,  0 };
   
   // (NOTE: we don't evaluate N attacks N, B attacks B and R attacks R)
+  //                                  P    N    B    R    Q    K 
   const int pAttacks          [7] = { 0,  10,  10,  15,   0,   0,  0 };
   const int nAttacks          [7] = { 1,   5,   5,  10,  10,   0,  0 };  // N/B
   const int rAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
@@ -99,13 +100,13 @@ void sEvaluator::ScoreB(sPosition *p, int side)
   int sq, ownPawnCnt, oppPawnCnt;
   const int oppo = Opp(side);
   U64 bbMob, bbAtt;
-  U64 bbPieces    = bbPc(p, side, B);
-  U64 bbOccupied  = OccBb(p) ^ bbPc(p, side, Q); // accept mobility through own queen
+  U64 bbPieces   = bbPc(p, side, B);
+  U64 bbOcc  = OccBb(p) ^ bbPc(p, side, Q); // accept mobility through own queen
 
   while (bbPieces) {
-    sq = PopFirstBit(&bbPieces);                 // set piece location and clear it from bbPieces
-	bbMob = GenCache.GetBishMob(bbOccupied, sq); // set control/mobility bitboard
-	bbAllAttacks[side] |= bbMob;                 // update attack data
+    sq = PopFirstBit(&bbPieces);            // set piece location and clear it from bbPieces
+	bbMob = GenCache.GetBishMob(bbOcc, sq); // set control/mobility bitboard
+	bbAllAttacks[side] |= bbMob;            // update attack data
 	ScoreRelationToPawns(p, side, B, sq);    
 
 	// pawns on bishop color
@@ -157,12 +158,12 @@ void sEvaluator::ScoreR(sPosition *p, int side)
   const int oppo = Opp(side);
   U64 bbMob, bbAtt, bbContact;
   U64 bbPieces   = bbPc(p, side, R);
-  U64 bbOccupied = OccBb(p) ^ bbPc(p, side, Q) ^ bbPc(p, side, R); // R and Q are considered transparent
+  U64 bbOcc      = OccBb(p) ^ bbPc(p, side, Q) ^ bbPc(p, side, R); // R and Q are considered transparent
 
   while (bbPieces) {
-    sq = PopFirstBit(&bbPieces);                 // set piece location and clear it from bbPieces
-	bbMob = GenCache.GetRookMob(bbOccupied, sq); // set control/mobility bitboard
-	bbAllAttacks[side] |= bbMob;                 // update attack data
+    sq = PopFirstBit(&bbPieces);            // set piece location and clear it from bbPieces
+	bbMob = GenCache.GetRookMob(bbOcc, sq); // set control/mobility bitboard
+	bbAllAttacks[side] |= bbMob;            // update attack data
 	ScoreRelationToPawns(p, side, R, sq);         
 
 	// attacks on enemy pieces
@@ -229,14 +230,14 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
   const int oppo = Opp(side);
   U64 bbMob, bbAttacks, bbContact, bbAtt;
   U64 bbPieces       = bbPc(p, side, Q); 
-  U64 bbOccupied     = OccBb(p); // real occupancy, since we'll look for contact checks
-  U64 bbTransparent  = bbPc(p, side, R) | bbPc(p, side, B);
+  U64 bbOcc          = OccBb(p); // real occupancy, since we'll look for contact checks
+  U64 bbThrough      = bbPc(p, side, R) | bbPc(p, side, B);
   U64 bbCanCheckFrom = bbStraightChecks[oppo] | bbDiagChecks[oppo];
 
   while (bbPieces) {
-    sq = PopFirstBit(&bbPieces);                  // set piece location and clear it from bbPieces 
-	bbMob = GenCache.GetQueenMob(bbOccupied, sq); // set control/mobility bitboard
-	bbAllAttacks[side] |= bbMob;                  // update attack data
+    sq = PopFirstBit(&bbPieces);             // set piece location and clear it from bbPieces 
+	bbMob = GenCache.GetQueenMob(bbOcc, sq); // set control/mobility bitboard
+	bbAllAttacks[side] |= bbMob;             // update attack data
 
 	// attacks on enemy pieces
 	if (bbMob & bbPc(p, oppo, P) ) AddMisc(side, qAttacks[P], qAttacks[P]);
@@ -271,10 +272,8 @@ void sEvaluator::ScoreQ(sPosition *p, int side)
 	&& (attCount[side] > 0 || p->pcCount[side][Q] > 1) ) // otherwise queen attack won't change score
 	{
 	   // factor in queen attacks through other pieces
-	   if (bbMob && bbTransparent)
-	      bbAttacks = QAttacks(bbOccupied ^ bbTransparent ^ SqBb(sq), sq);
-	   else 
-	      bbAttacks = bbMob;
+	   if (bbMob && bbThrough) bbAttacks = QAttacks(bbOcc ^ bbThrough ^ SqBb(sq), sq);
+	   else                    bbAttacks = bbMob;
 
 	   // count attacks
 	   bbAtt = bbAttacks & bbKingZone[side][KingSq(p, oppo)];
@@ -361,21 +360,21 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 
 void sEvaluator::AddKingAttack(int side, int pc, int cnt)
 {
-    attNumber[side] += 1;
-	attCount [side] += attPerPc[Data.safetyStyle][pc] * cnt;
-	attWood  [side] += woodPerPc[pc];
+   attNumber[side] += 1;
+   attCount [side] += attPerPc[Data.safetyStyle][pc] * cnt;
+   attWood  [side] += woodPerPc[pc];
 }
 
 void sEvaluator::AddMobility( int pc, int side, int cnt)
 {
-	mgMobility[side] += Data.mobBonusMg [pc] [cnt];
-	egMobility[side] += Data.mobBonusEg [pc] [cnt];
+   mgMobility[side] += Data.mobBonusMg [pc] [cnt];
+   egMobility[side] += Data.mobBonusEg [pc] [cnt];
 }
 
 void sEvaluator::AddMisc(int side, int mg, int eg)
 {
-	mgMisc[side] += mg;
-	egMisc[side] += eg;
+   mgMisc[side] += mg;
+   egMisc[side] += eg;
 }
 
 void sEvaluator::ScoreRelationToPawns(sPosition *p, int side, int piece, int sq)
