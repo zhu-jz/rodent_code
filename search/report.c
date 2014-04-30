@@ -40,28 +40,28 @@ void sSearcher::DisplayStats(void)
 
 void sSearcher::DisplayRootInfo(void) 
 {
-   if (Data.verbose) {
-       DisplayDepth();
-	   DisplaySpeed();
-	}
+   if (Data.verbose && rootDepth / ONE_PLY > 6) {
+      DisplayDepth();
+      DisplaySpeed();
+   }
 }
 
 void sSearcher::DisplayCurrmove(int move, int movesTried) 
 {
-	printf("info currmove ");
-    PrintMove(move);
-	printf(" currmovenumber %d \n", movesTried);
-	DisplaySpeed();
+   printf("info currmove ");
+   PrintMove(move);
+   printf(" currmovenumber %d \n", movesTried);
+   DisplaySpeed();
 }
 
 void sSearcher::DisplayDepth(void) {
-     printf("info depth %d \n", rootDepth / ONE_PLY);
+   printf("info depth %d \n", rootDepth / ONE_PLY);
 }
 
 void sSearcher::DisplaySettings(void)
 {
-     printf("info string Searched by Rodent, level %s", Data.currLevel);
-	 printf(", style %s\n", Data.currStyle);
+   printf("info string Searched by Rodent, level %s", Data.currLevel);
+   printf(", style %s\n", Data.currStyle);
 }
 
 void sSearcher::DisplayPv(int score, int *pv)
