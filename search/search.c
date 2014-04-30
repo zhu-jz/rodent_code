@@ -227,7 +227,7 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 	 nodesPerBranch = 0;
 	
 	 movesTried++;    // increase legal move count
-	 if (Data.verbose && !pondering) DisplayCurrmove(move, movesTried);
+	 if (Data.verbose && !pondering && depth > 6 * ONE_PLY) DisplayCurrmove(move, movesTried);
 	 depthChange = 0; // no depth modification so far
 	 History.OnMoveTried(move);
 
@@ -626,27 +626,27 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 int sSearcher::SetFutilityMargin(int depth) 
 {
-	return futilityBase + depth * futilityStep;
+   return futilityBase + depth * futilityStep;
 }
 
 int sSearcher::IsRepetition(sPosition *p)
 {
-    for (int i = 4; i <= p->reversibleMoves; i += 2)
-        if (p->hashKey == p->repetitionList[p->head - i])
-           return 1;
-    return 0;
+   for (int i = 4; i <= p->reversibleMoves; i += 2)
+      if (p->hashKey == p->repetitionList[p->head - i])
+         return 1;
+   return 0;
 }
 
 int sSearcher::DrawBy50Moves(sPosition *p) { 
-	return( p->reversibleMoves > 100);
+   return( p->reversibleMoves > 100);
 }
 
 int sSearcher::IsMoveOrdinary(int flagMoveType) {
-    return (!flagMoveType || flagMoveType == FLAG_NULL_EVASION);
+   return (!flagMoveType || flagMoveType == FLAG_NULL_EVASION);
 }
 
 int sSearcher::AvoidReduction(int move, int flagMoveType) {
-    return (MoveType(move) != CASTLE) && (flagMoveType != FLAG_HASH_MOVE) && (flagMoveType != FLAG_KILLER_MOVE);
+   return (MoveType(move) != CASTLE) && (flagMoveType != FLAG_HASH_MOVE) && (flagMoveType != FLAG_KILLER_MOVE);
 }
 
 void sSearcher::CheckInput(void)
