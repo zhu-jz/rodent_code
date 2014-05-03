@@ -228,7 +228,7 @@ void sParser::PrintUciOptions()
 	printf("option name PawnStructure type spin default %d min 0 max 500\n", Data.pawnStruct);
 	printf("option name PassedPawns type spin default %d min 0 max 500\n", Data.passedPawns);
 	printf("option name BookFilter type spin default %d min 0 max 100\n", Data.bookFilter);
-	printf("option name LazyMargin type spin default %d min -500 max 500\n", Data.lazyMargin);
+	printf("option name LazyMargin type spin default %d min -2000 max 2000\n", Data.lazyMargin);
 	printf("option name Contempt type spin default %d min -300 max 300\n", Data.contempt);
 	printf("option name UCI_Elo type spin default %d min 600 max 2600\n", Data.elo);
 	printf("option name UCI_LimitStrength type check default false\n", Data.useWeakening);
@@ -288,9 +288,7 @@ void sParser::ParseMoves(sPosition *p, char *ptr)
   
     for (;;) {
       ptr = ParseToken(ptr, token);
-
-      if (*token == '\0')
-        break;
+      if (*token == '\0') break;
 	  
 	  move = StrToMove(p, token);
 	  /*if (!IsLegal(p, move)) printf("move input error\n");
@@ -413,31 +411,31 @@ void sParser::ReadIniFile(char *fileName)
 
 void sParser::PrintEngineHeader() 
 {
-    printf("id name Rodent 1.4");
-	printf(" (build %d)\n", BUILD);
-    printf("id author Pawel Koziol (based on Sungorus by Pablo Vazquez)\n");
+   printf("id name Rodent 1.5");
+   printf(" (build %d)\n", BUILD);
+   printf("id author Pawel Koziol (based on Sungorus by Pablo Vazquez)\n");
 }
 
 void sParser::PrintBoard(sPosition *p)
 {
-  printf("--------------------------------------------\n");
-  for (int sq = 0; sq < 64; sq++) {
-	  if      (p->bbTp[P] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("P "); else printf("p "); }
-	  else if (p->bbTp[N] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("N "); else printf("n "); }
-	  else if (p->bbTp[B] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("B "); else printf("b "); }
-	  else if (p->bbTp[R] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("R "); else printf("r "); }
-	  else if (p->bbTp[Q] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("Q "); else printf("q "); }
-	  else if (p->bbTp[K] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("K "); else printf("k "); }
-	  else printf(". ");
-	  if ( (sq+1) % 8 == 0) printf(" %d\n", 9 - ((sq+1) / 8) );
-  }
-  printf("\na b c d e f g h\n");
-  printf("%d",Rank(A1));
+   printf("--------------------------------------------\n");
+   for (int sq = 0; sq < 64; sq++) {
+      if      (p->bbTp[P] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("P "); else printf("p "); }
+      else if (p->bbTp[N] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("N "); else printf("n "); }
+      else if (p->bbTp[B] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("B "); else printf("b "); }
+      else if (p->bbTp[R] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("R "); else printf("r "); }
+      else if (p->bbTp[Q] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("Q "); else printf("q "); }
+      else if (p->bbTp[K] & RelSqBb(sq,BLACK) ) { if ( p->bbCl[WHITE] & RelSqBb(sq,BLACK) ) printf("K "); else printf("k "); }
+      else printf(". ");
+      if ( (sq+1) % 8 == 0) printf(" %d\n", 9 - ((sq+1) / 8) );
+   }
+   printf("\na b c d e f g h\n");
+   printf("%d",Rank(A1));
 
-  printf("Polyglot     hash: %016llX \n", Book.GetPolyglotKey(p) );
-  printf("Incremental  hash: %016llX pawn: %016llX \n", p->hashKey, p->pawnKey);
-  printf("Recalculated hash: %016llX pawn: %016llX \n", TransTable.InitHashKey(p), TransTable.InitPawnKey(p));
-  printf("Incremental  pst : mg %d eg %d\n", p->pstMg[WHITE]-p->pstMg[BLACK], p->pstEg[WHITE]-p->pstEg[BLACK]);
-  Eval.DebugPst(p);
-  printf("\n--------------------------------------------\n");
+   printf("Polyglot     hash: %016llX \n", Book.GetPolyglotKey(p) );
+   printf("Incremental  hash: %016llX pawn: %016llX \n", p->hashKey, p->pawnKey);
+   printf("Recalculated hash: %016llX pawn: %016llX \n", TransTable.InitHashKey(p), TransTable.InitPawnKey(p));
+   printf("Incremental  pst : mg %d eg %d\n", p->pstMg[WHITE]-p->pstMg[BLACK], p->pstEg[WHITE]-p->pstEg[BLACK]);
+   Eval.DebugPst(p);
+   printf("\n--------------------------------------------\n");
 }
