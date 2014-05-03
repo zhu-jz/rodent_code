@@ -36,32 +36,33 @@ static const int moveCountLimit[24] = {0, 0, 0, 0, 4, 4, 4, 4, 7, 7, 7, 7, 12, 1
 
 void sSearcher::Init(void)
 {
-	aspiration       = 30;
-	futilityBase     = 100; // 80 and 120 are worse
-	futilityStep     = 20;  // by this much futility margin increases each quarter ply
-	futilityDepth    = 4;   // 5 is worse
-	minimalLmrDepth  = 2 * ONE_PLY; // 3 is worse
-    minimalNullDepth = 2 * ONE_PLY; // 3 is worse
+   aspiration       = 30;
+   futilityDepth    = 4;   // 5 is worse
+   minimalLmrDepth  = 2 * ONE_PLY; // 3 is worse
+   minimalNullDepth = 2 * ONE_PLY; // 3 is worse
 
-	// set null move reduction depth
-	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++) {
-		nullDepth[depth] = depth - 3*ONE_PLY - (depth - 3*ONE_PLY) / 4;
-	}
+   // set null move reduction depth
+   for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++) 
+      nullDepth[depth] = depth - 3*ONE_PLY - (depth - 3*ONE_PLY) / 4;
 
-	// set late move reduction depth using modified Stockfish formula
-	for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
-		for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
-           lmrSize[0][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // all node
-		   lmrSize[1][depth][moves] = 4 * (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
-		   lmrSize[2][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // cut node
+   // set futility margin
+   for(int depth = 0; depth < 10 * ONE_PLY; depth ++) 
+      futilityMargin[depth] = 100 + depth * 20;
 
-		   for (int node = 0; node <= 2; node++) {
-			   if (lmrSize[node][depth][moves] > 2 * ONE_PLY)
-                  lmrSize[node][depth][moves] += ONE_PLY / 2;
-               else if (lmrSize[node][depth][moves] > 1 * ONE_PLY)
-                  lmrSize[node][depth][moves] += ONE_PLY / 4;
-		   }
-		}
+   // set late move reduction depth using modified Stockfish formula
+   for(int depth = 0; depth < MAX_PLY * ONE_PLY; depth ++)
+      for(int moves = 0; moves < MAX_PLY * ONE_PLY; moves ++) {
+         lmrSize[0][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // all node
+         lmrSize[1][depth][moves] = 4 * (log((double) (depth/ONE_PLY)) * log((double) (moves)) / 3.5 );        // pv node
+         lmrSize[2][depth][moves] = 4 * (0.33 + log((double) (depth/ONE_PLY)) * log((double) (moves)) / 2.25); // cut node
+
+         for (int node = 0; node <= 2; node++) {
+            if (lmrSize[node][depth][moves] > 2 * ONE_PLY)
+               lmrSize[node][depth][moves] += ONE_PLY / 2;
+            else if (lmrSize[node][depth][moves] > 1 * ONE_PLY)
+               lmrSize[node][depth][moves] += ONE_PLY / 4;
+         }
+      }
 }
 
 void sSearcher::Think(sPosition *p, int *pv)
@@ -478,7 +479,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
                nodeEval = TransTable.RefineScore( p->hashKey, nodeEval );
 
                // this node looks bad enough, so we may apply futility pruning
-               if ( (nodeEval + SetFutilityMargin(depth) ) < beta ) flagFutility = 1;
+               if ( (nodeEval + futilityMargin[depth] ) < beta ) flagFutility = 1;
 			   // TODO: smaller margin for later moves (requires restructuring)
             }
 	     }
@@ -622,11 +623,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      TransTable.Store(p->hashKey, 0, best, UPPER, depth, ply);
 
    return best;
-}
-
-int sSearcher::SetFutilityMargin(int depth) 
-{
-   return futilityBase + depth * futilityStep;
 }
 
 int sSearcher::IsRepetition(sPosition *p)
