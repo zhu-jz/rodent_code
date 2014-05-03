@@ -36,9 +36,8 @@ private:
 	void CheckInput(void);
 	int isReporting;
 	int aspiration;       // initial size of aspiration window
-    int futilityBase;     // initial value of futility margin
-    int futilityStep;     // margin is incremented by this value for every 1/4 ply
     int futilityDepth;
+	int futilityMargin[10*ONE_PLY];
 	U64 stat[END_OF_STATS];
 
 	int Blunder(sPosition *p, int ply, int depth, int flag, int move, int lastMove, int flagInCheck);
@@ -67,13 +66,12 @@ private:
 	int Perft(sPosition *p, int ply, int depth);
 	int SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv);
 	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv);
-	int SetFutilityMargin(int depth);
 	
 	int RecognizeDraw(sPosition *p);
 	int nodes;
 	int rootDepth; 
 	int minimalLmrDepth;
-        int minimalNullDepth;
+	int minimalNullDepth;
 	double lmrSize[3][MAX_PLY * ONE_PLY][MAX_MOVES];
 	int nullDepth[MAX_PLY * ONE_PLY];
 	sFlatMoveList rootList;
