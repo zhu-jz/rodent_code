@@ -67,105 +67,102 @@ void sSearcher::Init(void)
 
 void sSearcher::Think(sPosition *p, int *pv)
 {
-  nodesPerBranch = 0;
-  bestMove = 0;
-  int flagBookProblem = 0;
-  isReporting         = 1;
-  nodes               = 0;
-  flagAbortSearch     = 0;
-  History.OnNewSearch();
-  TransTable.ChangeDate();
-  Timer.SetStartTime();
-  ClearStats();
-  pv[0] = 0; // for tests where book move is disabled
-  if (Data.useBook) {
-	  pv[0] = Book.GetBookMove(p, 1, &flagBookProblem); 
-  }
+   nodesPerBranch = 0;
+   bestMove = 0;
+   int flagBookProblem = 0;
+   isReporting         = 1;
+   nodes               = 0;
+   flagAbortSearch     = 0;
+   History.OnNewSearch();
+   TransTable.ChangeDate();
+   Timer.SetStartTime();
+   ClearStats();
+   pv[0] = 0; // for tests where book move is disabled
+   if (Data.useBook) 
+      pv[0] = Book.GetBookMove(p, 1, &flagBookProblem); 
 
-  if (!pv[0] || !IsLegal(p, pv[0]) || Data.isAnalyzing) {
-	   if (flagProtocol == PROTO_TXT) PrintTxtHeader();
+   if (!pv[0] || !IsLegal(p, pv[0]) || Data.isAnalyzing) {
+      if (flagProtocol == PROTO_TXT) PrintTxtHeader();
       Iterate(p, pv);
       if (Data.panelStyle == PANEL_NORMAL) DisplaySettings();
-  }
+   }
 
-  DisplayStats();
+   DisplayStats();
 }
 
 void sSearcher::Iterate(sPosition *p, int *pv) 
 {
-  int val = 0;
-  int curVal, alpha, beta, delta;
-  rootSide = p->side;
-  Data.InitAsymmetric(p->side);          // set asymmetric eval parameters, dependent on the side to move
-  rootList.Init(p);                      // create sorted root move list (using quiescence search scores)
-  int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
-  if (rootList.nOfMoves == 1) localDepth = 4 * ONE_PLY; // single reply
-  Timer.SetIterationTiming();            // define additional rules for starting next iteration
-  Timer.SetData(FLAG_ROOT_FAIL_LOW, 0);  // we haven't failed low yet
+   int val = 0;
+   int curVal, alpha, beta, delta;
+   rootSide = p->side;
+   Data.InitAsymmetric(p->side);          // set asymmetric eval parameters, dependent on the side to move
+   rootList.Init(p);                      // create sorted root move list (using quiescence search scores)
+   int localDepth = Timer.GetData(MAX_DEPTH) * ONE_PLY;
+   if (rootList.nOfMoves == 1) localDepth = 4 * ONE_PLY; // single reply
+   Timer.SetIterationTiming();            // define additional rules for starting next iteration
+   Timer.SetData(FLAG_ROOT_FAIL_LOW, 0);  // we haven't failed low yet
 
-  // check whether of the moves is potentially easy
-  Timer.SetData(FLAG_EASY_MOVE,     1);
-  for(int i = 0; i < rootList.nOfMoves; i ++)
-  {
-	  if (rootList.moves[i] != rootList.bestMove
-	  && rootList.value[i] > rootList.bestVal - 220) {
-	     Timer.SetData(FLAG_EASY_MOVE,     0);
-	     break;
-	  }
-  }
+   // check whether of the moves is potentially easy
+   Timer.SetData(FLAG_EASY_MOVE,     1);
+   for(int i = 0; i < rootList.nOfMoves; i ++) {
+      if (rootList.moves[i] != rootList.bestMove
+      && rootList.value[i] > rootList.bestVal - 220) {
+         Timer.SetData(FLAG_EASY_MOVE,     0);
+         break;
+      }
+   }
 
-  for (rootDepth = ONE_PLY; rootDepth <= localDepth; rootDepth+=ONE_PLY) {
+   for (rootDepth = ONE_PLY; rootDepth <= localDepth; rootDepth+=ONE_PLY) {
 
-	DisplayRootInfo();
-	delta = aspiration;
+      DisplayRootInfo();
+      delta = aspiration;
 
-	if (rootDepth <= 6 * ONE_PLY) { alpha = -INF;      beta = INF;       }
-	else                          { alpha = val-delta; beta = val+delta; }
+      if (rootDepth <= 6 * ONE_PLY) { alpha = -INF;      beta = INF;       }
+      else                          { alpha = val-delta; beta = val+delta; }
     
-	// first use aspiration window around the value from the last completed depth
-	curVal = SearchRoot(p, alpha, beta, rootDepth, pv);
-	bestMove = pv[0];
-	if (flagAbortSearch) break;
+      // first use aspiration window around the value from the last completed depth
+      curVal = SearchRoot(p, alpha, beta, rootDepth, pv);
+      bestMove = pv[0];
+      if (flagAbortSearch) break;
 
-	// if score is outside the window, re-search
-	if (curVal >= beta || curVal <= alpha) {
+      // if score is outside the window, re-search
+      if (curVal >= beta || curVal <= alpha) {
 
-        // fail-low, it might be prudent to assign some more time
-        if (curVal < val) Timer.OnRootFailLow();
+         // fail-low, it might be prudent to assign some more time
+         if (curVal < val) Timer.OnRootFailLow();
+         if (curVal >= beta)  beta  = val +3*delta;
+         if (curVal <= alpha) alpha = val -3*delta;
 
-		if (curVal >= beta)  beta  = val +3*delta;
-		if (curVal <= alpha) alpha = val -3*delta;
+         curVal = SearchRoot(p, alpha, beta, rootDepth, pv);
+         bestMove = pv[0];
+         if (flagAbortSearch) break;
 
-		curVal = SearchRoot(p, alpha, beta, rootDepth, pv);
-		bestMove = pv[0];
-        if (flagAbortSearch) break;
-
-		// the second window
-		if (curVal >= beta || curVal <= alpha) 
+         // the second window
+         if (curVal >= beta || curVal <= alpha) 
             curVal = SearchRoot(p, -INF, INF, rootDepth, pv);
-		bestMove = pv[0];
-        if (flagAbortSearch) break;
-	}
+            bestMove = pv[0];
+            if (flagAbortSearch) break;
+      }
 
-	// SAVE POSITION LEARNING DATA
-	if (Data.useLearning 
-	&& !flagAbortSearch
-	&& !Data.useWeakening
-	&&  p->pieceMat[WHITE] > 2000 
-	&&  p->pieceMat[BLACK] > 2000) 
-		Learner.WriteLearnData(p->hashKey, rootDepth, curVal);
+      // SAVE POSITION LEARNING DATA
+      if (Data.useLearning 
+      && !flagAbortSearch
+      && !Data.useWeakening
+      &&  p->pieceMat[WHITE] > 2000 
+      &&  p->pieceMat[BLACK] > 2000) 
+         Learner.WriteLearnData(p->hashKey, rootDepth, curVal);
 
-	// abort root search if we don't expect to finish the next iteration
-	if (Timer.FinishIteration() ) {
-		if (Data.verbose) {
-			DisplaySavedIterationTime();
-		    if (Timer.GetData(FLAG_EASY_MOVE) ) printf("info string This iteration was easy!\n");
-		}
-		break; 
-	}
+      // abort root search if we don't expect to finish the next iteration
+      if (Timer.FinishIteration() ) {
+         if (Data.verbose) {
+            DisplaySavedIterationTime();
+            if (Timer.GetData(FLAG_EASY_MOVE) ) printf("info string This iteration was easy!\n");
+         }
+         break; 
+      }
 
-	val = curVal;
-  }
+      val = curVal;
+   }
 }
 
 int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
@@ -292,15 +289,15 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 
 int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv)
 {
-  int best,                     // best value found at this node
-	  score,                    // score returned by a search started in this node
-	  move,                     // a move we are searching right now
-	  depthChange,              // extension/reduction value
-	  newDepth,                 // depth of a new search started in this node
-	  newPv[MAX_PLY],           // new main line
-      flagMoveType;             // move type flag, supplied by NextMove()
-  sSelector Selector;           // an object responsible for maintaining move list and picking moves 
-    UNDO  undoData[1];          // data required to undo a move
+   int best,                     // best value found at this node
+   score,                    // score returned by a search started in this node
+   move,                     // a move we are searching right now
+   depthChange,              // extension/reduction value
+   newDepth,                 // depth of a new search started in this node
+   newPv[MAX_PLY],           // new main line
+   flagMoveType;             // move type flag, supplied by NextMove()
+   sSelector Selector;           // an object responsible for maintaining move list and picking moves 
+   UNDO  undoData[1];          // data required to undo a move
 
   // NODE INITIALIZATION
   int nullScore      = 0;       // result of a null move search
