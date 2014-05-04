@@ -177,7 +177,7 @@ void sEvaluator::ScoreR(sPosition *p, int side)
 	if ( !(bbFrontSpan & bbPc(p,side, P) ) ) {                // no own pawns in front of the rook
 	   if ( !(bbFrontSpan & bbPc(p, oppo, P) ) )              // no enemy pawns - open file
 		  AddMisc(side, rookOpenMg, rookOpenEg);
-	    else                                                  // enemy pawns present - semi-open file
+	   else                                                   // enemy pawns present - semi-open file
 		  AddMisc(side, rookSemiOpenMg, rookSemiOpenEg);
 	}
 
@@ -303,7 +303,7 @@ void sEvaluator::ScoreP(sPosition *p, int side)
 	
 	if (bbStop &~bbOcc) {                  // this pawn is mobile
 	   if (Data.pstMg[side][P][sq] > 0)    // bonus gets bigger for well positioned pawns
-		   AddMisc(side, Data.pstMg[side][P][sq] / 5, 2);
+		   AddMisc(side, 5, 2);
 	   else AddMisc(side, 2, 1);
 	}
 
