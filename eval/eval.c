@@ -58,80 +58,80 @@ const int egTwoOnSeventh  = 10;
 
 void sEvaluator::InitStaticScore(void) 
 {
-     mgScore            = 0;   egScore            = 0;  // clear midgame/endgame score component
-     pawnScoreMg[WHITE] = 0;   pawnScoreMg[BLACK] = 0;  // clear midgame pawn scores
-     pawnScoreEg[WHITE] = 0;   pawnScoreEg[BLACK] = 0;  // clear endgame pawn scores	 
-     passerScoreMg[WHITE] = 0;   passerScoreMg[BLACK] = 0;  // clear midgame pawn scores
-     passerScoreEg[WHITE] = 0;   passerScoreEg[BLACK] = 0;  // clear endgame pawn scores
+   mgScore            = 0;   egScore            = 0;  // clear midgame/endgame score component
+   pawnScoreMg[WHITE] = 0;   pawnScoreMg[BLACK] = 0;  // clear midgame pawn scores
+   pawnScoreEg[WHITE] = 0;   pawnScoreEg[BLACK] = 0;  // clear endgame pawn scores	 
+   passerScoreMg[WHITE] = 0;   passerScoreMg[BLACK] = 0;  // clear midgame pawn scores
+   passerScoreEg[WHITE] = 0;   passerScoreEg[BLACK] = 0;  // clear endgame pawn scores
 }
 
 void sEvaluator::InitDynamicScore(sPosition *p) 
 {
-     attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
-	 attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
-	 attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
-	 checkCount[WHITE]       = 0;   checkCount[BLACK]  = 0;
-	 attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
-	 mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
-	 egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
-	 mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
-	 egMobility[WHITE]       = 0;   egMobility[BLACK]  = 0;  // clear endgame mobility	 
-	 bbPawnTakes[WHITE]    = GetWPControl( bbPc(p, WHITE, P) );
-	 bbPawnTakes[BLACK]    = GetBPControl( bbPc(p, BLACK, P) );
-	 bbPawnCanTake[WHITE] = FillNorth( bbPawnTakes[WHITE] );
-	 bbPawnCanTake[BLACK] = FillSouth( bbPawnTakes[BLACK] );
-	 bbAllAttacks[WHITE]     = bbPawnTakes[WHITE];
-	 bbAllAttacks[BLACK]     = bbPawnTakes[BLACK];
-	 bbMinorCoorAttacks[WHITE]  = 0ULL;
-	 bbMinorCoorAttacks[BLACK]  = 0ULL;
- 	 bbRookCoorAttacks[WHITE]   = 0ULL;
-	 bbRookCoorAttacks[BLACK]   = 0ULL;
+   attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
+   attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
+   attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
+   checkCount[WHITE]       = 0;   checkCount[BLACK]  = 0;
+   attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
+   mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
+   egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
+   mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
+   egMobility[WHITE]       = 0;   egMobility[BLACK]  = 0;  // clear endgame mobility	 
+   bbPawnTakes[WHITE]    = GetWPControl( bbPc(p, WHITE, P) );
+   bbPawnTakes[BLACK]    = GetBPControl( bbPc(p, BLACK, P) );
+   bbPawnCanTake[WHITE] = FillNorth( bbPawnTakes[WHITE] );
+   bbPawnCanTake[BLACK] = FillSouth( bbPawnTakes[BLACK] );
+   bbAllAttacks[WHITE]     = bbPawnTakes[WHITE];
+   bbAllAttacks[BLACK]     = bbPawnTakes[BLACK];
+   bbMinorCoorAttacks[WHITE]  = 0ULL;
+   bbMinorCoorAttacks[BLACK]  = 0ULL;
+   bbRookCoorAttacks[WHITE]   = 0ULL;
+   bbRookCoorAttacks[BLACK]   = 0ULL;
 
-
-	 // set squares from which king can be checked 
-	 U64 bbOccupied = OccBb(p);
-	 bbStraightChecks[WHITE] = RAttacks(bbOccupied, KingSq(p, WHITE) );  
-	 bbStraightChecks[BLACK] = RAttacks(bbOccupied, KingSq(p, BLACK) );  
-	 bbDiagChecks[WHITE]     = BAttacks(bbOccupied, KingSq(p, WHITE) );  
-	 bbDiagChecks[BLACK]     = BAttacks(bbOccupied, KingSq(p, BLACK) );  
-	 bbKnightChecks[WHITE]   = bbKnightAttacks[KingSq(p, WHITE)];
-	 bbKnightChecks[BLACK]   = bbKnightAttacks[KingSq(p, BLACK)];
+   // set squares from which king can be checked 
+   U64 bbOccupied = OccBb(p);
+   bbStraightChecks[WHITE] = RAttacks(bbOccupied, KingSq(p, WHITE) );  
+   bbStraightChecks[BLACK] = RAttacks(bbOccupied, KingSq(p, BLACK) );  
+   bbDiagChecks[WHITE]     = BAttacks(bbOccupied, KingSq(p, WHITE) );  
+   bbDiagChecks[BLACK]     = BAttacks(bbOccupied, KingSq(p, BLACK) );  
+   bbKnightChecks[WHITE]   = bbKnightAttacks[KingSq(p, WHITE)];
+   bbKnightChecks[BLACK]   = bbKnightAttacks[KingSq(p, BLACK)];
 }
 
 void sEvaluator::SetScaleFactor(sPosition *p) 
 {
-     mgFact = Min( p->phase, 24); // normalize for opening material
-     egFact = 24 - mgFact;
+   mgFact = Min( p->phase, 24); // normalize for opening material
+   egFact = 24 - mgFact;
 }
 
 // Interpolate between mgScore and egScore, depending on remaining material 
 int sEvaluator::Interpolate(void) {
-    return ( (mgFact * mgScore ) / 24 ) + ( (egFact * egScore ) / 24 );
+   return ( (mgFact * mgScore ) / 24 ) + ( (egFact * egScore ) / 24 );
 }
 
 void sEvaluator::ScoreHanging(sPosition *p, int side)
 {
-	U64 bbHanging    = p->bbCl[Opp(side)] & ~bbPawnTakes[Opp(side)]; 
-	U64 bbThreatened = p->bbCl[Opp(side)] & bbPawnTakes[side];
-	bbHanging |= bbThreatened;            // piece attacked by our pawn isn't well defended
-	bbHanging &= bbAllAttacks[side];      // obviously, hanging piece has to be attacked
-	bbHanging &= ~bbPc(p, Opp(side), P);  // currently we don't evaluate threats against pawns
+   int pc, sq, val;
 
-	U64 bbSpace = UnoccBb(p) & bbAllAttacks[side];
-	bbSpace &= ~bbRelRank[side][RANK_1];    // controlling home ground is not space advantage
-	bbSpace &= ~bbRelRank[side][RANK_2];
-	bbSpace &= ~bbRelRank[side][RANK_3];
-	bbSpace &= ~bbPawnTakes[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
-	AddMisc(side, PopCnt(bbSpace), 0);
-	int pc, sq, val;
+   U64 bbHanging    = p->bbCl[Opp(side)] & ~bbPawnTakes[Opp(side)]; 
+   U64 bbThreatened = p->bbCl[Opp(side)] & bbPawnTakes[side];
+   bbHanging |= bbThreatened;            // piece attacked by our pawn isn't well defended
+   bbHanging &= bbAllAttacks[side];      // obviously, hanging piece has to be attacked
+   bbHanging &= ~bbPc(p, Opp(side), P);  // currently we don't evaluate threats against pawns
 
-    while (bbHanging) {
-       sq  = FirstOne(bbHanging);
-	   pc  = TpOnSq(p, sq);
-	   val = Data.matValue[pc] / 64;
-	   AddMisc(side, 10+val, 18+val);
-	   bbHanging &= bbHanging - 1;
-	}
+   U64 bbSpace = UnoccBb(p) & bbAllAttacks[side];
+   bbSpace &= ~bbRelRank[side][RANK_1];    // controlling home ground is not space advantage
+   bbSpace &= ~bbRelRank[side][RANK_2];
+   bbSpace &= ~bbRelRank[side][RANK_3];
+   bbSpace &= ~bbPawnTakes[Opp(side)]; // squares attacked by enemy pawns aren't effectively controlled
+   AddMisc(side, PopCnt(bbSpace), 0);
+
+   while (bbHanging) {
+      sq  = FirstOne(bbHanging);
+      pc  = TpOnSq(p, sq);
+      val = Data.matValue[pc] / 64;
+      AddMisc(side, 10+val, 18+val);
+      bbHanging &= bbHanging - 1;
+   }
 }
 
 void sEvaluator::ScoreKingShield(sPosition *p, int side)
@@ -175,48 +175,50 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
 {
-	bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
+   bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
 
-	if (Data.safetyStyle == KS_QUADRATIC) {
-		int attUnit = attCount[side];    // attacks on squares near enemy king
-		attUnit += checkCount[side];     // check and contact check threats
-		attUnit += (attWood[side] / 2);  // material involved in the attack
-		if (attUnit > 99) attUnit = 99;  // bounds checking
-		attScore[side] = Data.kingDanger[attUnit];
-	}
-	if (Data.safetyStyle == KS_HANDMADE) {
-		int attUnit = attCount[side] + checkCount[side];
-		attScore[side] = safety[ attUnit + n_of_att[attNumber[side]] ];
-	}
-	ScaleValue(&attScore[side], Data.attSidePercentage[side]);
+   if (Data.safetyStyle == KS_QUADRATIC) {
+      int attUnit = attCount[side];    // attacks on squares near enemy king
+      attUnit += checkCount[side];     // check and contact check threats
+      attUnit += (attWood[side] / 2);  // material involved in the attack
+      if (attUnit > 99) attUnit = 99;  // bounds checking
+      attScore[side] = Data.kingDanger[attUnit];
+   }
+
+   if (Data.safetyStyle == KS_HANDMADE) {
+      int attUnit = attCount[side] + checkCount[side];
+      attScore[side] = safety[ attUnit + n_of_att[attNumber[side]] ];
+   }
+
+   ScaleValue(&attScore[side], Data.attSidePercentage[side]);
 }
 
 int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side) 
 {
-	if ( !bbOwnPawns ) return -36;
-	if ( bbOwnPawns & bbRelRank[side][RANK_2] ) return    2;
-	if ( bbOwnPawns & bbRelRank[side][RANK_3] ) return  -11;
-	if ( bbOwnPawns & bbRelRank[side][RANK_4] ) return  -20;
-	if ( bbOwnPawns & bbRelRank[side][RANK_5] ) return  -27;
-	if ( bbOwnPawns & bbRelRank[side][RANK_6] ) return  -32;
-	if ( bbOwnPawns & bbRelRank[side][RANK_7] ) return  -35;
-	return 0;
+   if ( !bbOwnPawns ) return -36;
+   if ( bbOwnPawns & bbRelRank[side][RANK_2] ) return    2;
+   if ( bbOwnPawns & bbRelRank[side][RANK_3] ) return  -11;
+   if ( bbOwnPawns & bbRelRank[side][RANK_4] ) return  -20;
+   if ( bbOwnPawns & bbRelRank[side][RANK_5] ) return  -27;
+   if ( bbOwnPawns & bbRelRank[side][RANK_6] ) return  -32;
+   if ( bbOwnPawns & bbRelRank[side][RANK_7] ) return  -35;
+   return 0;
 }
 
 int sEvaluator::EvalFileStorm(U64 bbOppPawns, int side)
 {
-	if (!bbOppPawns) return -15;
-	if (bbOppPawns & bbRelRank[side][RANK_4] ) return -3;
-	if (bbOppPawns & bbRelRank[side][RANK_5] ) return -5;
-	if (bbOppPawns & bbRelRank[side][RANK_6] ) return -7;
-    return 0;
+   if (!bbOppPawns) return -15;
+   if (bbOppPawns & bbRelRank[side][RANK_4] ) return -3;
+   if (bbOppPawns & bbRelRank[side][RANK_5] ) return -5;
+   if (bbOppPawns & bbRelRank[side][RANK_6] ) return -7;
+   return 0;
 }
 
 void sEvaluator::ScorePatterns(sPosition *p, int side)
 {
-	// more than one rook on the 7th rank
-	if (MoreThanOne( ( bbPc(p,side,R) ) & bbRelRank[side][RANK_7])) 
-		AddMisc(side, mgTwoOnSeventh,egTwoOnSeventh);
+   // more than one rook on the 7th rank
+   if (MoreThanOne( ( bbPc(p,side,R) ) & bbRelRank[side][RANK_7])) 
+      AddMisc(side, mgTwoOnSeventh,egTwoOnSeventh);
 }
 
 int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
@@ -354,8 +356,8 @@ int sEvaluator::FinalizeScore(sPosition * p, int score)
 
 void sEvaluator::ScaleValue(int * value, int factor) 
 {
-     *value *= factor;
-	 *value /= 100;
+   *value *= factor;
+   *value /= 100;
 }
 
 void sEvaluator::DebugPst(sPosition *p) 
