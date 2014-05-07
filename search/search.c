@@ -289,15 +289,15 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 
 int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv)
 {
-   int best,                     // best value found at this node
-   score,                    // score returned by a search started in this node
-   move,                     // a move we are searching right now
-   depthChange,              // extension/reduction value
-   newDepth,                 // depth of a new search started in this node
-   newPv[MAX_PLY],           // new main line
-   flagMoveType;             // move type flag, supplied by NextMove()
-   sSelector Selector;           // an object responsible for maintaining move list and picking moves 
-   UNDO  undoData[1];          // data required to undo a move
+  int best,                     // best value found at this node
+	  score,                    // score returned by a search started in this node
+	  move,                     // a move we are searching right now
+	  depthChange,              // extension/reduction value
+	  newDepth,                 // depth of a new search started in this node
+	  newPv[MAX_PLY],           // new main line
+      flagMoveType;             // move type flag, supplied by NextMove()
+  sSelector Selector;           // an object responsible for maintaining move list and picking moves 
+    UNDO  undoData[1];          // data required to undo a move
 
   // NODE INITIALIZATION
   int nullScore      = 0;       // result of a null move search
@@ -365,7 +365,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // EVAL PRUNING (aka "post futility pruning", inspired by DiscoCheck by Lucas Braesch) 
   if ( depth <= 3*ONE_PLY
-  &&   flagCanPrune) {
+  &&   flagCanPrune
+  &&  !wasNull
+  &&   p->pieceMat[p->side] > Data.matValue[N] ) {
 	 if (nodeEval == INVALID) nodeEval = Eval.ReturnFast(p);
 	 int evalMargin = 40 * depth;
 	 if (nodeEval - evalMargin >= beta)
@@ -516,7 +518,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // FUTILITY PRUNING 
 	 if ( flagCanReduce
-	 &&	  flagFutility
+	 &&   flagFutility
 	 &&   IsMoveOrdinary(flagMoveType)  // not a tt move, not a capture, not a killer move
 	 &&   movesTried > 1                // we have found at least one legal move
 	 ) {
@@ -525,7 +527,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 }
 
      // LATE MOVE PRUNING (2014-01-24: modelled after Toga II 4.0)
-
      if ( flagCanReduce
      &&   depth <= 5*ONE_PLY 
      &&  !History.Refutes(lastMove, move) )
@@ -552,8 +553,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
-			if (depth + depthChange < ONE_PLY)
+			if (depth + depthChange < ONE_PLY) {
 				depthChange = 0; // don't reduce into qs
+			}
 			else {
 		        History.OnMoveReduced(move);
  	            flagIsReduced = 1;
@@ -644,32 +646,32 @@ int sSearcher::AvoidReduction(int move, int flagMoveType) {
 
 void sSearcher::CheckInput(void)
 {
-    char command[80];
+   char command[80];
 
-    if (Data.verbose) {
-        if (!( nodes % 500000) ) DisplaySpeed(); // report search speed
-    }
+   if (Data.verbose) {
+      if (!( nodes % 500000) ) DisplaySpeed(); // report search speed
+   }
 
-    if (nodes & 4095 || rootDepth == ONE_PLY) return;
+   if (nodes & 4095 || rootDepth == ONE_PLY) return;
 
-    if (InputAvailable()) {
-       Parser.ReadLine(command, sizeof(command));
-       if (strcmp(command, "stop") == 0)
-          flagAbortSearch = 1;
-       else if (strcmp(command, "ponderhit") == 0)
-          pondering = 0;
-    }
+   if (InputAvailable()) {
+      Parser.ReadLine(command, sizeof(command));
+      if (strcmp(command, "stop") == 0)
+         flagAbortSearch = 1;
+      else if (strcmp(command, "ponderhit") == 0)
+         pondering = 0;
+   }
 
-	// node limit exceeded
-	if ( Timer.GetData(MAX_NODES) 
-	&& nodes > Timer.GetData(MAX_NODES)) 
-	   flagAbortSearch = 1;
+   // node limit exceeded
+   if ( Timer.GetData(MAX_NODES) 
+   && nodes > Timer.GetData(MAX_NODES)) 
+      flagAbortSearch = 1;
 
-    // timeout
-    if ( !pondering 
-    && !Timer.IsInfiniteMode()
-    && Timer.TimeHasElapsed() )
-       flagAbortSearch = 1;
+   // timeout
+   if ( !pondering 
+   && !Timer.IsInfiniteMode()
+   && Timer.TimeHasElapsed() )
+      flagAbortSearch = 1;
 }
 
 int sSearcher::DrawScore(sPosition *p)
