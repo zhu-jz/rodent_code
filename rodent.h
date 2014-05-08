@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 1
-#define BENCH_8 809302
+#define BUILD 3
+#define BENCH_8 771882
 
 #undef CDECL
 
@@ -83,10 +83,6 @@ enum eMoveFlag {
 
 // search depth variables
 #define ONE_PLY         4
-#define THREE_Q_PLY     (ONE_PLY * 3) / 4
-#define HALF_PLY        ONE_PLY / 2
-#define QUARTER_PLY     ONE_PLY / 4
-
 #define MAX_PLY         64
 #define MAX_MOVES       256
 #define INF             32765 // was 32767, we save some space for flags
