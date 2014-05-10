@@ -75,7 +75,7 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 {
   int sq; 
   int flagIsOpen, flagIsWeak;
-  U64 flagIsPhalanx, flagIsDoubled;
+  U64 flagIsPhalanx, flagPhalanx2, flagIsDoubled;
   U64 bbPieces = bbPc(p, side, P);
   U64 bbOwnPawns = bbPieces;
   U64 bbFrontSpan;
@@ -88,6 +88,7 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	flagIsDoubled  = bbFrontSpan & bbOwnPawns;
     flagIsOpen     = ( ( bbFrontSpan & bbPc(p, Opp(side), P) ) == 0 );
 	flagIsPhalanx  = ShiftEast(SqBb(sq) ) & bbOwnPawns;
+	flagPhalanx2   = ShiftWest(SqBb(sq) ) & bbOwnPawns;
 	flagIsWeak     = ( ( bbPawnSupport[side][sq] & bbOwnPawns ) == 0);
 	
 	if (flagIsDoubled) {
@@ -110,7 +111,7 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 		}
 		
 	    // candidate passer
-		if (flagIsPhalanx) { // test lower bonus when !flagIsWeak
+		if (flagIsPhalanx || flagPhalanx2) { // test lower bonus when !flagIsWeak
 		    if (PopCntSparse(bbObstacles) == 1) AddPasserScore(CANDIDATE,side,sq);
 	    }
 	}
@@ -132,12 +133,12 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 
 void sEvaluator::AddPawnProperty(int pawnProperty, int side, int sq)
 {
-     pawnScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
-	 pawnScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
+   pawnScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
+   pawnScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
 }
 
 void sEvaluator::AddPasserScore(int pawnProperty, int side, int sq)
 {
-     passerScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
-	 passerScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
+   passerScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
+   passerScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
 }
