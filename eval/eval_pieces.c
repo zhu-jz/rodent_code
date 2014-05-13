@@ -33,9 +33,9 @@
   // (NOTE: we don't evaluate N attacks N, B attacks B and R attacks R)
   //                                  P    N    B    R    Q    K 
   const int pAttacks          [7] = { 0,  10,  10,  15,   0,   0,  0 };
-  const int nAttacks          [7] = { 1,   5,   5,  10,  10,   0,  0 };  // N/B
-  const int rAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
-  const int qAttacks          [7] = { 1,   3,   3,   5,   5,   0,  0 };
+  const int nAttacks          [7] = { 1,   3,   3,   5,   9,   0,  0 };  // N/B
+  const int rAttacks          [7] = { 1,   3,   3,   5,   9,   0,  0 };
+  const int qAttacks          [7] = { 1,   3,   3,   5,   9,   0,  0 };
 
   const int outpostBase       [7] = { 0,   4,   4,   0,   0,   0,  0 };
   const int queenContactCheck [2] = { 6, 10 };
