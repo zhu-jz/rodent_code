@@ -61,6 +61,9 @@ void sSearcher::Init(void)
                lmrSize[node][depth][moves] += ONE_PLY / 2;
             else if (lmrSize[node][depth][moves] > 1 * ONE_PLY)
                lmrSize[node][depth][moves] += ONE_PLY / 4;
+
+			if ( lmrSize[node][depth][moves] > depth - ONE_PLY)
+				lmrSize[node][depth][moves] = depth - ONE_PLY;
          }
       }
 }
@@ -451,12 +454,12 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
   if (nodeType == PV_NODE && !move && depth >= 4*ONE_PLY && !flagInCheck ) {
-	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, 0, newPv); // BUG, should use lastMove
+	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, lastMove, contMove, newPv); 
 	  TransTable.RetrieveMove(p->hashKey, &move);
   }
 
   if (nodeType == CUT_NODE && !move && depth >= 6*ONE_PLY && !flagInCheck ) {
-	  Search(p, ply, alpha, beta, depth-4*ONE_PLY, PV_NODE, NO_NULL, 0, 0, newPv); // BUG, should use lastMove
+	  Search(p, ply, alpha, beta, depth-4*ONE_PLY, PV_NODE, NO_NULL, lastMove, contMove, newPv);
 	  TransTable.RetrieveMove(p->hashKey, &move);
   } // end of internal iterative deepening code
 
