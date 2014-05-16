@@ -65,7 +65,6 @@ private:
 	int AvoidReduction(int move, int flagMoveType);
 	int Perft(sPosition *p, int ply, int depth);
 	int SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv);
-	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv);
 	
 	int RecognizeDraw(sPosition *p);
 	int nodes;
@@ -80,11 +79,11 @@ public:
 	int bestMove;
 	int DrawScore(sPosition *p);
 	int Quiesce(sPosition *p, int ply, int qDepth, int alpha, int beta, int isRoot, int *pv);
-	int QuiesceSmart(sPosition *p, int ply, int qDepth, int alpha, int beta, int isRoot, int *pv); 
 	void Think(sPosition *, int *);
 	void ShowPerft(sPosition *p, int depth);
 	void Divide(sPosition *p, int ply, int depth);
 	void Bench(int depth);
+	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv);
 };
 
 extern struct sSearcher Searcher;
