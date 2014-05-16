@@ -28,6 +28,7 @@ and sorting of moves.
 #include "data.h"
 #include "bitboard/bitboard.h"
 #include "search/search.h"
+#include "trans.h"
 #include "hist.h"
 
 // initializes data needed for move ordering
@@ -181,15 +182,15 @@ void sSelector::ScoreQuiet(int refutationSq)
 	||       *movep == m->refutation
 	 ) { 
 		 if ( Swap(m->p, Fsq(*movep), Tsq(*movep) ) >= -100 ) {
-		     sortVal *= 2;
+		   //  sortVal *= 2;
 		     sortVal += 10000;
 	   }
     }
 	// there is a much lower bonus for continuation moves
 	else if (*movep == m->continuation) {
 		 if ( Swap(m->p, Fsq(*movep), Tsq(*movep) ) >= -100 ) {
-		     sortVal *= 3;
-			 sortVal /= 2;
+		    // sortVal *= 3;
+			// sortVal /= 2;
 		     sortVal += 5000;
 		}
 	}
@@ -297,12 +298,15 @@ int sFlatMoveList::GetNextMove()
 void sFlatMoveList::Init(sPosition * p)
 {
 	sSelector Selector;      // an object responsible for maintaining move list and picking moves 
-	int move;
+	int move,score;
 	int unusedFlag;
 	UNDO  undoData[1];       // data required to undo a move
 	int pv[MAX_PLY];
 
-	Selector.InitMoveList(p, 0, 0, 0, 0); // prepare move selector
+	if (!TransTable.Retrieve(p->hashKey, &move, &score, -INF, INF, ONE_PLY, 1)) 
+	Searcher.Search(p,0,-INF,INF,ONE_PLY,PV_NODE,0,0,0,pv);
+
+	Selector.InitMoveList(p, 1, 1, 1, 1); // prepare move selector
 	nOfMoves = 0;
 	bestMove = 0;
 	bestVal = -INF;
@@ -315,8 +319,7 @@ void sFlatMoveList::Init(sPosition * p)
 		  continue; 
 	  }
  
-	  value[nOfMoves] = Max( -INF+1, -Searcher.QuiesceSmart(p, 0, 0, -INF, INF, 1, pv) );
-	  //value[nOfMoves] = -Searcher.Quiesce(p, 0, 0, -INF, INF, 1, pv);
+	  value[nOfMoves] = -Searcher.Quiesce(p, 0, 0, -INF, INF, 1, pv);
 	  if (value[nOfMoves] > bestVal) {
 		  bestVal = value[nOfMoves];
 		  bestMove = move;
