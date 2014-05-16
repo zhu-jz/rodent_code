@@ -326,7 +326,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // QUIESCENCE SEARCH ENTRY POINT
   if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, 0, pv);
-  //if ( depth < ONE_PLY ) return QuiesceSmart(p, ply, 0, alpha, beta, 0, pv); // with check extension moved down got 49,1% out of 2000 games
 
   nodes++;
   nodesPerBranch++;
