@@ -528,7 +528,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
         continue;
 	 }
 
-     // LATE MOVE PRUNING (2014-01-24: modelled after Toga II 4.0)
+     // LATE MOVE PRUNING (2014-01-24: modelled after Toga II 3.0)
      if ( flagCanReduce
      &&   depth <= 5*ONE_PLY 
      &&  !History.Refutes(lastMove, move) )
@@ -595,7 +595,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 		 IncStat(FAIL_HIGH);
 		 if (movesTried == 1) IncStat(FAIL_FIRST);
          History.OnGoodMove(p, lastMove, move, depth / ONE_PLY, ply);
-		 if (History.MoveChangesMaterialBalance(p, move) ) {
+		 if (!History.MoveChangesMaterialBalance(p, move) ) {
 		    History.UpdateRefutation(lastMove, move);
 			History.UpdateContinuation(contMove, move);
 		 }		    
