@@ -551,7 +551,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 &&     movesTried > 3              // we're sufficiently down the move list
 	 &&     History.MoveIsBad(move)     // current move has bad history score
 	 &&    !History.Refutes(lastMove, move)
-	 //&&    !History.Continues(contMove, move)
+	 &&    !History.Continues(contMove, move)
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
