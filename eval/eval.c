@@ -180,6 +180,8 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
    if (Data.safetyStyle == KS_QUADRATIC) {
       int attUnit = attCount[side];    // attacks on squares near enemy king
       attUnit += checkCount[side];     // check and contact check threats
+	  if (p->side == side) 
+	     attUnit += checkCount[side];  // checks are more important for side to move
       attUnit += (attWood[side] / 2);  // material involved in the attack
       if (attUnit > 99) attUnit = 99;  // bounds checking
       attScore[side] = Data.kingDanger[attUnit];
@@ -224,11 +226,11 @@ void sEvaluator::ScorePatterns(sPosition *p, int side)
 int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 {
 #ifdef HASH_EVAL
-	int addr = p->hashKey % EVAL_HASH_SIZE;
-	if (EvalTT[addr].key == p->hashKey) {
-		int hashScore = EvalTT[addr].score;
-		return p->side == WHITE ? hashScore : -hashScore;
-	}
+   int addr = p->hashKey % EVAL_HASH_SIZE;
+   if (EvalTT[addr].key == p->hashKey) {
+      int hashScore = EvalTT[addr].score;
+      return p->side == WHITE ? hashScore : -hashScore;
+   }
 #endif
 
   int fullEval = 0;
@@ -303,10 +305,10 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
   score = FinalizeScore(p, score); // bounds, granulatity and weakening
 
 #ifdef HASH_EVAL
-  if (fullEval) {
-  EvalTT[addr].key = p->hashKey;
-  EvalTT[addr].score = score;
-  }
+   if (fullEval) {
+      EvalTT[addr].key = p->hashKey;
+      EvalTT[addr].score = score;
+   }
 #endif
 
   // return score relative to the side to move
