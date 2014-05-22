@@ -71,7 +71,6 @@ void sEvaluator::InitDynamicScore(sPosition *p)
    attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
    attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
    checkCount[WHITE]       = 0;   checkCount[BLACK]  = 0;
-   attWood[WHITE]          = 0;   attWood[BLACK]     = 0;  // clear "wood weight" of attack
    mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
    egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
    mgMobility[WHITE]       = 0;   mgMobility[BLACK]  = 0;  // clear midgame mobility
@@ -175,15 +174,18 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
 {
-   bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
-
    if (Data.safetyStyle == KS_QUADRATIC) {
       int attUnit = attCount[side];    // attacks on squares near enemy king
-      attUnit += checkCount[side];     // check and contact check threats
+      
+	  attUnit += checkCount[side];     // check and contact check threats
 	  if (p->side == side) 
 	     attUnit += checkCount[side];  // checks are more important for side to move
-      attUnit += (attWood[side] / 2);  // material involved in the attack
-      if (attUnit > 99) attUnit = 99;  // bounds checking
+
+	  U64 bbCloseAttacks = bbAllAttacks[side] & bbKingAttacks[KingSq(p, Opp(side)) ];
+	  bbCloseAttacks = bbCloseAttacks &~bbAllAttacks[Opp(side)];
+	  attUnit += PopCntSparse(bbCloseAttacks);
+      
+	  if (attUnit > 99) attUnit = 99;  // bounds checking
       attScore[side] = Data.kingDanger[attUnit];
    }
 
@@ -193,6 +195,8 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
    }
 
    ScaleValue(&attScore[side], Data.attSidePercentage[side]);
+
+   bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
 }
 
 int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side) 
@@ -338,45 +342,26 @@ int sEvaluator::ReturnFast(sPosition *p)
 
 int sEvaluator::Normalize(int val, int limit) 
 {
-	if (val > limit)       return limit;
-	else if (val < -limit) return -limit;
-    return val;
+   if (val > limit)       return limit;
+   else if (val < -limit) return -limit;
+   return val;
 }
 
 int sEvaluator::FinalizeScore(sPosition * p, int score)
 {
-  // add random value in weakening mode
-  if (Data.elo < MAX_ELO && Data.useWeakening) {
-	  int randomFactor = ( MAX_ELO - Data.elo ) / 10;
-	  int randomMod = (randomFactor / 2) - (p->hashKey % randomFactor);
-	  score += randomMod;
-  }
+   // add random value in weakening mode
+   if (Data.elo < MAX_ELO && Data.useWeakening) {
+      int randomFactor = ( MAX_ELO - Data.elo ) / 10;
+      int randomMod = (randomFactor / 2) - (p->hashKey % randomFactor);
+      score += randomMod;
+   }
 
-  score = Normalize(score, MAX_EVAL);         // enforce bounds
-  return ( score / GRAIN_SIZE) * GRAIN_SIZE;  // enforce grain
+   score = Normalize(score, MAX_EVAL);         // enforce bounds
+   return ( score / GRAIN_SIZE) * GRAIN_SIZE;  // enforce grain
 }
 
 void sEvaluator::ScaleValue(int * value, int factor) 
 {
    *value *= factor;
    *value /= 100;
-}
-
-void sEvaluator::DebugPst(sPosition *p) 
-{
-	 int sq, mg = 0, eg = 0;
-	 const int clMult[2] = {1, -1};
-	 U64 bbPieces;
-
-	 for (int cl = 0; cl <= 1; cl++)
-	 for (int pc = 0; pc <= 5; pc++)  
-	 {
-	     bbPieces = bbPc(p, cl, pc);
-	     while (bbPieces) {
-           sq = PopFirstBit(&bbPieces);
-	       mg += Data.pstMg[cl][pc][sq] * clMult[cl];
-		   eg += Data.pstEg[cl][pc][sq] * clMult[cl];
-	     }
-	 }
-	 printf("Recalculated pst : mg %d eg %d\n", mg, eg);
 }
