@@ -26,6 +26,7 @@
 #include "trans.h"
 #include "hist.h"
 #include "book.h"
+#include "learn.h"
 #include "eval/eval.h"
 #include "bitboard/bitboard.h"  // for SqBb and REL_SQ macros
 #include "search/search.h"
@@ -119,6 +120,7 @@ void sParser::UciLoop(void)
 		ptr = ParseToken(ptr, token);
 		Searcher.Divide(p, 0, atoi(token) );
     } else if (strcmp(token, "quit") == 0) {
+		if (Data.useLearning && !Data.useWeakening) Learner.Save("lrn.dat");
       exit(0);
     }
   }
@@ -435,7 +437,6 @@ void sParser::PrintBoard(sPosition *p)
    printf("Polyglot     hash: %016llX \n", Book.GetPolyglotKey(p) );
    printf("Incremental  hash: %016llX pawn: %016llX \n", p->hashKey, p->pawnKey);
    printf("Recalculated hash: %016llX pawn: %016llX \n", TransTable.InitHashKey(p), TransTable.InitPawnKey(p));
-   printf("Incremental  pst : mg %d eg %d\n", p->pstMg[WHITE]-p->pstMg[BLACK], p->pstEg[WHITE]-p->pstEg[BLACK]);
-   Eval.DebugPst(p);
+   printf("Piece/square eval: mg %d eg %d\n", p->pstMg[WHITE]-p->pstMg[BLACK], p->pstEg[WHITE]-p->pstEg[BLACK]);
    printf("\n--------------------------------------------\n");
 }
