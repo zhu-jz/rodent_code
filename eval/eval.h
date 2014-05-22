@@ -61,7 +61,6 @@ private:
   int attCount[2];         // attack counter based on square control
   int checkCount[2];       // check threat counter
   int attNumber[2];        // no. of pieces participating in the attack
-  int attWood[2];
   int mgFact,  egFact;     // material-driven scaling factors
   int mgScore, egScore;    // partial midgame and endgame scores (to be scaled)
 
@@ -106,7 +105,6 @@ private:
 public:
   int Normalize(int val, int limit);
   void ScaleValue(int * value, int factor);
-  void DebugPst(sPosition *p);
   int ReturnFast(sPosition *p);
   int ReturnFull(sPosition *p, int alpha, int beta);
 };
