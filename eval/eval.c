@@ -22,6 +22,7 @@
 #include "../data.h"
 #include "../rodent.h"
 #include "eval.h"
+#include <algorithm>
 
 const int safety[ 256 ] = {
 	  0,     1,    1,    2,    2,    3,    3,    4,   4,     5,
@@ -168,8 +169,7 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 {
    int shelter = EvalFileShelter( bbFile & bbPc(p, side, P), side );
    int storm   = EvalFileStorm ( bbFile & bbPc(p, Opp(side), P), side );
-   if (bbFile & bbCentralFile) return (shelter / 2) + storm;
-   else                        return shelter + storm;
+   return bbFile & bbCentralFile ? (shelter / 2) + storm : shelter + storm;
 }
 
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
@@ -177,10 +177,9 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
    if (Data.safetyStyle == KS_QUADRATIC) {
       int attUnit = attCount[side];    // attacks on squares near enemy king
       
-	  attUnit += checkCount[side];     // check and contact check threats
-	  if (p->side == side) 
-	     attUnit += checkCount[side];  // checks are more important for side to move
-
+	  // check and contact check threats (more important 
+	  attUnit += checkCount[side] * (p->side == side ? 2 : 1);
+	  
 	  U64 bbCloseAttacks = bbAllAttacks[side] & bbKingAttacks[KingSq(p, Opp(side)) ];
 	  bbCloseAttacks = bbCloseAttacks &~bbAllAttacks[Opp(side)];
 	  attUnit += PopCntSparse(bbCloseAttacks);
@@ -342,9 +341,7 @@ int sEvaluator::ReturnFast(sPosition *p)
 
 int sEvaluator::Normalize(int val, int limit) 
 {
-   if (val > limit)       return limit;
-   else if (val < -limit) return -limit;
-   return val;
+   return std::min(limit, std::max(-limit,val) );
 }
 
 int sEvaluator::FinalizeScore(sPosition * p, int score)
