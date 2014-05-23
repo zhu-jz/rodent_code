@@ -51,17 +51,6 @@ int pondering;
 char ponder_str[6];
 
 // mobility values
-/*
-static const int n_mob_mg[28] = { -16-4, -12-2,  -8,  0,  4,  8,  12, 16, 16};
-static const int n_mob_eg[28] = { -16-4, -12-2,  -8,  0,  4,  8,  12, 16, 16};
-static const int b_mob_mg[28] = { -16-4, -12-2,  -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
-static const int b_mob_eg[28] = { -16-4, -12-2,  -8, -4, -2,  0,  2,  4,  6,  8, 10, 12, 14, 14, 16                                 };
-static const int r_mob_mg[28] = { -10-4,  -8-2,  -6,  4,  2,  0,  2,  4,  6,  8, 10, 10, 11, 12, 13,                                };
-static const int r_mob_eg[28] = { -20-4, -16-2, -12,  8,  4,  0,  4,  8, 12, 16, 20, 20, 22, 24, 26,                                };
-static const int q_mob_mg[28] = {  -6-4,  -4-2,  -2,  0,  0,  1,  1,  1,  2,  2,  2,  3,  3,  3,  3,  4,  4,  4,  4,  5,  5,  5,  5 };
-static const int q_mob_eg[28] = { -12-4,  -8-2,  -4, -2,  0,  1,  2,  3,  4,  5,  6,  6,  7,  7,  8,  8,  8,  9,  9,  9, 10, 10, 10 };
-*/
-
 static const int n_mob_mg[28] = {-16-4, -8-2, -4, +0, +4, +8,+11,+13,+14,+14,+14,+14,+14,+14,+14,+14 };
 static const int n_mob_eg[28] = {-14-4, -7-2, -3, +0, +3, +6, +8, +9,+10,+10,+10,+14,+14,+14,+14,+14 };
 static const int b_mob_mg[28] = {-20,-15,-10, -5, +0, +5, +9,+12,+14,+15,+16,+17,+18,+19,+19,+19 };
@@ -172,7 +161,7 @@ void sData::InitOptions(void) // init user-accessible stuff
 	 passedPawns     = 105; // 100 is worse, 110 might be marginally better
 	 pawnStruct      = 100;
 	 bishopPair      = 50; 
-     verbose         = 0;       // no additional display
+         verbose         = 0;       // no additional display
 	 elo             = MAX_ELO; // no weakening
 	 contempt        = 12;
 	 isAnalyzing     = 0;
@@ -180,7 +169,7 @@ void sData::InitOptions(void) // init user-accessible stuff
 	 useWeakening    = 0;
 	 useLearning     = 0;
 	 bookFilter      = 10;
-	 lazyMargin      = 180+30;  // WAS 180
+	 lazyMargin      = 600;
 }
 
 // used at the beginning of search to set scaling factors for eval components
