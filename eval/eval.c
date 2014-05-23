@@ -175,16 +175,18 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
 {
    if (Data.safetyStyle == KS_QUADRATIC) {
-      int attUnit = attCount[side];    // attacks on squares near enemy king
+	  int attUnit = attCount[side]; // attacks on squares near enemy king
       
-	  // check and contact check threats (more important 
+	  // check and contact check threats (more important for side to move)
 	  attUnit += checkCount[side] * (p->side == side ? 2 : 1);
 	  
+	  // attacks on undefended squares adjacent to enemy king
 	  U64 bbCloseAttacks = bbAllAttacks[side] & bbKingAttacks[KingSq(p, Opp(side)) ];
 	  bbCloseAttacks = bbCloseAttacks &~bbAllAttacks[Opp(side)];
-	  attUnit += PopCntSparse(bbCloseAttacks);
+	  attUnit += 3*PopCntSparse(bbCloseAttacks);
       
 	  if (attUnit > 99) attUnit = 99;  // bounds checking
+	  if (attCount[side] < 2) attUnit = 0;
       attScore[side] = Data.kingDanger[attUnit];
    }
 
@@ -194,8 +196,6 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
    }
 
    ScaleValue(&attScore[side], Data.attSidePercentage[side]);
-
-   bbAllAttacks[side] |= bbKingAttacks[KingSq(p, side) ];
 }
 
 int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side) 
@@ -275,6 +275,8 @@ int sEvaluator::ReturnFull(sPosition *p, int alpha, int beta)
 	  ScoreKingShield(p, BLACK);  
 	  ScoreKingAttacks(p, WHITE);
 	  ScoreKingAttacks(p, BLACK);
+	  bbAllAttacks[WHITE] |= bbKingAttacks[KingSq(p, WHITE) ];
+	  bbAllAttacks[BLACK] |= bbKingAttacks[KingSq(p, BLACK) ];
 	  ScoreHanging(p, WHITE);
 	  ScoreHanging(p, BLACK);
 
