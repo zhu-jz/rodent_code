@@ -96,80 +96,80 @@ void sData::InitBadBishop(void)
 
 void sData::SetBadBishopMask(int bishSq, int pawnSq, int val)
 {
-     bbBadBishopMasks[WHITE][bishSq] ^= SqBb(pawnSq);
-	 bbBadBishopMasks[BLACK][ REL_SQ(bishSq,BLACK) ] ^= RelSqBb(pawnSq, BLACK);
-	 badBishopPenalty[WHITE][bishSq] = val;
-	 badBishopPenalty[BLACK][REL_SQ(bishSq,BLACK)] = val;
+   bbBadBishopMasks[WHITE][bishSq] ^= SqBb(pawnSq);
+   bbBadBishopMasks[BLACK][ REL_SQ(bishSq,BLACK) ] ^= RelSqBb(pawnSq, BLACK);
+   badBishopPenalty[WHITE][bishSq] = val;
+   badBishopPenalty[BLACK][REL_SQ(bishSq,BLACK)] = val;
 }
 
 void sData::InitSinglePiece(int pc, int mat, int del, int phase) 
 {
-     matValue[pc]      = mat;   
-	 deltaValue[pc]    = del;
-	 phaseValue[pc]    = phase;         
+   matValue[pc]      = mat;   
+   deltaValue[pc]    = del;
+   phaseValue[pc]    = phase;         
 }
 
 void sData::InitMobBonus(void) 
 {
-	 for (int i = 0; i < 28; i++) {
-		 mobBonusMg[N][i] = n_mob_mg[i];
-		 mobBonusEg[N][i] = n_mob_eg[i];
-		 mobBonusMg[B][i] = b_mob_mg[i];
-		 mobBonusEg[B][i] = b_mob_eg[i];
-		 mobBonusMg[R][i] = r_mob_mg[i];
-		 mobBonusEg[R][i] = r_mob_eg[i];
-		 mobBonusMg[Q][i] = q_mob_mg[i];
-		 mobBonusEg[Q][i] = q_mob_eg[i];
-	 }
+   for (int i = 0; i < 28; i++) {
+      mobBonusMg[N][i] = n_mob_mg[i];
+      mobBonusEg[N][i] = n_mob_eg[i];
+      mobBonusMg[B][i] = b_mob_mg[i];
+      mobBonusEg[B][i] = b_mob_eg[i];
+      mobBonusMg[R][i] = r_mob_mg[i];
+      mobBonusEg[R][i] = r_mob_eg[i];
+      mobBonusMg[Q][i] = q_mob_mg[i];
+      mobBonusEg[Q][i] = q_mob_eg[i];
+   }
 }
 
 void sData::InitCastleMask(void) 
 {
-  for (int sq = 0; sq < 64; sq++) castleMask[sq] = 15;
-  castleMask[A1] = 13;
-  castleMask[E1] = 12;
-  castleMask[H1] = 14;
-  castleMask[A8] = 7;
-  castleMask[E8] = 3;
-  castleMask[H8] = 11;
+   for (int sq = 0; sq < 64; sq++) castleMask[sq] = 15;
+   castleMask[A1] = 13;
+   castleMask[E1] = 12;
+   castleMask[H1] = 14;
+   castleMask[A8] = 7;
+   castleMask[E8] = 3;
+   castleMask[H8] = 11;
 }
 
 void sData::InitSearchData(void) 
 {
-	 useNull          = 1;
-	 lmrHistLimit     = 60;      // 70 is better in very fast games (10s per game)
-	 deltaMargin      = 150;
-	 goodCaptMargin   = 30;      // BxN is OK, RxB isn't
+   useNull          = 1;
+   lmrHistLimit     = 60;      // 70 is better in very fast games (10s per game)
+   deltaMargin      = 150;
+   goodCaptMargin   = 30;      // BxN is OK, RxB isn't
 }
 
 void sData::InitDistanceBonus(void) 
 {
-    for (int i = 0; i < 64; ++i) {
-         for (int j = 0; j < 64; ++j) {
+   for (int i = 0; i < 64; ++i) {
+      for (int j = 0; j < 64; ++j) {
          distance[i][j] = 14 - ( Abs( Rank(i) - Rank(j) ) + Abs( File(i) - File(j) ) );
-         }
-     }
+      }
+   }
 }
 
 void sData::InitOptions(void) // init user-accessible stuff
 {
-	 safetyStyle     = KS_QUADRATIC;
-	 ownMobility     = 110; // WAS 110
-	 oppMobility     = 110; // WAS 110
-	 ownAttack       = 100; // WAS 100
-	 oppAttack       = 100; // WAS 100
-	 passedPawns     = 105; // 100 is worse, 110 might be marginally better
-	 pawnStruct      = 100;
-	 bishopPair      = 50; 
-         verbose         = 0;       // no additional display
-	 elo             = MAX_ELO; // no weakening
-	 contempt        = 12;
-	 isAnalyzing     = 0;
-	 useBook         = 1;
-	 useWeakening    = 0;
-	 useLearning     = 0;
-	 bookFilter      = 10;
-	 lazyMargin      = 600;
+   safetyStyle  = KS_QUADRATIC;
+   ownMobility  = 110; // WAS 110
+   oppMobility  = 110; // WAS 110
+   ownAttack    = 100; // WAS 100
+   oppAttack    = 100; // WAS 100
+   passedPawns  = 105; // 100 is worse, 110 might be marginally better
+   pawnStruct   = 100;
+   bishopPair   = 50; 
+   verbose      = 0;       // no additional display
+   elo          = MAX_ELO; // no weakening
+   contempt     = 12;
+   isAnalyzing  = 0;  
+   useBook      = 1;
+   useWeakening = 0;
+   useLearning  = 0;
+   bookFilter   = 10;
+   lazyMargin   = 210;
 }
 
 // used at the beginning of search to set scaling factors for eval components
