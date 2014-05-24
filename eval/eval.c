@@ -176,17 +176,8 @@ void sEvaluator::ScoreKingAttacks(sPosition *p, int side)
 {
    if (Data.safetyStyle == KS_QUADRATIC) {
 	  int attUnit = attCount[side]; // attacks on squares near enemy king
-      
-	  // check and contact check threats (more important for side to move)
-	  attUnit += checkCount[side] * (p->side == side ? 2 : 1);
-	  
-	  // attacks on undefended squares adjacent to enemy king
-	  U64 bbCloseAttacks = bbAllAttacks[side] & bbKingAttacks[KingSq(p, Opp(side)) ];
-	  bbCloseAttacks = bbCloseAttacks &~bbAllAttacks[Opp(side)];
-	  attUnit += 3*PopCntSparse(bbCloseAttacks);
-      
+	  attUnit += checkCount[side];
 	  if (attUnit > 99) attUnit = 99;  // bounds checking
-	  if (attCount[side] < 2) attUnit = 0;
       attScore[side] = Data.kingDanger[attUnit];
    }
 
