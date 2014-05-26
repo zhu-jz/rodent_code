@@ -43,7 +43,6 @@ void sHistory::OnNewGame(void)
     for (int j = 0; j < 64; j++) {
       cutoff[i][j] = 100;
 	  refutation[i][j] = 0;
-	  continuation[i][j] = 0;
 	}
 
   for (int i = 0; i < 12; i++)
@@ -93,11 +92,6 @@ void sHistory::UpdateRefutation(int lastMove, int move)
 	refutation [Fsq(lastMove)] [Tsq(lastMove)] = move;
 }
 
-void sHistory::UpdateContinuation(int prevMove, int move)
-{
-	continuation [Fsq(prevMove)] [Tsq(prevMove)] = move;
-}
-
 void sHistory::OnGoodMove(sPosition *p, int lastMove, int move, int depth, int ply)
 {
      if (MoveChangesMaterialBalance(p,move) ) return;
@@ -145,17 +139,7 @@ int sHistory::Refutes(int lastMove, int move)
 	return (refutation [Fsq(lastMove)] [Tsq(lastMove)] == move);
 }
 
-int sHistory::Continues(int prevMove, int move)
-{
-	return (continuation [Fsq(prevMove)] [Tsq(prevMove)] == move);
-}
-
 int sHistory::GetRefutation(int lastMove)
 {
 	return refutation [Fsq(lastMove)] [Tsq(lastMove)];
-}
-
-int sHistory::GetContinuation(int lastMove)
-{
-	return continuation [Fsq(lastMove)] [Tsq(lastMove)];
 }
