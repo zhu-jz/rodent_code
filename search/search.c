@@ -334,7 +334,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   // REUSING LEARNED DATA ABOUT SCORE OF SPECIFIC POSITIONS
   if ( Data.useLearning 
   &&  !Data.useWeakening
-  &&   ply == 2 ) // reading at bigger depths may hinder exploring alternatives to mainline
+  &&   (ply == 2 || ply == 4 || ply == 6 || ply == 8) ) // reading at bigger depths may hinder exploring alternatives to mainline
   {
 	  int learnVal = Learner.ReadLearnData(p->hashKey, depth);
 	  if (learnVal != INVALID) return learnVal;
@@ -351,8 +351,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   // TRANSPOSITION TABLE READ
   if (TransTable.Retrieve(p->hashKey, &move, &score, alpha, beta, depth, ply)) 
   {
-	  if (score >= beta)
-		  History.UpdateSortOnly(p, move, depth / ONE_PLY, ply);
+     if (score >= beta)
+        History.UpdateSortOnly(p, move, depth / ONE_PLY, ply);
      return score;
   }
   
@@ -551,7 +551,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	 &&     movesTried > 3              // we're sufficiently down the move list
 	 &&     History.MoveIsBad(move)     // current move has bad history score
 	 &&    !History.Refutes(lastMove, move)
-	 &&    !History.Continues(contMove, move)
 	 ) {
 		 if ( IsMoveOrdinary(flagMoveType) ) {
 		    depthChange -= lmrSize[nodeType+1][depth][movesTried];
