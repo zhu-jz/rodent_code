@@ -17,129 +17,32 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "rodent.h"
-#include "data.h"
-#include "hist.h"
+#pragma once
 
-void sHistory::OnNewSearch(void)
-{
-  for (int i = 0; i < 64; i++)
-    for (int j = 0; j < 64; j++)
-      cutoff[i][j] = 100;
-  
-  for (int i = 0; i < 12; i++)
-    for (int j = 0; j < 64; j++)
-      history[i][j] /= 16; // leave some information from previous search
+class sHistory {
+private:
+     int history[12][64];
+	 int cutoff[64][64];
+	 int refutation[64][64];
+	 int killer[MAX_PLY][2];
+	 void ReducePeaks(void);
+	 void UpdateCutoff(int move);
+	 void UpdateKillers(int move, int ply);
+	 void UpdateHistory(sPosition *p, int move, int depth);
+public:
+	 int MoveChangesMaterialBalance(sPosition *p, int move);
+	 void OnGoodMove(sPosition *p, int lastMove, int move, int depth, int ply);
+	 void UpdateSortOnly(sPosition *p, int move, int depth, int ply);
+	 void OnNewSearch(void);
+	 void OnNewGame(void);
+	 void OnMoveTried(int move);
+	 void OnMoveReduced(int move);
+	 int MoveIsBad(int move);
+	 void UpdateRefutation(int lastMove, int move);
+	 int GetMoveHistoryValue(int pc, int sq_to);
+	 int GetKiller(int ply, int slot);
+	 int Refutes(int lastMove, int move);
+	 int GetRefutation(int lastMove);
+};
 
-  for (int i = 0; i < MAX_PLY-2; i++) {
-    killer[i][0] = killer[i+2][0];
-    killer[i][1] = killer[i+2][1];
-  }
-}
-
-void sHistory::OnNewGame(void)
-{
-  for (int i = 0; i < 64; i++)
-    for (int j = 0; j < 64; j++) {
-      cutoff[i][j] = 100;
-	  refutation[i][j] = 0;
-	}
-
-  for (int i = 0; i < 12; i++)
-    for (int j = 0; j < 64; j++)
-      history[i][j] = 0;
-
-  for (int i = 0; i < MAX_PLY-2; i++) {
-    killer[i][0] = 0;
-    killer[i][1] = 0;
-  }
-}
-
-int sHistory::MoveChangesMaterialBalance(sPosition *p, int move)
-{
-    if (p->pc[Tsq(move)] != NO_PC || IsProm(move) || MoveType(move) == EP_CAP) return 1;
-	return 0;
-}
-
-void sHistory::ReducePeaks(void)
-{
-  for (int i = 0; i < 12; i++)
-    for (int j = 0; j < 64; j++)
-      history[i][j] /= 2;
-}
-
-void sHistory::UpdateKillers(int move, int ply)
-{
-  if (move != killer[ply][0]) {
-     killer[ply][1] = killer[ply][0];
-     killer[ply][0] = move;
-  }
-}
-
-void sHistory::UpdateHistory(sPosition *p, int move, int depth)
-{
-     history[p->pc[Fsq(move)]][Tsq(move)] += depth * depth;
-}
-
-void sHistory::UpdateCutoff(int move)
-{
-	cutoff [Fsq(move)] [Tsq(move)] += 8; 
-	// NOTE: 8 and 9 work equally well in self-play, 7 and 10 untested
-}
-
-void sHistory::UpdateRefutation(int lastMove, int move)
-{
-	refutation [Fsq(lastMove)] [Tsq(lastMove)] = move;
-}
-
-void sHistory::OnGoodMove(sPosition *p, int lastMove, int move, int depth, int ply)
-{
-     if (MoveChangesMaterialBalance(p,move) ) return;
-     UpdateCutoff(move); // update table used for cutoff decisions
-     UpdateHistory(p, move, depth);
-     UpdateKillers(move, ply);
-}
-
-void sHistory::UpdateSortOnly(sPosition *p, int move, int depth, int ply)
-{
-     if (MoveChangesMaterialBalance(p,move) ) return;
-     UpdateHistory(p, move, depth);
-     UpdateKillers(move, ply);
-}
-
-int sHistory::GetMoveHistoryValue(int pc, int sq_to) 
-{
-    int val = history[pc][sq_to];
-	if ( val > (1 << 15) ) History.ReducePeaks();
-	return val;
-}
-
-int sHistory::GetKiller(int ply, int slot) 
-{
-    return killer[ply][slot];
-}
-
-void sHistory::OnMoveReduced(int move) 
-{
-    cutoff [Fsq(move)] [Tsq(move)] = 51;
-}
-
-void sHistory::OnMoveTried(int move) 
-{
-    cutoff [Fsq(move)] [Tsq(move)] -= 1;
-}
-
-int sHistory::MoveIsBad(int move) 
-{
-    return (cutoff [Fsq(move)] [Tsq(move)] < Data.lmrHistLimit);
-}
-
-int sHistory::Refutes(int lastMove, int move)
-{
-	return (refutation [Fsq(lastMove)] [Tsq(lastMove)] == move);
-}
-
-int sHistory::GetRefutation(int lastMove)
-{
-	return refutation [Fsq(lastMove)] [Tsq(lastMove)];
-}
+extern sHistory History;
