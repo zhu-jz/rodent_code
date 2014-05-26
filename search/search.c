@@ -464,7 +464,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // CREATE MOVE LIST AND START SEARCHING
   best = -INF;
-  Selector.InitMoveList(p, History.GetRefutation(lastMove), History.GetContinuation(contMove), move, ply);
+  Selector.InitMoveList(p, History.GetRefutation(lastMove), 0, move, ply);
 
   // LOOP THROUGH THE MOVE LIST
   while ( move = Selector.NextMove(refutationSq, &flagMoveType) ) {
@@ -596,7 +596,6 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
          History.OnGoodMove(p, lastMove, move, depth / ONE_PLY, ply);
 		 if (!History.MoveChangesMaterialBalance(p, move) ) {
 		    History.UpdateRefutation(lastMove, move);
-			History.UpdateContinuation(contMove, move);
 		 }		    
          TransTable.Store(p->hashKey, move, score, LOWER, depth, ply);
          return score;
