@@ -182,18 +182,9 @@ void sSelector::ScoreQuiet(int refutationSq)
 	||       *movep == m->refutation
 	 ) { 
 		 if ( Swap(m->p, Fsq(*movep), Tsq(*movep) ) >= -100 ) {
-		   //  sortVal *= 2;
 		     sortVal += 10000;
 	   }
     }
-	// there is a much lower bonus for continuation moves
-	else if (*movep == m->continuation) {
-		 if ( Swap(m->p, Fsq(*movep), Tsq(*movep) ) >= -100 ) {
-		    // sortVal *= 3;
-			// sortVal /= 2;
-		     sortVal += 5000;
-		}
-	}
 
     *valuep++ = sortVal;
   }
