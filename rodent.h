@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 3
-#define BENCH_8 771882
+#define BUILD 21
+#define BENCH_8 787655
 
 #undef CDECL
 
@@ -162,7 +162,6 @@ typedef struct  // set of move lists subdivided into move classes
   int killer1;
   int killer2;
   int refutation;
-  int continuation;
   int *next;
   int *last;
   int move[MAX_MOVES];
