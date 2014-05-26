@@ -38,7 +38,6 @@ void sSelector::InitMoveList(sPosition *p, int refMove, int contMove, int transM
   m->phase = 0;
   m->transMove = transMove;
   m->refutation = refMove;
-  m->continuation = contMove;
   m->killer1 = History.GetKiller(ply, 0);
   m->killer2 = History.GetKiller(ply, 1);
 }
@@ -295,7 +294,7 @@ void sFlatMoveList::Init(sPosition * p)
 	int pv[MAX_PLY];
 
 	if (!TransTable.Retrieve(p->hashKey, &move, &score, -INF, INF, ONE_PLY, 1)) 
-	Searcher.Search(p,0,-INF,INF,ONE_PLY,PV_NODE,0,0,0,pv);
+	Searcher.Search(p,0,-INF,INF,ONE_PLY,PV_NODE,0,0,pv);
 
 	Selector.InitMoveList(p, 1, 1, 1, 1); // prepare move selector
 	nOfMoves = 0;
