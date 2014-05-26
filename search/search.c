@@ -212,7 +212,7 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
   if (!move && depth >= 4*ONE_PLY && !flagInCheck ) {
-	  Search(p, 0, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, 0, newPv);
+	  Search(p, 0, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, 0, newPv);
 	  TransTable.RetrieveMove(p->hashKey, &move);
   }
 
@@ -238,11 +238,11 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
 
 	 // PRINCIPAL VARIATION SEARCH
 	 if (best == -INF )
-       score =   -Search(p, 1, -beta,    -alpha, newDepth, NEW_NODE(PV_NODE), NO_NULL, move, 0, newPv);
+       score =   -Search(p, 1, -beta,    -alpha, newDepth, NEW_NODE(PV_NODE), NO_NULL, move, newPv);
      else {
-       score =   -Search(p, 1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, 0, newPv);
+       score =   -Search(p, 1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, newPv);
        if (!flagAbortSearch && score > alpha && score < beta)
-         score = -Search(p, 1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, 0, newPv);
+         score = -Search(p, 1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, newPv);
      }
 
      Manipulator.UndoMove(p, move, undoData);
@@ -290,7 +290,7 @@ int sSearcher::SearchRoot(sPosition *p, int alpha, int beta, int depth, int *pv)
    return best;
 }
 
-int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv)
+int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv)
 {
   int best,                     // best value found at this node
 	  score,                    // score returned by a search started in this node
@@ -409,7 +409,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	  }
 		  
       Manipulator.DoNull(p, undoData);                            // NODE_ALL
-      nullScore = -Search(p, ply + 1, -beta, -beta + 1, newDepth, NEW_NODE(nodeType), WAS_NULL, 0, 0, newPv);
+      nullScore = -Search(p, ply + 1, -beta, -beta + 1, newDepth, NEW_NODE(nodeType), WAS_NULL, 0, newPv);
 
 	  // extract refutation of a null move from transposition table; usually 
 	  // it will be a capture and we will sort safe evasions above other quiet moves.
@@ -423,7 +423,7 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	  // verify null move in the endgame or at sufficient depth
 	  if (nullScore >= beta && p->pieceMat[p->side] < 1600 ) 
-          nullScore = Search(p, ply, alpha, beta, newDepth-ONE_PLY, CUT_NODE, NO_NULL, 0, 0, newPv); // BUG, should verify with lastMove
+          nullScore = Search(p, ply, alpha, beta, newDepth-ONE_PLY, CUT_NODE, NO_NULL, 0, newPv); // BUG, should verify with lastMove
 	                                             
       if (nullScore >= beta) {
          // we don't want to overwrite real entries, as they are more useful for move ordering 
@@ -453,12 +453,12 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
   // INTERNAL ITERATIVE DEEPENING - we try to get a hash move to improve move ordering
   if (nodeType == PV_NODE && !move && depth >= 4*ONE_PLY && !flagInCheck ) {
-	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, lastMove, contMove, newPv); 
+	  Search(p, ply, alpha, beta, depth-2*ONE_PLY, PV_NODE, NO_NULL, lastMove, newPv); 
 	  TransTable.RetrieveMove(p->hashKey, &move);
   }
 
   if (nodeType == CUT_NODE && !move && depth >= 6*ONE_PLY && !flagInCheck ) {
-	  Search(p, ply, alpha, beta, depth-4*ONE_PLY, PV_NODE, NO_NULL, lastMove, contMove, newPv);
+	  Search(p, ply, alpha, beta, depth-4*ONE_PLY, PV_NODE, NO_NULL, lastMove, newPv);
 	  TransTable.RetrieveMove(p->hashKey, &move);
   } // end of internal iterative deepening code
 
@@ -570,11 +570,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
 	 // PRINCIPAL VARIATION SEARCH
 	 if (best == -INF )
-       score =   -Search(p, ply+1, -beta,    -alpha, newDepth, NEW_NODE(nodeType), NO_NULL, move, lastMove, newPv);
+       score =   -Search(p, ply+1, -beta,    -alpha, newDepth, NEW_NODE(nodeType), NO_NULL, move, newPv);
      else { 
-       score =   -Search(p, ply+1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, lastMove, newPv);
+       score =   -Search(p, ply+1, -alpha-1, -alpha, newDepth, CUT_NODE, NO_NULL, move, newPv);
        if (!flagAbortSearch && score > alpha && score < beta)
-         score = -Search(p, ply+1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, lastMove, newPv);
+         score = -Search(p, ply+1, -beta,    -alpha, newDepth, PV_NODE, NO_NULL, move, newPv);
      }
 
      // FALLBACK TO NORMAL SEARCH IF REDUCED MOVE SEEMS GOOD
