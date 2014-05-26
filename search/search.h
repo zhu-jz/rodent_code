@@ -83,7 +83,7 @@ public:
 	void ShowPerft(sPosition *p, int depth);
 	void Divide(sPosition *p, int ply, int depth);
 	void Bench(int depth);
-	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int contMove, int *pv);
+	int Search(sPosition *p, int ply, int alpha, int beta, int depth, int nodeType, int wasNull, int lastMove, int *pv);
 };
 
 extern struct sSearcher Searcher;
