@@ -425,11 +425,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 	  if (nullScore >= beta && p->pieceMat[p->side] < 1600 ) 
           nullScore = Search(p, ply, alpha, beta, newDepth-ONE_PLY, CUT_NODE, NO_NULL, 0, newPv); // BUG, should verify with lastMove
 	                                             
-      if (nullScore >= beta) {
-         // we don't want to overwrite real entries, as they are more useful for move ordering 
-         if (!move) TransTable.Store(p->hashKey, 0, nullScore, LOWER, depth, ply);
+      if (nullScore >= beta)
 		 return Eval.Normalize(nullScore, MAX_EVAL); // checkmate from null move search isn't reliable
-	  }
     }
   } // end of null move code 
 
