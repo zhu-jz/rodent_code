@@ -321,11 +321,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   if ( DrawBy50Moves(p) )                 return DrawScore(p); 
   if ( !flagInCheck && RecognizeDraw(p) ) return 0;
 
-  // CHECK EXTENSION
-  if (flagInCheck) depth += ONE_PLY;
-
   // QUIESCENCE SEARCH ENTRY POINT
   if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, 0, pv);
+
+  // CHECK EXTENSION
+  if (flagInCheck) depth += ONE_PLY;
 
   nodes++;
   nodesPerBranch++;
@@ -401,7 +401,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
     fullNodeEval = Eval.ReturnFull(p, alpha, beta);
     if ( beta <= fullNodeEval ) {
 
-      newDepth = nullDepth[depth];
+      newDepth = depth - 4*ONE_PLY;
+	  if (depth > 6*ONE_PLY && fullNodeEval - 100 > beta) newDepth -= ONE_PLY;
 
 	  // normal search would fail low, so null move search shouldn't fail high
       if (TransTable.Retrieve(p->hashKey, &nullRefutation, &nullScore, alpha, beta, newDepth, ply) ) {
@@ -421,9 +422,9 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 
       if (flagAbortSearch) return 0; // timeout, "stop" command or mispredicted ponder move
 
-	  // verify null move in the endgame or at sufficient depth
-	  if (nullScore >= beta && p->pieceMat[p->side] < 1600 ) 
-          nullScore = Search(p, ply, alpha, beta, newDepth-ONE_PLY, CUT_NODE, NO_NULL, 0, newPv); // BUG, should verify with lastMove
+	  // verify null move
+	  if (nullScore >= beta && depth >= 6*ONE_PLY ) 
+          nullScore = Search(p, ply, alpha, beta, depth-5*ONE_PLY, CUT_NODE, NO_NULL, 0, newPv); // BUG, should verify with lastMove
 	                                             
       if (nullScore >= beta)
 		 return Eval.Normalize(nullScore, MAX_EVAL); // checkmate from null move search isn't reliable
