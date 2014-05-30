@@ -401,8 +401,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
     fullNodeEval = Eval.ReturnFull(p, alpha, beta);
     if ( beta <= fullNodeEval ) {
 
-      newDepth = depth - 4*ONE_PLY;
-	  if (depth > 6*ONE_PLY && fullNodeEval - 100 > beta) newDepth -= ONE_PLY;
+      newDepth = nullDepth[depth];
+	  int verDepth = newDepth - 2 * ONE_PLY;
 
 	  // normal search would fail low, so null move search shouldn't fail high
       if (TransTable.Retrieve(p->hashKey, &nullRefutation, &nullScore, alpha, beta, newDepth, ply) ) {
@@ -423,8 +423,8 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
       if (flagAbortSearch) return 0; // timeout, "stop" command or mispredicted ponder move
 
 	  // verify null move
-	  if (nullScore >= beta && depth >= 6*ONE_PLY ) 
-          nullScore = Search(p, ply, alpha, beta, depth-5*ONE_PLY, CUT_NODE, NO_NULL, 0, newPv); // BUG, should verify with lastMove
+	  if (nullScore >= beta && depth >= 8 * ONE_PLY ) 
+          nullScore = Search(p, ply, alpha, beta, verDepth, CUT_NODE, NO_NULL, lastMove, newPv);
 	                                             
       if (nullScore >= beta)
 		 return Eval.Normalize(nullScore, MAX_EVAL); // checkmate from null move search isn't reliable
