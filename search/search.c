@@ -376,12 +376,25 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
 		return nodeEval - evalMargin;
   } // end of eval pruning code
 
+  // QUIESCENCE NULL MOVE (idea from CCC post of Vincent Diepeveen)
+  if ( Data.useNull
+  &&   flagCanPrune
+  &&   depth <= minimalNullDepth
+  &&  !wasNull
+  &&   p->pieceMat[p->side] > Data.matValue[N]) {
+     Manipulator.DoNull(p, undoData);
+     score = -Quiesce(p, ply, 0, -beta, -beta+1, 0, pv);
+	 Manipulator.UndoNull(p, undoData);
+
+	 if (score >= beta) return score;
+  }  // end of quiescence null move code
+
   // NULL MOVE - we allow opponent to move twice in a row; if he cannot beat
   // beta this way, then we assume that there is no need to search any further.
 
   if ( Data.useNull
   &&   flagCanPrune
- // &&   depth > minimalNullDepth
+  &&   depth > minimalNullDepth
   &&  !wasNull
   &&   p->pieceMat[p->side] > Data.matValue[N]) 
   {
