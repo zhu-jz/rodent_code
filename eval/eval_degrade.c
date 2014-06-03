@@ -40,10 +40,15 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	int weaker = Opp(stronger);
 
 	if ( p->pieceMat[stronger] > 1400
-	||   p->pcCount[stronger][P] > 2 ) return 64;
+	||   p->pieceMat[weaker] > 1400 ) return 64;
 
-	if ( p->pieceMat[weaker] > 1400
-	||   p->pcCount[weaker][P] > 2 ) return 64;
+    // decrease score in pure opposite bishops ending
+    if (MaterialBishop(p, stronger) 
+    && MaterialBishop(p, weaker)
+    && BishopsAreDifferent(p) ) return 32; // 1/2
+	
+	if (p->pcCount[stronger][P] > 2 
+	||  p->pcCount[weaker][P] > 2 ) return 64;
 
 	const U64 bbKingBlockH[2] = {SqBb(H8) | SqBb(H7) | SqBb(G8) | SqBb(G7) ,
 	                             SqBb(H1) | SqBb(H2) | SqBb(G1) | SqBb(G2)};
@@ -89,11 +94,6 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
        &&  NotOnBishColor(p, stronger, p->kingSquare[weaker])
        ) return 0;
 
-       // decrease score in pure opposite bishops ending
-       if (MaterialBishop(p, stronger) 
-       && MaterialBishop(p, weaker)
-       && BishopsAreDifferent(p) ) return 32; // 1/2
-
 	} // stronger side has no more than a minor piece
 
 	// no win if stronger side has just one minor piece and no pawns
@@ -110,6 +110,7 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	  // low and almost equal material, except KBB vs KN:     1/8
 	  if ( MaterialRook(p, stronger)  && MaterialRook(p, weaker) ) return 8;
 	  if ( MaterialQueen(p, stronger) && MaterialQueen(p, weaker) ) return 8;
+	  if ( MaterialRookMinor(p, stronger) && MaterialRookMinor(p, weaker) ) return 8;
 	  if ( MaterialBN(p, stronger) && ( MaterialMinor (p, weaker) || MaterialRook(p, weaker) ) ) return 8;
 	  if ( MaterialBB(p, stronger) && ( MaterialBishop(p, weaker) || MaterialRook(p, weaker) ) ) return 8;
 	}
