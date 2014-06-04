@@ -22,202 +22,126 @@
 #include "../bitboard/bitboard.h"
 #include "eval.h"
 
-int sEvaluator::PullToDraw(sPosition *p, int score)
+	static const int BN_wb[64] = {
+		0,    0,  15,  30,  45,  60,  85, 100,
+		0,   15,  30,  45,  60,  85, 100,  85,
+		15,  30,  45,  60,  85, 100,  85,  60,
+		30,  45,  60,  85, 100,  85,  60,  45,
+		45,  60,  85, 100,  85,  60,  45,  30,
+		60,  85, 100,  85,  60,  45,  30,  15,
+		85, 100,  85,  60,  45,  30,  15,   0,
+	   100,  85,  60,  45,  30,  15,   0,   0
+	};
+
+	static const int BN_bb[64] = {
+		100, 85,  60,  45,  30,  15,   0,   0,
+		85, 100,  85,  60,  45,  30,  15,   0,
+		60,  85, 100,  85,  60,  45,  30,  15,
+		45,  60,  85, 100,  85,  60,  45,  30,
+		30,  45,  60,  85, 100,  85,  60,  45,
+		15,  30,  45,  60,  85, 100,  85,  60,
+		0,   15,  30,  45,  60,  85, 100,  85,
+		0,   0,   15,  30,  45,  60,  85, 100
+	};
+
+// TODO: move to data struct
+static const int pawnMat[9] = {-40, 90, 180, 270, 360, 450, 540, 630, 720};
+
+//  Crafty-like material imbalance table indexed by difference         
+//  in major piece material (R) and minor piece material (n) :          
+
+#define A  80 // advantage in both major and minor pieces
+#define Rk 50 // advantage in major pieces only
+#define Nt 40 // advantage in minor pieces only
+#define Ex 15 // exchange disadvantage // was 10
+#define Mm 60 // two minors for a rook 
+
+static const int imbalance[9][9] = {
+/* n=-4  n=-3  n=-2  n=-1  n=0   n=+1  n=+2  n=+3  n=+4 */
+  {  -A,   -A,   -A,   -A,  -Rk,    0,    0,    0,    0 }, // R = -4 
+  {  -A,   -A,   -A,   -A,  -Rk,    0,    0,    0,    0 }, // R = -3 
+  {  -A,   -A,   -A,   -A,  -Rk,    0,    0,    0,    0 }, // R = -2 
+  {  -A,   -A,   -A,   -A,  -Rk,  -Ex,   Mm,    0,    0 }, // R = -1 
+  { -Nt,   -Nt, -Nt,  -Nt,    0,   Nt,   Nt,   Nt,   Nt }, // R =  0 
+  {   0,    0,  -Mm,   Ex,   Rk,    A,    A,    A,    A }, // R = +1 
+  {   0,    0,    0,    0,   Rk,    A,    A,    A,    A }, // R = +2 
+  {   0,    0,    0,    0,   Rk,    A,    A,    A,    A }, // R = +3 
+  {   0,    0,    0,    0,   Rk,    A,    A,    A,    A }  // R = +4 
+};
+
+#define NP 6 // values as close as possible to LK formula (1/16 and 1/32 of a pawn)
+#define RP 3
+
+static const int N_adj[9] = { -4*NP, -3*NP, -2*NP, -NP,  0,  NP,  2*NP,  3*NP,  4*NP };
+static const int R_adj[9] = {  4*RP,  3*RP,  2*RP,  RP,  0, -RP, -2*RP, -3*RP, -4*RP };
+
+int sEvaluator::GetMaterialScore(sPosition *p) 
 {
-  int degradation = 64; 
-  if (score > 0) degradation = SetDegradationFactor(p, WHITE);
-  if (score < 0) degradation = SetDegradationFactor(p, BLACK);
+   // piece material
+   int score = p->pieceMat[WHITE] - p->pieceMat[BLACK];
 
-  score *= degradation;
-  return score / 64;
+   // pawn material
+   score += pawnMat[p->pcCount[WHITE][P]];
+   score -= pawnMat[p->pcCount[BLACK][P]];
+
+   // bishop pair
+   if ( p->pcCount[WHITE][B] > 1) score += Data.bishopPair;
+   if ( p->pcCount[BLACK][B] > 1) score -= Data.bishopPair;
+
+   // rook/knight adjustment based on no. of pawns
+   score += ( N_adj[ p->pcCount[WHITE][P] ] * p->pcCount[WHITE] [N] );
+   score -= ( N_adj[ p->pcCount[BLACK][P] ] * p->pcCount[BLACK] [N] );
+   score += ( R_adj[ p->pcCount[WHITE][P] ] * p->pcCount[WHITE] [R] );
+   score -= ( R_adj[ p->pcCount[BLACK][P] ] * p->pcCount[BLACK] [R] );
+
+   // material imbalance table
+   int minorBalance = p->pcCount[WHITE][N] - p->pcCount[BLACK][N] + p->pcCount[WHITE][B]   - p->pcCount[BLACK][B];
+   int majorBalance = p->pcCount[WHITE][R] - p->pcCount[BLACK][R] + 2*p->pcCount[WHITE][Q] - 2*p->pcCount[BLACK][Q];
+
+   int majorIndex = Max( majorBalance + 4, 0 );
+   if (majorIndex > 8) majorIndex = 8;
+
+   int minorIndex = Max(minorBalance + 4, 0);
+   if (minorIndex > 8) minorIndex = 8;
+
+   return score + imbalance[majorIndex][minorIndex];
 }
 
-// Functions responsible for scaling down the evaluation score
-// in case of drawish endgames.
-
-int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
+int sEvaluator::CheckmateHelper(sPosition *p) 
 {
-	int weaker = Opp(stronger);
+   int result = 0;
 
-	if ( p->pieceMat[stronger] > 1400
-	||   p->pcCount[stronger][P] > 2 ) return 64;
+   if (p->pcCount[WHITE][P] == 0
+   &&  p->pcCount[BLACK][P] == 0) {
+      
+      // incentive for the final simplification (so that KRR vs KR is won)
+      if ( p->pieceMat[WHITE] == 0 ) result -= 50;
+      if ( p->pieceMat[BLACK] == 0 ) result += 50;
 
-	if ( p->pieceMat[weaker] > 1400
-	||   p->pcCount[weaker][P] > 2 ) return 64;
+      if ( (p->pieceMat[WHITE] - p->pieceMat[BLACK]) > 100
+      && p->pieceMat[BLACK] < 600) 
+      {
+         // drive enemy king towards the edge
+         result += (40 - Data.pstEg[BLACK][K][p->kingSquare[BLACK]] + Data.distance[p->kingSquare[WHITE]] [p->kingSquare[BLACK]]);
 
-	const U64 bbKingBlockH[2] = {SqBb(H8) | SqBb(H7) | SqBb(G8) | SqBb(G7) ,
-	                             SqBb(H1) | SqBb(H2) | SqBb(G1) | SqBb(G2)};
-	const U64 bbKingBlockA[2] = {SqBb(A8) | SqBb(A7) | SqBb(B8) | SqBb(B7) ,
-	                             SqBb(A1) | SqBb(A2) | SqBb(B1) | SqBb(B2)};
+         if (MaterialBN(p, WHITE) ) { // mate with bishop and knight
+            if ( bbPc(p, WHITE, B) & bbWhiteSq) result -= 2*BN_bb[p->kingSquare[BLACK]];
+            if ( bbPc(p, WHITE, B) & bbBlackSq) result -= 2*BN_wb[p->kingSquare[BLACK]];
+         }
+      }
 
-	if ( p->pieceMat[stronger] < Data.matValue[R] ) {
+      if ((p->pieceMat[WHITE] - p->pieceMat[BLACK]) < -100
+      && p->pieceMat[WHITE] < 600)
+	  {
+         // drive enemy king towards the edge
+         result -= (40 - Data.pstEg[WHITE][K][p->kingSquare[WHITE]] + Data.distance[p->kingSquare[WHITE]] [p->kingSquare[BLACK]]);
 
-	   // KPK with edge pawn (else KBPK recognizer would break)
-	   if (p->pieceMat[stronger] == 0
-	   &&  p->pieceMat[weaker]   == 0
-	   &&  p->pcCount[stronger][P]  == 1
-	   &&  p->pcCount[weaker][P]  == 0) {
+         if (MaterialBN(p, BLACK) ) { // mate with bishop and knight
+            if ( bbPc(p, BLACK, B) & bbWhiteSq) result += 2*BN_bb[p->kingSquare[WHITE]];
+            if ( bbPc(p, BLACK, B) & bbBlackSq) result += 2*BN_wb[p->kingSquare[WHITE]];
+         }
+      }
+   }
 
-	      if (bbPc(p, stronger, P) & bbFILE_H
-          && bbPc(p, weaker, K)  & bbKingBlockH[stronger]) return 0;
-
-	      if (bbPc(p, stronger, P) & bbFILE_A
-          && bbPc(p, weaker, K)  & bbKingBlockA[stronger]) return 0;
-	}
-
-	   // KBPK(P) draws with edge pawn and wrong bishop
-	   if (p->pieceMat[stronger] == Data.matValue[B]
-	   &&  p->pieceMat[weaker]   == 0
-	   &&  p->pcCount[stronger][P]  == 1 ) {
-
-	      if (bbPc(p, stronger, P) & bbFILE_H
-          && NotOnBishColor(p, stronger, REL_SQ(H8,stronger))
-          && bbPc(p, weaker, K)  & bbKingBlockH[stronger]) return 0;
-
-	      if (bbPc(p, stronger, P) & bbFILE_A
-          && NotOnBishColor(p, stronger, REL_SQ(A8,stronger))
-          && bbPc(p, weaker, K)  & bbKingBlockA[stronger]) return 0;
-	   }
-
-	   // KBP vs Km is drawn when defending king stands on pawn's path 
-       // and cannot be driven out by a Bishop
-       if (MaterialBishop(p, stronger)
-       &&  MaterialMinor(p, weaker)
-       &&  p->pcCount[stronger][P] == 1
-       &&  p->pcCount[weaker][P] == 0
-       &&  ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) )
-       &&  NotOnBishColor(p, stronger, p->kingSquare[weaker])
-       ) return 0;
-
-       // decrease score in pure opposite bishops ending
-       if (MaterialBishop(p, stronger) 
-       && MaterialBishop(p, weaker)
-       && BishopsAreDifferent(p) ) return 32; // 1/2
-
-	} // stronger side has no more than a minor piece
-
-	// no win if stronger side has just one minor piece and no pawns
-	if (p->pcCount[stronger][P] == 0) {   
-       if ( p->pieceMat[stronger] < 400 ) return 0;
-	}
-
-    // no pawns of either color on the board
-    if (p->pcCount[stronger][P] == 0 
-    &&  p->pcCount[weaker  ][P] == 0) 
-	{
-      if (MaterialNN(p,stronger) ) return 0;
-
-	  // low and almost equal material, except KBB vs KN:     1/8
-	  if ( MaterialRook(p, stronger)  && MaterialRook(p, weaker) ) return 8;
-	  if ( MaterialQueen(p, stronger) && MaterialQueen(p, weaker) ) return 8;
-	  if ( MaterialRookMinor(p, stronger) && MaterialRookMinor(p, weaker) ) return 8;
-	  if ( MaterialBN(p, stronger) && ( MaterialMinor (p, weaker) || MaterialRook(p, weaker) ) ) return 8;
-	  if ( MaterialBB(p, stronger) && ( MaterialBishop(p, weaker) || MaterialRook(p, weaker) ) ) return 8;
-	}
-
-	if (p->pcCount[stronger][P] == 0 ) {
-
-       // it's hard to win with a bare rook against a minor/minor + pawn
-       if (p->pieceMat[stronger] == Data.matValue[R] 
-       && p->pieceMat[weaker] > 0 ) return 16; // 1/4
-
-       // it's hard to win with a rook and a minor against a rook/rook + pawns
-       if (MaterialRookMinor(p, stronger) 
-       && MaterialRook(p, weaker) ) return 16; // 1/4
-
-       // it's hard to win with a queen and a minor against a queen/queen + pawns
-       if ( MaterialQueenMinor(p, stronger) 
-       && MaterialQueen(p, weaker) ) return 32; // 1/2
-	}
-
-    // some special rules for rook endgame with one pawn
-    if (MaterialRook(p, stronger)
-    &&  MaterialRook(p, weaker)
-    &&  p->pcCount[stronger][P] == 1
-    &&  p->pcCount[weaker][P] == 0
-  ) {
-      // good defensive position with a king on pawn's path
-	  if ( ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) ) ) 
-	      return 32; // 1/2
-
-	  // draw code for rook endgame with edge pawn
-	  if ( ( RelSqBb(A7,stronger) & bbPc(p, stronger, P) )
-	  &&   ( RelSqBb(A8,stronger) & bbPc(p, stronger, R) )
-	  &&   ( bbFILE_A & bbPc(p, weaker, R) )
-	  &&   ( ( RelSqBb(H7,stronger) & bbPc(p, weaker, K) ) || ( RelSqBb(G7,stronger) & bbPc(p, weaker, K) ) )
-		  ) return 0; // dead draw
-
-	  if ( ( RelSqBb(H7,stronger) & bbPc(p, stronger, P) )
-	  &&   ( RelSqBb(H8,stronger) & bbPc(p, stronger, R) )
-	  &&   ( bbFILE_H & bbPc(p, weaker, R) )
-	  &&   ( ( RelSqBb(A7,stronger) & bbPc(p, weaker, K) ) || ( RelSqBb(B7,stronger) & bbPc(p, weaker, K) ) )
-		  ) return 0; // dead draw
-
-	  // TODO: back rank defense
-	}
-
-	// TODO: KRPPKRP with no passers
-    // TODO: KBPKP with blockade and wrong bishop
-
-	return 64; // no degradation
-}
-
-int BishopsAreDifferent(sPosition * p) {
-	if ( ( bbWhiteSq & bbPc(p, WHITE, B) ) && ( bbBlackSq & bbPc(p, BLACK, B) ) ) return 1;
-	if ( ( bbBlackSq & bbPc(p, WHITE, B) ) && ( bbWhiteSq & bbPc(p, BLACK, B) ) ) return 1;
-    return 0;
-}
-
-int NotOnBishColor(sPosition * p, int bishSide, int sq) 
-{
-    if ( ( ( bbWhiteSq & bbPc(p, bishSide, B) ) == 0 )
-    && ( SqBb(sq) & bbWhiteSq) ) return 1;
-
-    if ( ( ( bbBlackSq & bbPc(p, bishSide, B) ) == 0 )
-    && ( SqBb(sq) & bbBlackSq) ) return 1;
-
-    return 0;
-}
-
-int MaterialKnight(sPosition *p, int side) {
-   return ( p->pieceMat[side] == Data.matValue[N] );
-}
-
-int MaterialBishop(sPosition *p, int side) {
-   return ( p->pieceMat[side] == Data.matValue[B] );
-}
-
-int MaterialMinor(sPosition *p, int side) {
-   return ( (p->pieceMat[side] ==  Data.matValue[B]) 
-	 || (p->pieceMat[side] ==  Data.matValue[N]) );
-}
-
-int MaterialRook(sPosition *p, int side) {
-   return ( p->pieceMat[side] == Data.matValue[R] );
-}
-
-int MaterialRookMinor(sPosition *p, int side) {
-   return (    (p->pieceMat[side] == Data.matValue[R] + Data.matValue[B]) 
-   || (p->pieceMat[side] == Data.matValue[R] + Data.matValue[N]) );
-}
-
-int MaterialQueen(sPosition *p, int side) {
-   return ( p->pieceMat[side] == Data.matValue[Q] );
-}
-
-int MaterialQueenMinor(sPosition *p, int side) {
-    return (    (p->pieceMat[side] == Data.matValue[Q] + Data.matValue[B]) 
-	         || (p->pieceMat[side] == Data.matValue[Q] + Data.matValue[N]) );
-}
-
-int MaterialNN(sPosition *p, int side) {
-    return ( p->pieceMat[side] == 2*Data.matValue[N] );
-}
-
-int MaterialBB(sPosition *p, int side) {
-    return ( p->pieceMat[side] == 2*Data.matValue[B] );
-}
-
-int MaterialBN(sPosition *p, int side) {
-    return ( p->pieceMat[side] == Data.matValue[B] + Data.matValue[N] );
+  return result;
 }
