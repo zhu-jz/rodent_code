@@ -17,6 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "stdio.h"
 #include "data.h"
 #include "bitboard/bitboard.h"
 #include "rodent.h"
@@ -49,6 +50,34 @@ U64 zobCastle[16];
 U64 zobEp[8];
 int pondering;
 char ponder_str[6];
+
+const int safety[ 256 ] = { // handmade king safety values
+	  0,     1,    1,    2,    2,    3,    3,    4,   4,     5,
+	  6,     7,    8,    9,   10,   11,   11,   12,   12,   13,
+	 13,    14,   14,   15,   16,   17,   18,   19,   20,   22,
+	 24,    26,   28,   30,   32,   34,   36,   39,   42,   45,
+	 48,    52,   56,   60,   64,   68,   72,   76,   80,   83,
+	 86,    89,   92,   94,   96,   98,  100,  101,  102,  103,
+	104,   105,  106,  107,  108,  109,  110,  111,  112,  113,
+	114,   115,  116,  117,  118,  119,  120,  121,  122,  123,
+	124,   125,  126,  127,  128,  129,  130,  131,  132,  133,
+	134,   135,  136,  137,  138,  139,  140,  141,  142,  143,
+	144,   145,  146,  147,  148,  149,  150,  151,  152,  153,
+	154,   155,  156,  157,  158,  159,  160,  161,  162,  163,
+	164,   165,  166,  167,  168,  169,  170,  171,  172,  173,
+	174,   175,  176,  177,  178,  179,  180,  181,  182,  183,
+	184,   185,  186,  187,  188,  189,  190,  191,  192,  193,
+	194,   195,  196,  197,  198,  199,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
+	200,   200,  200,  200,  200,  200                       };
 
 // mobility values
 static const int n_mob_mg[28] = {-16-4, -8-2, -4, +0, +4, +8,+11,+13,+14,+14,+14,+14,+14,+14,+14,+14 };
@@ -169,14 +198,25 @@ void sData::InitOptions(void) // init user-accessible stuff
    useWeakening = 0;
    useLearning  = 0;
    bookFilter   = 10;
-   lazyMargin   = 210;
+   lazyMargin   = 210+20;
 }
 
 // used at the beginning of search to set scaling factors for eval components
 void sData::InitAsymmetric(int side) 
 {
-     mobSidePercentage[side]      = ownMobility;
-     mobSidePercentage[Opp(side)] = oppMobility;
-     attSidePercentage[side]      = ownAttack;
-     attSidePercentage[Opp(side)] = oppAttack;
+   int oppo = Opp(side);
+   mobSidePercentage[side] = ownMobility;
+   mobSidePercentage[oppo] = oppMobility;
+   attSidePercentage[side] = ownAttack;
+   attSidePercentage[oppo] = oppAttack;
+   for (int i = 0; i <=255; i++) {
+	  if (safetyStyle == KS_QUADRATIC) {
+         danger[side][i] = ( kingDanger[i] * attSidePercentage[side] ) / 100;
+         danger[oppo][i] = ( kingDanger[i] * attSidePercentage[oppo] ) / 100;
+	  }
+	  if (safetyStyle == KS_HANDMADE) {
+         danger[side][i] = ( safety[i] * attSidePercentage[side] ) / 100;
+         danger[oppo][i] = ( safety[i] * attSidePercentage[oppo] ) / 100;
+	  }
+   }
 }
