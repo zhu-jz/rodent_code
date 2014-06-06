@@ -321,11 +321,11 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
   if ( DrawBy50Moves(p) )                 return DrawScore(p); 
   if ( !flagInCheck && RecognizeDraw(p) ) return 0;
 
-  // QUIESCENCE SEARCH ENTRY POINT
-  if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, 0, pv);
-
   // CHECK EXTENSION
   if (flagInCheck) depth += ONE_PLY;
+
+  // QUIESCENCE SEARCH ENTRY POINT
+  if ( depth < ONE_PLY ) return Quiesce(p, ply, 0, alpha, beta, 0, pv);
 
   nodes++;
   nodesPerBranch++;
@@ -533,11 +533,10 @@ int sSearcher::Search(sPosition *p, int ply, int alpha, int beta, int depth, int
      {
          if (IsMoveOrdinary(flagMoveType) 
          &&  normalMoveCnt > moveCountLimit[depth] ) { 
-		 if (normalMoveCnt > moveCountLimit[depth] / 2 )  
+		 if (normalMoveCnt > moveCountLimit[depth] / 2)  
 			 { Manipulator.UndoMove(p, move, undoData); continue; }
 	 		 if (History.MoveIsBad(move) ) 
 			 { Manipulator.UndoMove(p, move, undoData); continue; }
-
  		 }
 	 }
 
