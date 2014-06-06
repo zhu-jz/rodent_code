@@ -148,20 +148,17 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
 {
    if (Data.safetyStyle == KS_QUADRATIC) {
-	  // printf("q");
-	  int attUnit = attCount[side]; // attacks on squares near enemy king
-	  attUnit += checkCount[side];
-	  attUnit += (attWood[side] / 2);  // material involved in the attack
-	  if (attUnit > 99) attUnit = 99;  // bounds checking
+      int attUnit = attCount[side]; // attacks on squares near enemy king
+      attUnit += checkCount[side];
+      attUnit += (attWood[side] / 2);  // material involved in the attack
+      if (attUnit > 99) attUnit = 99;  // bounds checking
       attScore[side] = Data.danger[side][attUnit];
    }
 
    if (Data.safetyStyle == KS_HANDMADE) {
-	  // printf("h");
       int attUnit = attCount[side] + checkCount[side];
       attScore[side] = Data.danger[side][ attUnit + n_of_att[attNumber[side]] ];
    }
-   
 }
 
 int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side) 
