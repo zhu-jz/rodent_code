@@ -47,7 +47,8 @@ public:
  int pawnStruct;
  int bishopPair;
  int badBishopPenalty[2][64];
- int kingDanger[100];
+ int kingDanger[256];
+ int danger[2][256];
  int safetyStyle;
  int contempt;
 
