@@ -198,7 +198,7 @@ void sData::InitOptions(void) // init user-accessible stuff
    useWeakening = 0;
    useLearning  = 0;
    bookFilter   = 10;
-   lazyMargin   = 210+20;
+   lazyMargin   = 220;
 }
 
 // used at the beginning of search to set scaling factors for eval components
