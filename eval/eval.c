@@ -24,34 +24,6 @@
 #include "eval.h"
 #include <algorithm>
 
-const int safety[ 256 ] = {
-	  0,     1,    1,    2,    2,    3,    3,    4,   4,     5,
-	  6,     7,    8,    9,   10,   11,   11,   12,   12,   13,
-	 13,    14,   14,   15,   16,   17,   18,   19,   20,   22,
-	 24,    26,   28,   30,   32,   34,   36,   39,   42,   45,
-	 48,    52,   56,   60,   64,   68,   72,   76,   80,   83,
-	 86,    89,   92,   94,   96,   98,  100,  101,  102,  103,
-	104,   105,  106,  107,  108,  109,  110,  111,  112,  113,
-	114,   115,  116,  117,  118,  119,  120,  121,  122,  123,
-	124,   125,  126,  127,  128,  129,  130,  131,  132,  133,
-	134,   135,  136,  137,  138,  139,  140,  141,  142,  143,
-	144,   145,  146,  147,  148,  149,  150,  151,  152,  153,
-	154,   155,  156,  157,  158,  159,  160,  161,  162,  163,
-	164,   165,  166,  167,  168,  169,  170,  171,  172,  173,
-	174,   175,  176,  177,  178,  179,  180,  181,  182,  183,
-	184,   185,  186,  187,  188,  189,  190,  191,  192,  193,
-	194,   195,  196,  197,  198,  199,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200,  200,  200,  200,  200,
-	200,   200,  200,  200,  200,  200                       };
-
 const int n_of_att[ 24 ] =   { 0, 6, 12, 18, 24, 32, 48, 52, 56, 60, 64, 66, 68, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70 };
 
 const int mgTwoOnSeventh  = 5;
@@ -71,6 +43,7 @@ void sEvaluator::InitDynamicScore(sPosition *p)
    attScore[WHITE]         = 0;   attScore[BLACK]    = 0;  // clear attack scores
    attNumber[WHITE]        = 0;   attNumber[BLACK]   = 0;  // clear no. of attackers
    attCount[WHITE]         = 0;   attCount[BLACK]    = 0;
+   attWood[WHITE]          = 0;   attWood[BLACK] = 0;
    checkCount[WHITE]       = 0;   checkCount[BLACK]  = 0;
    mgMisc[WHITE]           = 0;   mgMisc[BLACK]      = 0;  // clear miscelanneous midgame scores
    egMisc[WHITE]           = 0;   egMisc[BLACK]      = 0;  // clear miscelanneous endgame scores
@@ -175,18 +148,20 @@ int sEvaluator::EvalKingFile(sPosition * p, int side, U64 bbFile)
 void sEvaluator::ScoreKingAttacks(sPosition *p, int side) 
 {
    if (Data.safetyStyle == KS_QUADRATIC) {
+	  // printf("q");
 	  int attUnit = attCount[side]; // attacks on squares near enemy king
 	  attUnit += checkCount[side];
+	  attUnit += (attWood[side] / 2);  // material involved in the attack
 	  if (attUnit > 99) attUnit = 99;  // bounds checking
-      attScore[side] = Data.kingDanger[attUnit];
+      attScore[side] = Data.danger[side][attUnit];
    }
 
    if (Data.safetyStyle == KS_HANDMADE) {
+	  // printf("h");
       int attUnit = attCount[side] + checkCount[side];
-      attScore[side] = safety[ attUnit + n_of_att[attNumber[side]] ];
+      attScore[side] = Data.danger[side][ attUnit + n_of_att[attNumber[side]] ];
    }
-
-   ScaleValue(&attScore[side], Data.attSidePercentage[side]);
+   
 }
 
 int sEvaluator::EvalFileShelter(U64 bbOwnPawns, int side) 
