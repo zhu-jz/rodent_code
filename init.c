@@ -45,7 +45,6 @@ void Init(void)
   InitZobrist();
   InitPossibleAttacks();
   InitPawnSupport();
-  Data.InitBadBishop();  // bad bishop bitboards initialization
   Data.InitOptions();
   //                 name,  val, delta, phase
   Data.InitSinglePiece( P,  0,     150,  0);  // pawn material is evaluated in eval.c, so no value set here
