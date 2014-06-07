@@ -19,8 +19,8 @@
 
 #pragma once
 
-#define BUILD 21
-#define BENCH_8 787655
+#define BUILD 25
+#define BENCH_8 788536
 
 #undef CDECL
 
@@ -259,7 +259,6 @@ extern U64 bbKingZone[2][64];
 
 extern U64 bbPassedMask[2][64];
 extern U64 bbAdjacentMask[8];
-extern U64 bbBadBishopMasks[2][64];
 
 extern int castleMask[64];
 extern const int bitTable[64];
