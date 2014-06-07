@@ -51,6 +51,7 @@
   //                                    P   N   B   R   Q   K         P   N   B   R   Q   K
   const int attPerPc     [2]  [7] = { { 0,  2,  2,  3,  5,  0,  0}, { 0,  1,  1,  2,  4,  0,  0} };
   const int canCheckWith [2]  [7] = { { 0,  1,  1,  3,  4,  0,  0}, { 0,  1,  1,  2,  3,  0,  0} };
+  const int woodPerPc         [7] =   { 0,  1,  1,  2,  4,  0,  0};
 
 void sEvaluator::ScoreN(sPosition *p, int side) 
 {
@@ -143,9 +144,8 @@ void sEvaluator::ScoreB(sPosition *p, int side)
 	if (bbMob & bbDiagChecks[Opp(side)] )
 		checkCount[side] += canCheckWith[Data.safetyStyle][B];
 
-	// bishop blocked by own pawns
-	if ( bbBadBishopMasks[side][sq] & bbPc(p, side, P) )
-       AddMisc(side, Data.badBishopPenalty[side][sq], Data.badBishopPenalty[side][sq]);
+	// bishop blocked by own pawns TODO
+
   }
 }
 
@@ -356,6 +356,7 @@ void sEvaluator::AddKingAttack(int side, int pc, int cnt)
 {
    attNumber[side] += 1;
    attCount [side] += attPerPc[Data.safetyStyle][pc] * cnt;
+   attWood[side] += woodPerPc[pc];
 }
 
 void sEvaluator::AddMobility( int pc, int side, int cnt)
