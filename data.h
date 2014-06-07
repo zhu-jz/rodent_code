@@ -84,9 +84,7 @@ public:
  void InitSearchData(void);
  void InitDistanceBonus(void);
  void InitOptions(void);
- void InitBadBishop(void);
  void InitAsymmetric(int side);
- void SetBadBishopMask(int bishSq, int pawnSq, int val);
  int GetPawnMgPst(int sq);
  int GetRookMgPst(int sq);
  int GetPhalanxPstMg(int sq);
