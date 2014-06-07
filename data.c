@@ -30,7 +30,6 @@ U64 bbKingAttacks[64];
 U64 bbKingZone[2][64];
 U64 bbPassedMask[2][64];
 U64 bbAdjacentMask[8];
-U64 bbBadBishopMasks[2][64];
 int castleMask[64];
 
 // used for a mathematical trick in FirstOne
@@ -90,46 +89,6 @@ static const int q_mob_mg[32] = { -6, -5, -4, -3, -2, -1, +0, +1, +2, +3, +4, +4
                                   +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7, +7 };
 static const int q_mob_eg[32] = {-12, -10, -8 -6, -4, -2, +0, +2, +4, +6, +7, +8, +9,+10,+11,+11,
                                  +12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12,+12 };
-
-void sData::InitBadBishop(void)
-{
-	 // first clear bad bishop masks
-	 for (int side = 0; side < 2; side++) {
-	    for (int sq = 0; sq < 64; sq++) {  
-			 bbBadBishopMasks [side][sq] = 0ULL;
-			 badBishopPenalty[side][sq] = 0;
-		 }
-	 }
-
-	 SetBadBishopMask(F1, E2, -20);
-	 SetBadBishopMask(C1, D2, -20);
-	 SetBadBishopMask(A2, B3, -10); SetBadBishopMask(A2, C4, -10);
-	 SetBadBishopMask(B2, C3, -5);
-	 SetBadBishopMask(C2, D3, -5);  SetBadBishopMask(C2, E4, -5);
-	 SetBadBishopMask(D2, E3, -5);
-	 SetBadBishopMask(E2, D3, -5);
-	 SetBadBishopMask(F2, E3, -5);  SetBadBishopMask(F2, D4, -5);
-	 SetBadBishopMask(G2, F3, -5);
-	 SetBadBishopMask(H2, G3, -10); SetBadBishopMask(H2, F4, -10);
-	 SetBadBishopMask(A3, B4, -5);  SetBadBishopMask(A3, C5, -5);
-	 SetBadBishopMask(B3, C4, -10); SetBadBishopMask(B3, D5, -10);
-	 SetBadBishopMask(C3, D4, -5);
-	 SetBadBishopMask(D3, E4, -5);
-	 SetBadBishopMask(E3, D4, -5);
-	 SetBadBishopMask(F3, E4, -5);
-	 SetBadBishopMask(G3, F4, -10); SetBadBishopMask(G3, E5, -10);
-	 SetBadBishopMask(H3, G4, -5);  SetBadBishopMask(H3, F5, -5);
-	 SetBadBishopMask(C4, D5, -3);
-	 SetBadBishopMask(F4, E5, -3);
-}
-
-void sData::SetBadBishopMask(int bishSq, int pawnSq, int val)
-{
-   bbBadBishopMasks[WHITE][bishSq] ^= SqBb(pawnSq);
-   bbBadBishopMasks[BLACK][ REL_SQ(bishSq,BLACK) ] ^= RelSqBb(pawnSq, BLACK);
-   badBishopPenalty[WHITE][bishSq] = val;
-   badBishopPenalty[BLACK][REL_SQ(bishSq,BLACK)] = val;
-}
 
 void sData::InitSinglePiece(int pc, int mat, int del, int phase) 
 {
