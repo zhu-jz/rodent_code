@@ -62,7 +62,7 @@ void sSearcher::Init(void)
             else if (lmrSize[node][depth][moves] > 1 * ONE_PLY)
                lmrSize[node][depth][moves] += ONE_PLY / 4;
 
-			if ( lmrSize[node][depth][moves] > depth - ONE_PLY)
+			if ( lmrSize[node][depth][moves] > depth - ONE_PLY) // reduction cannot be bigger than remaining depth
 				lmrSize[node][depth][moves] = depth - ONE_PLY;
          }
       }
@@ -118,7 +118,7 @@ void sSearcher::Iterate(sPosition *p, int *pv)
    for (rootDepth = ONE_PLY; rootDepth <= localDepth; rootDepth+=ONE_PLY) {
 
       DisplayRootInfo();
-      delta = aspiration;
+      delta = 24;
 
       if (rootDepth <= 6 * ONE_PLY) { alpha = -INF;      beta = INF;       }
       else                          { alpha = val-delta; beta = val+delta; }
@@ -133,8 +133,8 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 
          // fail-low, it might be prudent to assign some more time
          if (curVal < val) Timer.OnRootFailLow();
-         if (curVal >= beta)  beta  = val +3*delta;
-         if (curVal <= alpha) alpha = val -3*delta;
+         if (curVal >= beta)  beta  = val +2*delta;
+         if (curVal <= alpha) alpha = val -2*delta;
 
          curVal = SearchRoot(p, alpha, beta, rootDepth, pv);
          bestMove = pv[0];
@@ -142,9 +142,20 @@ void sSearcher::Iterate(sPosition *p, int *pv)
 
          // the second window
          if (curVal >= beta || curVal <= alpha) 
+
+         if (curVal >= beta)  beta  = val +4*delta;
+         if (curVal <= alpha) alpha = val -4*delta;
+
+         curVal = SearchRoot(p, alpha, beta, rootDepth, pv);
+         bestMove = pv[0];
+         if (flagAbortSearch) break;
+   
+		 // the final window
+		 if (curVal >= beta || curVal <= alpha)  {
             curVal = SearchRoot(p, -INF, INF, rootDepth, pv);
             bestMove = pv[0];
             if (flagAbortSearch) break;
+		}
       }
 
       // SAVE POSITION LEARNING DATA
