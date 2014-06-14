@@ -29,23 +29,23 @@ const int pawnBackwardOnOpen = -15;
 
 void sEvaluator::EvalPawns(sPosition *p)
 {
-  int pawnHash = p->pawnKey % PAWN_HASH_SIZE;
+   int pawnHash = p->pawnKey % PAWN_HASH_SIZE;
 
-  // try reading score from pawn hashtable
-  if ( PawnTT[pawnHash].pawnKey == p->pawnKey) {
-	  mgScore += PawnTT[pawnHash].mgPawns;
-	  egScore += PawnTT[pawnHash].egPawns;
-	  mgScore += PawnTT[pawnHash].mgPassers;
-	  egScore += PawnTT[pawnHash].egPassers;
-  }
-  else
-  {
+   // try reading score from pawn hashtable
+   if ( PawnTT[pawnHash].pawnKey == p->pawnKey) {
+      mgScore += PawnTT[pawnHash].mgPawns;
+      egScore += PawnTT[pawnHash].egPawns;
+      mgScore += PawnTT[pawnHash].mgPassers;
+      egScore += PawnTT[pawnHash].egPassers;
+   }
+   else
+   {
       SinglePawnScore(p, WHITE);
       SinglePawnScore(p, BLACK);
-	  EvalPawnCenter(p, WHITE);
-	  EvalPawnCenter(p, BLACK);
+      EvalPawnCenter(p, WHITE);
+      EvalPawnCenter(p, BLACK);
  
-	  mgScore += ( ( (pawnScoreMg[WHITE] - pawnScoreMg[BLACK]) * Data.pawnStruct ) / 100 );
+      mgScore += ( ( (pawnScoreMg[WHITE] - pawnScoreMg[BLACK]) * Data.pawnStruct ) / 100 );
       egScore += ( ( (pawnScoreEg[WHITE] - pawnScoreEg[BLACK]) * Data.pawnStruct ) / 100 );
       mgScore += ( ( (passerScoreMg[WHITE] - passerScoreMg[BLACK]) * Data.passedPawns ) / 100 );
       egScore += ( ( (passerScoreEg[WHITE] - passerScoreEg[BLACK]) * Data.passedPawns ) / 100 );
@@ -54,27 +54,29 @@ void sEvaluator::EvalPawns(sPosition *p)
       PawnTT[pawnHash].pawnKey = p->pawnKey;
       PawnTT[pawnHash].mgPawns   = ( ( (pawnScoreMg[WHITE] - pawnScoreMg[BLACK])* Data.pawnStruct ) / 100 );
       PawnTT[pawnHash].egPawns   = ( ( (pawnScoreEg[WHITE] - pawnScoreEg[BLACK])* Data.pawnStruct ) / 100 );
-	  PawnTT[pawnHash].mgPassers = ( ( (passerScoreMg[WHITE] - passerScoreMg[BLACK])* Data.passedPawns ) / 100 );
+      PawnTT[pawnHash].mgPassers = ( ( (passerScoreMg[WHITE] - passerScoreMg[BLACK])* Data.passedPawns ) / 100 );
       PawnTT[pawnHash].egPassers = ( ( (passerScoreEg[WHITE] - passerScoreEg[BLACK])* Data.passedPawns ) / 100 );
-  }
+   }
 }
 
 void sEvaluator::EvalPawnCenter(sPosition *p, int side)
 {
-      //here we care about defending central pawns; see midgame phalanx pst for more
-	  if (bbPc(p, side, P) & RelSqBb(D4,side) ) {
-          if (bbPc(p, side, P) & RelSqBb(E3,side) )  pawnScoreMg[side] += centDefense;
-          if (bbPc(p, side, P) & RelSqBb(C3,side) )  pawnScoreMg[side] += centDefense;
-      }
+   int oppo = Opp(side);	  
+   if (bbPc(p, side, P) & RelSqBb(D4,side) ) {
+      // defend central pawns (pawns side by side evaluated as "phalanx")
+      if (bbPc(p, side, P) & RelSqBb(E3,side) )  pawnScoreMg[side] += centDefense;
+      if (bbPc(p, side, P) & RelSqBb(C3,side) )  pawnScoreMg[side] += centDefense;
+   }
 
-      if (bbPc(p, side, P) & RelSqBb(E4,side) && bbPc(p, side, P) & RelSqBb(D3,side) ) 
-         pawnScoreMg[side] += centDefense;
+   if (bbPc(p, side, P) & RelSqBb(E4,side) ) {
+      if ( bbPc(p, side, P) & RelSqBb(D3,side) ) pawnScoreMg[side] += centDefense;
+   }
 }
 
 void sEvaluator::SinglePawnScore(sPosition *p, int side)
 {
-  int sq; 
-  int flagIsOpen, flagIsWeak;
+  int sq, flagIsOpen, flagIsWeak;
+  int oppo = Opp(side);
   U64 flagIsPhalanx, flagPhalanx2, flagIsDoubled;
   U64 bbPieces = bbPc(p, side, P);
   U64 bbOwnPawns = bbPieces;
@@ -84,12 +86,12 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
     sq = PopFirstBit(&bbPieces);
 
     // gather information about a pawn that is evaluated
-	bbFrontSpan    = GetFrontSpan(SqBb(sq), side );
-	flagIsDoubled  = bbFrontSpan & bbOwnPawns;
-    flagIsOpen     = ( ( bbFrontSpan & bbPc(p, Opp(side), P) ) == 0 );
-	flagIsPhalanx  = ShiftEast(SqBb(sq) ) & bbOwnPawns;
-	flagPhalanx2   = ShiftWest(SqBb(sq) ) & bbOwnPawns;
-	flagIsWeak     = ( ( bbPawnSupport[side][sq] & bbOwnPawns ) == 0);
+	bbFrontSpan   = GetFrontSpan(SqBb(sq), side );
+	flagIsDoubled = bbFrontSpan & bbOwnPawns;
+    flagIsOpen    = !( bbFrontSpan & bbPc(p, oppo, P) );
+	flagIsPhalanx = ShiftEast(SqBb(sq) ) & bbOwnPawns;
+	flagPhalanx2  = ShiftWest(SqBb(sq) ) & bbOwnPawns;
+	flagIsWeak    = !( bbPawnSupport[side][sq] & bbOwnPawns );
 	
 	if (flagIsDoubled) {
 	    pawnScoreMg[side] += doubledPawn[MG][File(sq)];
@@ -102,7 +104,7 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	}
 
 	if (flagIsOpen) {
-		U64 bbObstacles = bbPassedMask[side][sq] & bbPc(p, Opp(side), P);
+		U64 bbObstacles = bbPassedMask[side][sq] & bbPc(p, oppo, P);
 		
 	    // passed pawn (some more eval will be done in ScoreP() in eval_pieces.c)
 		if (!bbObstacles) {
@@ -133,12 +135,12 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 
 void sEvaluator::AddPawnProperty(int pawnProperty, int side, int sq)
 {
-   pawnScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
-   pawnScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
+     pawnScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
+	 pawnScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
 }
 
 void sEvaluator::AddPasserScore(int pawnProperty, int side, int sq)
 {
-   passerScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
-   passerScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
+     passerScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
+	 passerScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
 }
