@@ -84,9 +84,13 @@ int sEvaluator::GetMaterialScore(sPosition *p)
    score += pawnMat[p->pcCount[WHITE][P]];
    score -= pawnMat[p->pcCount[BLACK][P]];
 
-   // bishop pair
+   // bishop pair bonus
    if ( p->pcCount[WHITE][B] > 1) score += Data.bishopPair;
    if ( p->pcCount[BLACK][B] > 1) score -= Data.bishopPair;
+
+   // knight pair penalty
+   if ( p->pcCount[WHITE][N] > 1) score -= 10;
+   if ( p->pcCount[BLACK][N] > 1) score += 10;
 
    // rook/knight adjustment based on no. of pawns
    score += ( N_adj[ p->pcCount[WHITE][P] ] * p->pcCount[WHITE] [N] );
