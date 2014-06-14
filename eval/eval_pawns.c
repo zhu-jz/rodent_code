@@ -77,10 +77,9 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 {
   int sq, flagIsOpen, flagIsWeak;
   int oppo = Opp(side);
-  U64 flagIsPhalanx, flagPhalanx2, flagIsDoubled;
+  U64 flagIsPhalanx, flagPhalanx2, flagIsDoubled, bbFrontSpan;
   U64 bbPieces = bbPc(p, side, P);
   U64 bbOwnPawns = bbPieces;
-  U64 bbFrontSpan;
  
   while (bbPieces) {
     sq = PopFirstBit(&bbPieces);
@@ -119,13 +118,10 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 	}
     
 	if (flagIsWeak) {
-		if (!(bbAdjacentMask[File(sq)] & bbOwnPawns)) // isolated
-		{ 
+		if (!(bbAdjacentMask[File(sq)] & bbOwnPawns)) { // isolated 
 		   AddPawnProperty(ISOLATED,side,sq);
 		   if (flagIsOpen) pawnScoreMg[side] += pawnIsolatedOnOpen;
-		}
-		else // backward
-		{
+		} else {                                        // backward
 		   AddPawnProperty(BACKWARD,side,sq);
 		   if (flagIsOpen) pawnScoreMg[side] += pawnBackwardOnOpen;
 		}
@@ -135,12 +131,12 @@ void sEvaluator::SinglePawnScore(sPosition *p, int side)
 
 void sEvaluator::AddPawnProperty(int pawnProperty, int side, int sq)
 {
-     pawnScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
-	 pawnScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
+   pawnScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
+   pawnScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
 }
 
 void sEvaluator::AddPasserScore(int pawnProperty, int side, int sq)
 {
-     passerScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
-	 passerScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
+   passerScoreMg[side] += Data.pawnProperty[pawnProperty][MG][side][sq]; 
+   passerScoreEg[side] += Data.pawnProperty[pawnProperty][EG][side][sq];
 }
