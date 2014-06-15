@@ -69,7 +69,7 @@ static const int imbalance[9][9] = {
   {   0,    0,    0,    0,   Rk,    A,    A,    A,    A }  // R = +4 
 };
 
-#define NP 6 // values as close as possible to LK formula (1/16 and 1/32 of a pawn)
+#define NP 8
 #define RP 3
 
 static const int N_adj[9] = { -4*NP, -3*NP, -2*NP, -NP,  0,  NP,  2*NP,  3*NP,  4*NP };
