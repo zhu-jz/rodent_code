@@ -22,6 +22,9 @@
 #include "../bitboard/bitboard.h"
 #include "eval.h"
 
+static const U64 bbNormalPawn[2] = { bbRANK_2 | bbRANK_3 | bbRANK_4 | bbRANK_5,
+	                                 bbRANK_7 | bbRANK_6 | bbRANK_5 | bbRANK_4 };
+
 int sEvaluator::PullToDraw(sPosition *p, int score)
 {
   int degradation = 64; 
@@ -42,10 +45,31 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	if ( p->pieceMat[stronger] > 1400
 	||   p->pieceMat[weaker] > 1400 ) return 64;
 
+	// KBP vs Km is drawn when defending king stands on pawn's path 
+    // and cannot be driven out by a Bishop
+    if (PcMatBishop(p, stronger)
+    &&  PcMatMinor(p, weaker)
+    &&  p->pcCount[stronger][P] == 1
+    &&  p->pcCount[weaker][P] == 0
+    &&  ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) )
+    &&  NotOnBishColor(p, stronger, p->kingSquare[weaker])
+    ) return 0;
+
     // decrease score in pure opposite bishops ending
     if (PcMatBishop(p, stronger) 
     && PcMatBishop(p, weaker)
-    && BishopsAreDifferent(p) ) return 32; // 1/2
+    && BishopsAreDifferent(p) ) {
+	   if  ( p->pcCount[stronger][P] == 0 ) return 0; // instruction order fix
+
+	   // special case: one pawn vs no pawn
+	   if  ( p->pcCount[stronger][P] == 1
+       &&  p->pcCount[weaker][P] == 0 ) {
+		   // this pawn is not too advanced, weaker side should hold the draw
+		   if (bbNormalPawn[stronger] & bbPc(p,stronger,P) ) return 0;
+	   }
+
+	   return 32; // default: halve the score
+	}
 	
 	if (p->pcCount[stronger][P] > 2 
 	||  p->pcCount[weaker][P] > 2 ) return 64;
@@ -84,16 +108,6 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
           && bbPc(p, weaker, K)  & bbKingBlockA[stronger]) return 0;
 	   }
 
-	   // KBP vs Km is drawn when defending king stands on pawn's path 
-       // and cannot be driven out by a Bishop
-       if (PcMatBishop(p, stronger)
-       &&  PcMatMinor(p, weaker)
-       &&  p->pcCount[stronger][P] == 1
-       &&  p->pcCount[weaker][P] == 0
-       &&  ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) )
-       &&  NotOnBishColor(p, stronger, p->kingSquare[weaker])
-       ) return 0;
-
 	} // stronger side has no more than a minor piece
 
 	// no win if stronger side has just one minor piece and no pawns
@@ -130,7 +144,7 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
        && PcMatQueen(p, weaker) ) return 32; // 1/2
 	}
 
-	// rare KNPK draw rule
+	// rare KNPK draw rule: king blocking an edge pawn on 7th rank draws
 	if (PcMatKnight(p, stronger) 
     &&  PcMatNone(p, weaker)
     &&  p->pcCount[stronger][P] == 1
@@ -222,7 +236,7 @@ int PcMatQueen(sPosition *p, int side) {
 
 int PcMatQueenMinor(sPosition *p, int side) {
     return (    (p->pieceMat[side] == Data.matValue[Q] + Data.matValue[B]) 
-	     || (p->pieceMat[side] == Data.matValue[Q] + Data.matValue[N]) );
+	         || (p->pieceMat[side] == Data.matValue[Q] + Data.matValue[N]) );
 }
 
 int PcMatNN(sPosition *p, int side) {
@@ -234,5 +248,5 @@ int PcMatBB(sPosition *p, int side) {
 }
 
 int PcMatBN(sPosition *p, int side) {
-	return ( p->pieceMat[side] == Data.matValue[B] + Data.matValue[N] );
+    return ( p->pieceMat[side] == Data.matValue[B] + Data.matValue[N] );
 }
