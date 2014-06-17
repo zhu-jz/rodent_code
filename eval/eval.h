@@ -60,6 +60,7 @@ private:
   U64 bbAllAttacks[2];     // squares attacked by a side
   int attCount[2];         // attack counter based on square control
   int checkCount[2];       // check threat counter
+  int attWood[2];
   int attNumber[2];        // no. of pieces participating in the attack
   int mgFact,  egFact;     // material-driven scaling factors
   int mgScore, egScore;    // partial midgame and endgame scores (to be scaled)
@@ -114,13 +115,14 @@ extern struct sEvaluator Eval;
 int NotOnBishColor(sPosition * p, int bishSide, int sq);
 int BishopsAreDifferent(sPosition * p);
 
-int MaterialMinor(sPosition *p, int side);
-int MaterialKnight(sPosition *p, int side);
-int MaterialBishop(sPosition *p, int side);
-int MaterialRook(sPosition *p, int side);
-int MaterialRookMinor(sPosition *p, int side);
-int MaterialQueen(sPosition *p, int side);
-int MaterialQueenMinor(sPosition *p, int side);
-int MaterialBB(sPosition *p, int side);
-int MaterialNN(sPosition *p, int side);
-int MaterialBN(sPosition *p, int side);
+int PcMatNone(sPosition *p, int side);
+int PcMatMinor(sPosition *p, int side);
+int PcMatKnight(sPosition *p, int side);
+int PcMatBishop(sPosition *p, int side);
+int PcMatRook(sPosition *p, int side);
+int PcMatRookMinor(sPosition *p, int side);
+int PcMatQueen(sPosition *p, int side);
+int PcMatQueenMinor(sPosition *p, int side);
+int PcMatBB(sPosition *p, int side);
+int PcMatNN(sPosition *p, int side);
+int PcMatBN(sPosition *p, int side);
