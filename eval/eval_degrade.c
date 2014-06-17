@@ -43,8 +43,8 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	||   p->pieceMat[weaker] > 1400 ) return 64;
 
     // decrease score in pure opposite bishops ending
-    if (MaterialBishop(p, stronger) 
-    && MaterialBishop(p, weaker)
+    if (PcMatBishop(p, stronger) 
+    && PcMatBishop(p, weaker)
     && BishopsAreDifferent(p) ) return 32; // 1/2
 	
 	if (p->pcCount[stronger][P] > 2 
@@ -60,8 +60,8 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 	   // KPK with edge pawn (else KBPK recognizer would break)
 	   if (p->pieceMat[stronger] == 0
 	   &&  p->pieceMat[weaker]   == 0
-	   &&  p->pcCount[stronger][P]  == 1
-	   &&  p->pcCount[weaker][P]  == 0) {
+	   &&  p->pcCount[stronger][P]  == 1  // TODO: all pawns of a stronger side on a rim
+	   &&  p->pcCount[weaker][P]  == 0) { // TODO: accept pawns for a weaker side
 
 	      if (bbPc(p, stronger, P) & bbFILE_H
           && bbPc(p, weaker, K)  & bbKingBlockH[stronger]) return 0;
@@ -72,8 +72,8 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 
 	   // KBPK(P) draws with edge pawn and wrong bishop
 	   if (p->pieceMat[stronger] == Data.matValue[B]
-	   &&  p->pieceMat[weaker]   == 0
-	   &&  p->pcCount[stronger][P]  == 1 ) {
+	   &&  p->pieceMat[weaker]   == 0        // TODO: accept pawns for a weaker side
+	   &&  p->pcCount[stronger][P]  == 1 ) { // TODO: all pawns of a stronger side on a rim
 
 	      if (bbPc(p, stronger, P) & bbFILE_H
           && NotOnBishColor(p, stronger, REL_SQ(H8,stronger))
@@ -86,8 +86,8 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
 
 	   // KBP vs Km is drawn when defending king stands on pawn's path 
        // and cannot be driven out by a Bishop
-       if (MaterialBishop(p, stronger)
-       &&  MaterialMinor(p, weaker)
+       if (PcMatBishop(p, stronger)
+       &&  PcMatMinor(p, weaker)
        &&  p->pcCount[stronger][P] == 1
        &&  p->pcCount[weaker][P] == 0
        &&  ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) )
@@ -105,14 +105,14 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
     if (p->pcCount[stronger][P] == 0 
     &&  p->pcCount[weaker  ][P] == 0) 
 	{
-      if (MaterialNN(p,stronger) ) return 0;
+      if (PcMatNN(p,stronger) ) return 0;
 
 	  // low and almost equal material, except KBB vs KN:     1/8
-	  if ( MaterialRook(p, stronger)  && MaterialRook(p, weaker) ) return 8;
-	  if ( MaterialQueen(p, stronger) && MaterialQueen(p, weaker) ) return 8;
-	  if ( MaterialRookMinor(p, stronger) && MaterialRookMinor(p, weaker) ) return 8;
-	  if ( MaterialBN(p, stronger) && ( MaterialMinor (p, weaker) || MaterialRook(p, weaker) ) ) return 8;
-	  if ( MaterialBB(p, stronger) && ( MaterialBishop(p, weaker) || MaterialRook(p, weaker) ) ) return 8;
+	  if ( PcMatRook(p, stronger)  && PcMatRook(p, weaker) ) return 8;
+	  if ( PcMatQueen(p, stronger) && PcMatQueen(p, weaker) ) return 8;
+	  if ( PcMatRookMinor(p, stronger) && PcMatRookMinor(p, weaker) ) return 8;
+	  if ( PcMatBN(p, stronger) && ( PcMatMinor (p, weaker) || PcMatRook(p, weaker) ) ) return 8;
+	  if ( PcMatBB(p, stronger) && ( PcMatBishop(p, weaker) || PcMatRook(p, weaker) ) ) return 8;
 	}
 
 	if (p->pcCount[stronger][P] == 0 ) {
@@ -122,21 +122,32 @@ int sEvaluator::SetDegradationFactor(sPosition *p, int stronger)
        && p->pieceMat[weaker] > 0 ) return 16; // 1/4
 
        // it's hard to win with a rook and a minor against a rook/rook + pawns
-       if (MaterialRookMinor(p, stronger) 
-       && MaterialRook(p, weaker) ) return 16; // 1/4
+       if (PcMatRookMinor(p, stronger) 
+       && PcMatRook(p, weaker) ) return 16; // 1/4
 
        // it's hard to win with a queen and a minor against a queen/queen + pawns
-       if ( MaterialQueenMinor(p, stronger) 
-       && MaterialQueen(p, weaker) ) return 32; // 1/2
+       if ( PcMatQueenMinor(p, stronger) 
+       && PcMatQueen(p, weaker) ) return 32; // 1/2
+	}
+
+	// rare KNPK draw rule
+	if (PcMatKnight(p, stronger) 
+    &&  PcMatNone(p, weaker)
+    &&  p->pcCount[stronger][P] == 1
+    &&  p->pcCount[weaker][P] == 0 ) {
+        if ( ( RelSqBb(A7,stronger) & bbPc(p, stronger, P) )
+		&&   ( RelSqBb(A8,stronger) & bbPc(p, weaker, K) ) ) return 0; // dead draw
+        if ( ( RelSqBb(H7,stronger) & bbPc(p, stronger, P) )
+		&&   ( RelSqBb(H8,stronger) & bbPc(p, weaker, K) ) ) return 0; // dead draw
 	}
 
     // some special rules for rook endgame with one pawn
-    if (MaterialRook(p, stronger)
-    &&  MaterialRook(p, weaker)
+    if (PcMatRook(p, stronger)
+    &&  PcMatRook(p, weaker)
     &&  p->pcCount[stronger][P] == 1
     &&  p->pcCount[weaker][P] == 0
   ) {
-      // good defensive position with a king on pawn's path
+      // good defensive position with a king on pawn's path increases drawing chances
 	  if ( ( SqBb(p->kingSquare[weaker]) & GetFrontSpan( bbPc(p, stronger, P), stronger ) ) ) 
 	      return 32; // 1/2
 
@@ -179,45 +190,49 @@ int NotOnBishColor(sPosition * p, int bishSide, int sq)
     return 0;
 }
 
-int MaterialKnight(sPosition *p, int side) {
+int PcMatNone(sPosition *p, int side) {
+	return ( p->pieceMat[side] == 0 );
+}
+
+int PcMatKnight(sPosition *p, int side) {
    return ( p->pieceMat[side] == Data.matValue[N] );
 }
 
-int MaterialBishop(sPosition *p, int side) {
+int PcMatBishop(sPosition *p, int side) {
    return ( p->pieceMat[side] == Data.matValue[B] );
 }
 
-int MaterialMinor(sPosition *p, int side) {
+int PcMatMinor(sPosition *p, int side) {
    return ( (p->pieceMat[side] ==  Data.matValue[B]) 
 	 || (p->pieceMat[side] ==  Data.matValue[N]) );
 }
 
-int MaterialRook(sPosition *p, int side) {
+int PcMatRook(sPosition *p, int side) {
    return ( p->pieceMat[side] == Data.matValue[R] );
 }
 
-int MaterialRookMinor(sPosition *p, int side) {
+int PcMatRookMinor(sPosition *p, int side) {
    return (    (p->pieceMat[side] == Data.matValue[R] + Data.matValue[B]) 
    || (p->pieceMat[side] == Data.matValue[R] + Data.matValue[N]) );
 }
 
-int MaterialQueen(sPosition *p, int side) {
+int PcMatQueen(sPosition *p, int side) {
    return ( p->pieceMat[side] == Data.matValue[Q] );
 }
 
-int MaterialQueenMinor(sPosition *p, int side) {
+int PcMatQueenMinor(sPosition *p, int side) {
     return (    (p->pieceMat[side] == Data.matValue[Q] + Data.matValue[B]) 
-	         || (p->pieceMat[side] == Data.matValue[Q] + Data.matValue[N]) );
+	     || (p->pieceMat[side] == Data.matValue[Q] + Data.matValue[N]) );
 }
 
-int MaterialNN(sPosition *p, int side) {
+int PcMatNN(sPosition *p, int side) {
     return ( p->pieceMat[side] == 2*Data.matValue[N] );
 }
 
-int MaterialBB(sPosition *p, int side) {
+int PcMatBB(sPosition *p, int side) {
     return ( p->pieceMat[side] == 2*Data.matValue[B] );
 }
 
-int MaterialBN(sPosition *p, int side) {
+int PcMatBN(sPosition *p, int side) {
 	return ( p->pieceMat[side] == Data.matValue[B] + Data.matValue[N] );
 }
