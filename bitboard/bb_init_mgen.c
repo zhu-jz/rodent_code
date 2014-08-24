@@ -32,21 +32,21 @@ void InitKindergartenBitboards()
    int i, j, k, l, x, y;
 
    // init masks
-   for (i = 0; i < 64; i++) {
+   for (int sq = 0; sq < 64; sq++) {
 
 	  // line masks
-      bbLineMask[HOR][i] = bbRANK_1 << (i & 070);
-      bbLineMask[VER][i] = bbFILE_A << (i & 007);
+      bbLineMask[HOR][sq] = bbRANK_1 << (sq & 070);
+      bbLineMask[VER][sq] = bbFILE_A << (sq & 007);
 
 	  // 1st set of diagonal masks
-      j = File(i) - Rank(i);
-      if (j > 0) bbLineMask[DIAG_AH][i] = bbDIAG_A1H8 >> (j * 8);
-      else       bbLineMask[DIAG_AH][i] = bbDIAG_A1H8 << (-j * 8);
+      j = File(sq) - Rank(sq);
+      if (j > 0) bbLineMask[DIAG_AH][sq] = bbDIAG_A1H8 >> (j * 8);
+      else       bbLineMask[DIAG_AH][sq] = bbDIAG_A1H8 << (-j * 8);
 
 	  // 2nd set of diagonal masks
-      j = File(i) - (RANK_8 - Rank(i));
-      if (j > 0) bbLineMask[DIAG_HA][i] = bbDIAG_A8H1 << (j * 8);
-      else       bbLineMask[DIAG_HA][i] = bbDIAG_A8H1 >> (-j * 8);
+      j = File(sq) - (RANK_8 - Rank(sq));
+      if (j > 0) bbLineMask[DIAG_HA][sq] = bbDIAG_A8H1 << (j * 8);
+      else       bbLineMask[DIAG_HA][sq] = bbDIAG_A8H1 >> (-j * 8);
    }
 
    // init sliding piece attacks
